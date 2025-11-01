@@ -1,0 +1,24 @@
+# PostgreSQL configuration for Active Record.
+# Ensure the database server is running and credentials are correct.
+
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+  username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "") %>
+  host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
+
+development:
+  <<: *default
+  database: ban_hang_development
+
+test:
+  <<: *default
+  database: ban_hang_test
+
+production:
+  <<: *default
+  database: ban_hang_production
+  username: <%= ENV.fetch("BAN_HANG_DATABASE_USER", "") %>
+  password: <%= ENV.fetch("BAN_HANG_DATABASE_PASSWORD", "") %>
