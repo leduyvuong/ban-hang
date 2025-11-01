@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>BanHang</title>
+    <meta charset="utf-8">
+    <title><%= page_title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="<%= page_description %>">
+    <link rel="canonical" href="<%= canonical_url %>">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -13,14 +16,15 @@
   <body class="min-h-screen bg-gray-50 text-gray-900">
     <header class="bg-white border-b border-gray-200">
       <div class="container mx-auto px-4">
-        <nav class="flex flex-wrap items-center justify-between gap-4 py-4 md:flex-nowrap">
+        <nav class="flex flex-wrap items-center justify-between gap-4 py-4 md:flex-nowrap" aria-label="Primary">
           <div class="flex items-center space-x-2">
-            <span class="text-2xl font-semibold text-indigo-600">BanHang</span>
+            <a href="/" class="text-2xl font-semibold text-indigo-600">BanHang</a>
           </div>
-          <form action="#" method="get" class="order-3 w-full md:order-none md:flex-1 md:px-8">
+          <form action="#" method="get" class="order-3 w-full md:order-none md:flex-1 md:px-8" role="search">
             <div class="relative">
-              <input type="search" name="q" placeholder="Search products..." class="w-full rounded-full border border-gray-300 bg-gray-100 py-2 pl-4 pr-10 text-sm focus:border-indigo-500 focus:bg-white focus:outline-none">
-              <span class="absolute inset-y-0 right-3 flex items-center text-gray-400">
+              <label for="global-search" class="sr-only">Search products</label>
+              <input id="global-search" type="search" name="q" placeholder="Search products..." class="w-full rounded-full border border-gray-300 bg-gray-100 py-2 pl-4 pr-10 text-sm focus:border-indigo-500 focus:bg-white focus:outline-none">
+              <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0a7.5 7.5 0 1 0-10.607-10.607 7.5 7.5 0 0 0 10.608 10.607Z" />
                 </svg>
@@ -40,7 +44,7 @@
       </div>
     </header>
 
-    <main>
+    <main class="grow">
       <section class="bg-gradient-to-r from-indigo-500 to-purple-500 py-16 text-white">
         <div class="container mx-auto px-4 text-center">
           <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Discover your next favourite products</h1>
