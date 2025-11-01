@@ -6,14 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="<%= page_description %>">
     <link rel="canonical" href="<%= canonical_url %>">
+    <% if meta_robots.present? %>
+      <meta name="robots" content="<%= meta_robots %>">
+    <% end %>
+    <% og = open_graph_tags %>
+    <meta property="og:type" content="<%= og[:type] %>">
+    <meta property="og:title" content="<%= og[:title] %>">
+    <meta property="og:description" content="<%= og[:description] %>">
+    <meta property="og:url" content="<%= og[:url] %>">
+    <% if og[:image].present? %>
+      <meta property="og:image" content="<%= og[:image] %>">
+    <% end %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "application.tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+    <%= yield :structured_data %>
   </head>
-  <body class="min-h-screen bg-gray-50 text-gray-900">
+  <body class="min-h-screen bg-gray-50 text-gray-900" data-controller="cart" data-cart-add-url-value="<%= add_item_cart_path %>" data-cart-update-url-value="<%= update_item_cart_path %>" data-cart-remove-url-value="<%= remove_item_cart_path %>" data-cart-clear-url-value="<%= clear_cart_path %>" data-cart-mini-url-value="<%= mini_cart_path(format: :json) %>">
     <header class="bg-white border-b border-gray-200">
       <div class="container mx-auto px-4">
         <nav class="flex flex-wrap items-center justify-between gap-4 py-4 md:flex-nowrap" aria-label="Primary">
@@ -32,40 +43,53 @@
             </div>
           </form>
           <div class="flex items-center space-x-4">
-            <a href="#" class="relative inline-flex items-center justify-center rounded-full bg-indigo-50 p-2 text-indigo-600 transition hover:bg-indigo-100">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437m0 0 1.035 3.878M7.5 14.25h10.128c.621 0 1.166-.401 1.342-.996l1.71-5.7a1.125 1.125 0 0 0-1.075-1.454H5.192m2.18 8.15L5.25 5.272m2.122 8.978L4.5 18.75m0 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm12-1.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z" />
-              </svg>
-              <span class="absolute -top-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-semibold text-white">3</span>
-            </a>
-            <a href="#" class="rounded-full bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow transition hover:bg-indigo-500">Login</a>
+            <div data-cart-target="mini">
+              <%= render partial: "cart/mini", locals: { cart: current_cart } %>
+            </div>
+            <% if logged_in? %>
+              <details class="group relative">
+                <summary class="flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-indigo-200 hover:text-indigo-600">
+                  <span class="hidden sm:inline">Hi, <%= current_user.name.split.first %></span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </summary>
+                <div class="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
+                  <div class="border-b border-gray-100 px-4 py-3 text-xs text-gray-500">
+                    Signed in as <span class="font-semibold text-gray-700"><%= current_user.email %></span>
+                  </div>
+                  <nav class="px-2 py-2 text-sm text-gray-700">
+                    <%= link_to "My orders", orders_path, class: "block rounded-xl px-3 py-2 transition hover:bg-indigo-50 hover:text-indigo-600" %>
+                    <%= link_to "Profile", edit_profile_path, class: "block rounded-xl px-3 py-2 transition hover:bg-indigo-50 hover:text-indigo-600" %>
+                    <% if admin? %>
+                      <%= link_to "Admin dashboard", admin_root_path, class: "block rounded-xl px-3 py-2 transition hover:bg-indigo-50 hover:text-indigo-600" %>
+                    <% end %>
+                    <%= button_to "Logout", session_path, method: :delete, class: "mt-2 w-full rounded-xl px-3 py-2 text-left text-red-600 transition hover:bg-red-50", form: { class: "px-2 pb-2" } %>
+                  </nav>
+                </div>
+              </details>
+            <% else %>
+              <div class="flex items-center gap-3">
+                <%= link_to "Login", new_session_path, class: "rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-indigo-200 hover:text-indigo-600" %>
+                <%= link_to "Register", new_registration_path, class: "rounded-full bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow transition hover:bg-indigo-500" %>
+              </div>
+            <% end %>
           </div>
         </nav>
       </div>
     </header>
 
+    <%= render "shared/flash" %>
+
     <main class="grow">
-      <section class="bg-gradient-to-r from-indigo-500 to-purple-500 py-16 text-white">
-        <div class="container mx-auto px-4 text-center">
-          <h1 class="text-4xl font-bold tracking-tight sm:text-5xl">Discover your next favourite products</h1>
-          <p class="mt-4 text-lg text-indigo-100">Shop curated selections with fast delivery and responsive support.</p>
-          <div class="mt-8 flex justify-center">
-            <a href="#" class="rounded-full bg-white px-6 py-3 text-sm font-semibold text-indigo-600 shadow transition hover:bg-indigo-50">Start exploring</a>
-          </div>
-        </div>
-      </section>
-
-      <section class="py-12">
-        <div class="container mx-auto px-4">
-          <%= yield %>
-        </div>
-      </section>
-    </main>
-
-    <footer class="bg-white border-t border-gray-200 py-6">
-      <div class="container mx-auto px-4 text-center text-sm text-gray-500">
-        &copy; <%= Time.current.year %> BanHang. All rights reserved.
+      <div class="container mx-auto px-4 py-12 sm:py-16">
+        <%= yield %>
       </div>
-    </footer>
+    </main>
+    <%= render "shared/footer" %>
+    <div data-cart-target="drawer" class="hidden">
+      <%= render partial: "cart/drawer", locals: { cart: current_cart } %>
+    </div>
+    <div class="pointer-events-none fixed top-5 right-5 z-50 space-y-3" data-cart-target="notifications"></div>
   </body>
 </html>

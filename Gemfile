@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "3.4.4"
+ruby "3.4.3"
 
 # Rails framework and essential gems for the storefront
 
@@ -14,8 +14,9 @@ gem "stimulus-rails"
 gem "importmap-rails"
 gem "sprockets-rails"
 gem "jbuilder"
-gem "tailwindcss-rails"
+gem "tailwindcss-rails", "~> 2.0"
 gem "bootsnap", require: false
+gem "bcrypt", "~> 3.1"
 
 group :development, :test do
   gem "debug", platforms: %i[mri truffleruby]
@@ -25,6 +26,7 @@ group :development do
   gem "web-console"
   gem "rack-mini-profiler"
   gem "listen"
+  gem "rubocop", require: false
 end
 
 group :test do

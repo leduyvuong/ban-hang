@@ -1,0 +1,12 @@
+<section class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-lg">
+  <div class="absolute -left-10 top-1/2 hidden h-40 w-40 -translate-y-1/2 rounded-full bg-white/10 blur-2xl lg:block"></div>
+  <div class="absolute -right-16 top-1/2 hidden h-48 w-48 -translate-y-1/2 rounded-full bg-white/10 blur-3xl lg:block"></div>
+  <div class="relative mx-auto flex flex-col items-center justify-between gap-6 px-6 py-10 text-center sm:flex-row sm:text-left lg:px-10">
+    <div class="max-w-2xl space-y-2">
+      <span class="inline-flex items-center rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em]">Special Offer!</span>
+      <h2 class="text-2xl font-bold">Flash sale – up to 40% off select collections</h2>
+      <p class="text-sm text-white/90">Limited-time discounts on best-selling essentials. Grab them before the sale ends Sunday at midnight.</p>
+    </div>
+    <%= link_to "Browse sale items", products_path(sort: "price_low_high"), class: "inline-flex items-center justify-center rounded-full bg-white px-5 py-2 text-sm font-semibold text-amber-600 shadow transition hover:-translate-y-0.5 hover:shadow-lg" %>
+  </div>
+</section>

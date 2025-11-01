@@ -1,0 +1,22 @@
+<div class="fixed inset-0 z-50 flex items-end justify-end bg-black/40 backdrop-blur-sm md:items-start" role="dialog" aria-modal="true">
+  <div class="absolute inset-0" data-action="click->cart#closeDrawer"></div>
+  <div class="relative h-full w-full max-w-md overflow-hidden bg-white shadow-2xl ring-1 ring-black/5 md:h-auto md:max-h-full md:rounded-l-3xl" data-cart-target="drawerPanel">
+    <header class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900">Your cart</h2>
+        <p class="text-sm text-gray-500"><%= pluralize(cart.total_items, "item") %></p>
+      </div>
+      <button type="button" class="rounded-full bg-gray-100 p-2 text-gray-500 transition hover:bg-gray-200 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" aria-label="Close cart" data-action="click->cart#closeDrawer">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </header>
+    <div class="max-h-[65vh] overflow-y-auto px-6 py-4" data-cart-target="drawerContent">
+      <%= render partial: "cart/items", locals: { cart: cart, compact: true } %>
+    </div>
+    <div class="border-t border-gray-200 px-6 py-4">
+      <%= render partial: "cart/summary", locals: { cart: cart, compact: true } %>
+    </div>
+  </div>
+</div>

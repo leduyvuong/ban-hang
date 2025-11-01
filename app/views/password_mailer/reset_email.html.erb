@@ -1,0 +1,8 @@
+<h1 style="font-size: 20px; margin-bottom: 12px;">Reset your BanHang password</h1>
+<p style="margin: 0 0 12px 0;">Hi <%= @user.name %>,</p>
+<p style="margin: 0 0 12px 0;">We received a request to reset your BanHang password. Click the button below to choose a new password. This link will expire in 2 hours.</p>
+<p style="margin: 20px 0;">
+  <a href="<%= @reset_url %>" style="background-color: #4f46e5; color: #fff; padding: 10px 16px; border-radius: 9999px; text-decoration: none; font-weight: 600;">Reset password</a>
+</p>
+<p style="margin: 0 0 12px 0;">If you didn't request a reset, you can safely ignore this email.</p>
+<p style="margin: 0;">Thanks,<br>BanHang Support</p>

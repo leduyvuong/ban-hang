@@ -1,0 +1,25 @@
+<turbo-frame id="newsletter_form">
+  <div class="space-y-4">
+    <div class="space-y-2">
+      <h2 class="text-2xl font-semibold text-gray-900">Subscribe to our newsletter</h2>
+      <p class="text-sm text-gray-500">Get exclusive offers and the latest product updates straight to your inbox.</p>
+    </div>
+
+    <% if newsletter_subscription.errors.any? %>
+      <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <p class="font-semibold">We couldn't subscribe you just yet:</p>
+        <ul class="mt-1 list-disc pl-5">
+          <% newsletter_subscription.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: newsletter_subscription, url: newsletter_subscriptions_path, data: { turbo_frame: "newsletter_form" }, class: "flex flex-col gap-3 sm:flex-row" do |form| %>
+      <%= form.email_field :email, placeholder: "Enter your email", class: "w-full rounded-full border border-gray-200 px-5 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      <%= form.submit "Subscribe", class: "inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-indigo-500" %>
+    <% end %>
+    <p class="text-xs text-gray-400">We respect your privacy. Unsubscribe anytime.</p>
+  </div>
+</turbo-frame>

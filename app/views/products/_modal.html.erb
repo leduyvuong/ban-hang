@@ -1,0 +1,53 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center px-4 py-10 sm:px-6" data-product-modal-target="overlay" data-action="keydown.escape->product-modal#close">
+  <div class="absolute inset-0 bg-gray-900/70 backdrop-blur-sm" data-product-modal-target="backdrop" data-action="click->product-modal#close"></div>
+  <div class="relative max-h-full w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5" role="dialog" aria-modal="true" aria-labelledby="product-modal-title" data-product-modal-target="panel">
+    <button type="button" class="absolute right-5 top-5 inline-flex items-center justify-center rounded-full bg-gray-100 p-2 text-gray-500 transition hover:bg-gray-200 hover:text-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" aria-label="Close quick view" data-action="product-modal#close">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75l10.5 10.5m0-10.5-10.5 10.5" />
+      </svg>
+    </button>
+
+    <div class="grid gap-6 p-6 sm:grid-cols-[1fr_1fr] sm:p-8">
+      <div class="overflow-hidden rounded-2xl bg-gray-100">
+        <% if product.image_url.present? %>
+          <img src="<%= product.image_url %>" alt="<%= product.name %>" class="h-full w-full object-cover">
+        <% else %>
+          <div class="flex h-full min-h-[220px] items-center justify-center text-gray-400">
+            <span>No image available</span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="space-y-4">
+        <header class="space-y-2">
+          <% if product.category.present? %>
+            <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-600"><%= product.category.name %></span>
+          <% end %>
+          <h2 id="product-modal-title" class="text-2xl font-semibold text-gray-900"><%= product.name %></h2>
+          <% if product.short_description.present? %>
+            <p class="text-sm text-gray-600"><%= product.short_description %></p>
+          <% end %>
+          <p class="text-lg font-semibold text-indigo-600"><%= number_to_currency(product.price) %></p>
+        </header>
+
+        <% if product.description.present? %>
+          <div class="max-h-40 overflow-y-auto text-sm text-gray-700">
+            <%= simple_format(product.description) %>
+          </div>
+        <% end %>
+
+        <div class="flex flex-wrap gap-3">
+          <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" data-action="click->cart#addItem" data-cart-product-id-param="<%= product.to_param %>" data-cart-quantity-param="1" data-product-id="<%= product.to_param %>" data-quantity="1">
+            Add to cart
+          </button>
+          <a href="<%= product_path(product) %>" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
+            View full details
+          </a>
+          <button type="button" class="inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-indigo-400 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" data-action="product-modal#close">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

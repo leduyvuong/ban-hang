@@ -1,0 +1,39 @@
+<% compact = local_assigns.fetch(:compact, false) %>
+<% cart.preload_products %>
+<% total_items = cart.total_items %>
+<% subtotal = cart.subtotal %>
+
+<div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+  <div class="flex items-center justify-between">
+    <h2 class="text-lg font-semibold text-gray-900"><%= compact ? "Summary" : "Order summary" %></h2>
+    <span class="text-sm text-gray-500"><%= pluralize(total_items, "item") %></span>
+  </div>
+
+  <% if cart.empty? %>
+    <p class="mt-4 text-sm text-gray-500">No items yet. Add something to unlock checkout.</p>
+    <div class="mt-6 flex flex-col gap-3">
+      <%= link_to "Continue shopping", products_path, class: "inline-flex items-center justify-center rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500" %>
+    </div>
+  <% else %>
+    <dl class="mt-4 space-y-3 text-sm text-gray-600">
+      <div class="flex items-center justify-between">
+        <dt>Subtotal</dt>
+        <dd class="font-semibold text-gray-900"><%= number_to_currency(subtotal) %></dd>
+      </div>
+      <div class="flex items-center justify-between">
+        <dt>Shipping</dt>
+        <dd class="text-gray-500">Calculated at checkout</dd>
+      </div>
+    </dl>
+
+    <div class="mt-6 space-y-3">
+      <% if compact %>
+        <%= link_to "Review cart", cart_path, class: "inline-flex w-full items-center justify-center rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500" %>
+        <%= link_to "Continue shopping", products_path, class: "inline-flex w-full items-center justify-center rounded-full border border-indigo-200 px-4 py-2 text-sm font-semibold text-indigo-600 transition hover:border-indigo-400 hover:text-indigo-700" %>
+      <% else %>
+        <%= link_to "Proceed to checkout", checkout_path, class: "inline-flex w-full items-center justify-center rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500" %>
+        <%= link_to "Continue shopping", products_path, class: "inline-flex w-full items-center justify-center rounded-full border border-indigo-200 px-4 py-2 text-sm font-semibold text-indigo-600 transition hover:border-indigo-400 hover:text-indigo-700" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

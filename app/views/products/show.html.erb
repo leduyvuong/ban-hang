@@ -1,0 +1,97 @@
+<% breadcrumb_items = [
+  { name: "Home", path: root_path, url: root_url },
+  { name: "Products", path: products_path, url: products_url },
+  { name: @product.name, path: product_path(@product), url: product_url(@product) }
+] %>
+
+<% content_for :structured_data do %>
+  <%# The layout yields :structured_data, so this script is injected into <head> for SEO crawlers. %>
+  <% breadcrumb_json_ld = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumb_items.each_with_index.map { |item, index|
+      {
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": item[:name],
+        "item": item[:url]
+      }
+    }
+  } %>
+  <script type="application/ld+json">
+    <%= breadcrumb_json_ld.to_json.html_safe %>
+  </script>
+<% end %>
+
+<nav class="text-sm text-gray-500" aria-label="Breadcrumb">
+  <ol class="flex flex-wrap items-center gap-1">
+    <% breadcrumb_items.each_with_index do |item, index| %>
+      <li class="flex items-center gap-1">
+        <% if index.zero? %>
+          <a href="<%= item[:path] %>" class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-1 font-medium text-gray-700 transition hover:bg-indigo-100 hover:text-indigo-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+            </svg>
+            <span><%= item[:name] %></span>
+          </a>
+        <% elsif index == breadcrumb_items.size - 1 %>
+          <span aria-current="page" class="rounded-full bg-indigo-600 px-3 py-1 font-semibold text-white"><%= item[:name] %></span>
+        <% else %>
+          <a href="<%= item[:path] %>" class="rounded-full bg-gray-100 px-3 py-1 font-medium text-gray-700 transition hover:bg-indigo-100 hover:text-indigo-600"><%= item[:name] %></a>
+        <% end %>
+      </li>
+      <% unless index == breadcrumb_items.size - 1 %>
+        <li aria-hidden="true" class="text-gray-400">/</li>
+      <% end %>
+    <% end %>
+  </ol>
+</nav>
+
+<article class="mt-6 grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+  <div class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200">
+    <% if @product.image_url.present? %>
+      <img src="<%= @product.image_url %>" alt="<%= @product.name %>" class="h-full w-full object-cover">
+    <% else %>
+      <div class="flex h-full min-h-[320px] items-center justify-center bg-gray-100 text-gray-400">
+        <span class="text-lg">No product image yet</span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="space-y-6">
+    <header class="space-y-3">
+      <% if @product.category.present? %>
+        <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-600"><%= @product.category.name %></span>
+      <% end %>
+      <h1 class="text-4xl font-bold text-gray-900"><%= @product.name %></h1>
+      <% if @product.short_description.present? %>
+        <p class="text-lg text-gray-600"><%= @product.short_description %></p>
+      <% end %>
+      <p class="text-2xl font-semibold text-indigo-600"><%= number_to_currency(@product.price) %></p>
+    </header>
+
+    <% if @product.description.present? %>
+      <section class="prose max-w-none text-gray-700">
+        <%= simple_format(@product.description) %>
+      </section>
+    <% end %>
+
+    <div class="flex flex-wrap gap-3">
+      <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" data-action="click->cart#addItem" data-cart-product-id-param="<%= @product.to_param %>" data-cart-quantity-param="1" data-product-id="<%= @product.to_param %>" data-quantity="1">
+        Add to cart
+      </button>
+      <%= link_to "View cart", cart_path, class: "inline-flex items-center gap-2 rounded-full border border-indigo-200 px-5 py-2.5 text-sm font-semibold text-indigo-600 transition hover:border-indigo-400 hover:text-indigo-700" %>
+    </div>
+
+    <div data-controller="product-modal" data-product-modal-url-value="<%= modal_product_path(@product) %>" class="space-y-3">
+      <button type="button" data-action="product-modal#open" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 9V5.25m0 3.75A2.25 2.25 0 1 1 9 11.25m2.25-2.25A2.25 2.25 0 1 0 13.5 11.25m-2.25 0V18m0 0h2.25m-2.25 0H9" />
+        </svg>
+        Quick view
+      </button>
+      <p class="text-sm text-gray-500">The modal loads with AJAX from <code>/products/<%= @product.to_param %>/modal</code>, so the main product URL stays crawlable.</p>
+      <div data-product-modal-target="container"></div>
+    </div>
+  </div>
+</article>

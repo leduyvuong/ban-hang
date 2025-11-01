@@ -1,0 +1,26 @@
+<div class="space-y-8">
+  <header class="space-y-2">
+    <h1 class="text-3xl font-bold text-gray-900">Shopping cart</h1>
+    <p class="text-base text-gray-600">Adjust quantities, remove items, or continue shopping before you head to checkout.</p>
+  </header>
+
+  <div class="grid gap-8 lg:grid-cols-[2fr_1fr]">
+    <section class="space-y-6">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900">Cart items</h2>
+        <% unless @cart.empty? %>
+          <%= form_with url: clear_cart_path, method: :delete, local: true, html: { class: "inline" } do %>
+            <button class="text-sm font-medium text-red-500 transition hover:text-red-600" data-action="click->cart#clearCart">Clear cart</button>
+          <% end %>
+        <% end %>
+      </div>
+      <div data-cart-target="fullItems">
+        <%= render partial: "cart/items", locals: { cart: @cart, compact: false } %>
+      </div>
+    </section>
+
+    <aside class="space-y-4" data-cart-target="fullSummary">
+      <%= render partial: "cart/summary", locals: { cart: @cart, compact: false } %>
+    </aside>
+  </div>
+</div>

@@ -2,6 +2,18 @@
   <div class="max-w-3xl space-y-3">
     <h1 class="text-3xl font-bold text-gray-900">Products</h1>
     <p class="text-base text-gray-600">Discover hand-picked Vietnamese goods, then filter or sort the catalogue to see the most relevant items for you.</p>
+    <% if @featured_product %>
+      <div class="flex flex-wrap items-center gap-3 rounded-2xl bg-indigo-50/70 p-4 text-sm text-indigo-900">
+        <span class="rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">Featured</span>
+        <span>
+          <%= link_to @featured_product.name, product_path(@featured_product), class: "font-semibold underline decoration-indigo-400 underline-offset-4 transition hover:text-indigo-700" %>
+          <span class="ml-2 text-indigo-700">→</span>
+        </span>
+        <% if @featured_product.short_description.present? %>
+          <span class="block w-full text-indigo-800 sm:w-auto"><%= @featured_product.short_description %></span>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 
   <div class="grid gap-8 lg:grid-cols-[280px_1fr]">
@@ -11,12 +23,19 @@
           <h2 class="text-lg font-semibold text-gray-900">Filter by category</h2>
           <fieldset class="space-y-3">
             <legend class="sr-only">Product category</legend>
-            <% category_filters.each do |key, details| %>
-              <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm transition hover:border-indigo-400 <%= 'ring-2 ring-indigo-500 border-indigo-500 bg-indigo-50/60' if key == @selected_category %>">
-                <%= form.radio_button :category, key, checked: key == @selected_category, class: "mt-1", data: { action: "change->product-filters#submit" } %>
+            <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm transition hover:border-indigo-400 <%= 'ring-2 ring-indigo-500 border-indigo-500 bg-indigo-50/60' if @selected_category == 'all' %>">
+              <%= form.radio_button :category, "all", checked: @selected_category == "all", class: "mt-1", data: { action: "change->product-filters#submit" } %>
+              <span>
+                <span class="font-medium text-gray-900">All products</span>
+                <span class="block text-gray-500">Browse the full BanHang catalogue.</span>
+              </span>
+            </label>
+            <% categories.each do |category| %>
+              <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm transition hover:border-indigo-400 <%= 'ring-2 ring-indigo-500 border-indigo-500 bg-indigo-50/60' if category.slug == @selected_category %>">
+                <%= form.radio_button :category, category.slug, checked: category.slug == @selected_category, class: "mt-1", data: { action: "change->product-filters#submit" } %>
                 <span>
-                  <span class="font-medium text-gray-900"><%= details[:name] %></span>
-                  <span class="block text-gray-500"><%= details[:description] %></span>
+                  <span class="font-medium text-gray-900"><%= category.name %></span>
+                  <span class="block text-gray-500">See products curated for <%= category.name.downcase %>.</span>
                 </span>
               </label>
             <% end %>
@@ -37,9 +56,9 @@
         </section>
 
         <div class="flex flex-col gap-3 rounded-xl bg-indigo-50/60 p-4 text-sm text-indigo-900">
-          <h2 class="text-base font-semibold text-indigo-900">SEO tip</h2>
-          <p>Filters use query parameters like <code>?category=budget</code>, and each filtered response includes a canonical link back to the main listing. This keeps search engines focused on a single authoritative URL while still letting shoppers browse variations.</p>
-          <button type="submit" class="w-full rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500">Apply filters</button>
+          <h2 class="text-base font-semibold text-indigo-900">Tip</h2>
+          <p>Each filtered view keeps the canonical link pointed at the main products page so search engines stay focused on your primary URL.</p>
+          <button type="submit" class="w-full rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500">Update results</button>
         </div>
       <% end %>
     </aside>

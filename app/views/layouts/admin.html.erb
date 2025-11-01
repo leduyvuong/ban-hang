@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title><%= @admin_page_title ? "#{@admin_page_title} | Admin | BanHang" : "Admin | BanHang" %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900">
+    <%= render "shared/flash" %>
+
+    <div class="flex min-h-screen">
+      <aside class="hidden w-72 flex-shrink-0 border-r border-slate-200 bg-white/90 backdrop-blur-sm lg:flex">
+        <div class="flex w-full flex-col">
+          <div class="border-b border-slate-200 p-6">
+            <a href="<%= admin_root_path %>" class="flex items-center gap-2 text-lg font-semibold tracking-tight text-indigo-600">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5l9-4.5 9 4.5m-18 0 9 4.5m-9-4.5v9l9 4.5m0-9 9-4.5m-9 4.5v9m9-13.5v9l-9 4.5" />
+              </svg>
+              BanHang Admin
+            </a>
+            <p class="mt-2 text-sm text-slate-500">Manage products, orders, and store analytics.</p>
+            <% if current_user %>
+              <p class="mt-2 text-xs text-slate-400">Signed in as <span class="font-medium text-slate-600"><%= current_user.email %></span></p>
+            <% end %>
+          </div>
+
+          <nav class="flex-1 space-y-2 p-4 text-sm font-medium text-slate-600">
+            <%= link_to admin_root_path, class: admin_nav_class(admin_root_path) do %>
+              <span>Dashboard</span>
+            <% end %>
+            <%= link_to admin_products_path, class: admin_nav_class(admin_products_path) do %>
+              <span>Products</span>
+            <% end %>
+            <%= link_to admin_orders_path, class: admin_nav_class(admin_orders_path) do %>
+              <span>Orders</span>
+            <% end %>
+          </nav>
+
+          <footer class="border-t border-slate-200 p-4 text-xs text-slate-400">
+            &copy; <%= Time.current.year %> BanHang Admin Panel
+          </footer>
+        </div>
+      </aside>
+
+      <div class="flex w-full flex-col lg:pl-0">
+        <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur-sm">
+          <div class="flex items-center justify-between px-4 py-4 sm:px-6">
+            <div class="flex items-center gap-3">
+              <button type="button" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-2 text-slate-500 shadow-sm transition hover:border-indigo-200 hover:text-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 lg:hidden" data-controller="admin-sidebar" data-action="click->admin-sidebar#toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 6h16.5m-16.5 6h16.5" />
+                </svg>
+              </button>
+              <div>
+                <h1 class="text-xl font-semibold text-slate-900"><%= @admin_page_title || "Admin" %></h1>
+                <% if @admin_page_subtitle.present? %>
+                  <p class="text-sm text-slate-500"><%= @admin_page_subtitle %></p>
+                <% end %>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="hidden text-right text-xs text-slate-500 sm:block">
+                <p class="font-semibold text-slate-900"><%= current_user&.name %></p>
+                <p><%= current_user&.email %></p>
+              </div>
+              <a href="/" class="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600">Storefront</a>
+              <%= button_to "Logout", session_path, method: :delete, class: "rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100", form: { class: "inline" } %>
+            </div>
+          </div>
+        </header>
+
+        <main class="flex-1 px-4 py-6 sm:px-6 lg:px-10">
+          <% if @admin_page_actions.present? %>
+            <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 class="text-lg font-semibold text-slate-900"><%= @admin_page_title %></h2>
+                <% if @admin_page_subtitle.present? %>
+                  <p class="text-sm text-slate-500"><%= @admin_page_subtitle %></p>
+                <% end %>
+              </div>
+              <div class="flex items-center gap-2">
+                <%= raw @admin_page_actions %>
+              </div>
+            </div>
+          <% end %>
+          <%= yield %>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+<footer class="mt-20 bg-slate-900 text-slate-300">
+  <div class="mx-auto max-w-6xl px-6 py-12">
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="space-y-3">
+        <h3 class="text-lg font-semibold text-white">BanHang</h3>
+        <p class="text-sm text-slate-400">Your one-stop destination for thoughtfully curated products that blend style, comfort, and everyday functionality.</p>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-sm font-semibold uppercase tracking-wide text-white">Quick Links</h4>
+        <ul class="space-y-2 text-sm text-slate-400">
+          <li><%= link_to "Home", root_path, class: "hover:text-white" %></li>
+          <li><%= link_to "Products", products_path, class: "hover:text-white" %></li>
+          <li><%= link_to "About", "#", class: "hover:text-white" %></li>
+          <li><%= link_to "Contact", "#", class: "hover:text-white" %></li>
+          <li><%= link_to "FAQ", "#", class: "hover:text-white" %></li>
+        </ul>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-sm font-semibold uppercase tracking-wide text-white">Customer Service</h4>
+        <ul class="space-y-2 text-sm text-slate-400">
+          <li><%= link_to "Contact Us", "#", class: "hover:text-white" %></li>
+          <li><%= link_to "Returns", "#", class: "hover:text-white" %></li>
+          <li><%= link_to "Shipping Info", "#", class: "hover:text-white" %></li>
+          <li><%= link_to "Order Tracking", "#", class: "hover:text-white" %></li>
+        </ul>
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-sm font-semibold uppercase tracking-wide text-white">Follow Us</h4>
+        <ul class="space-y-2 text-sm text-slate-400">
+          <li><a href="#" class="inline-flex items-center gap-2 hover:text-white"><span>Instagram</span></a></li>
+          <li><a href="#" class="inline-flex items-center gap-2 hover:text-white"><span>Facebook</span></a></li>
+          <li><a href="#" class="inline-flex items-center gap-2 hover:text-white"><span>Twitter</span></a></li>
+          <li><a href="#" class="inline-flex items-center gap-2 hover:text-white"><span>LinkedIn</span></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="border-t border-slate-800 bg-slate-950">
+    <div class="mx-auto flex flex-col gap-3 px-6 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+      <p>&copy; <%= Time.current.year %> BanHang. All rights reserved.</p>
+      <div class="flex items-center gap-4">
+        <%= link_to "Privacy Policy", "#", class: "hover:text-white" %>
+        <%= link_to "Terms of Service", "#", class: "hover:text-white" %>
+      </div>
+    </div>
+  </div>
+</footer>

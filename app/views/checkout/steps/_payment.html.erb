@@ -1,0 +1,54 @@
+<div class="space-y-6 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+  <div class="space-y-1">
+    <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Step 3 of 3</p>
+    <h2 class="text-xl font-semibold text-gray-900"><%= order_complete ? "Order placed" : "Payment" %></h2>
+    <p class="text-sm text-gray-500">
+      <% if order_complete %>
+        We simulated your payment and finalized the order. Thank you for shopping with BanHang!
+      <% else %>
+        No payment is required for this demo – simply confirm to place your order.
+      <% end %>
+    </p>
+  </div>
+
+  <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-700">
+    <p class="font-semibold text-gray-900">Shipping to</p>
+    <p class="mt-2"><%= shipping_form.name %></p>
+    <p><%= shipping_form.address %></p>
+    <p><%= shipping_form.city %>, <%= shipping_form.postal_code %></p>
+    <p class="mt-2 text-gray-500">Phone: <%= shipping_form.phone %></p>
+  </div>
+
+  <div class="rounded-2xl border border-gray-100 bg-gray-50 p-4 text-sm text-gray-600">
+    <div class="flex items-center justify-between">
+      <span class="font-semibold text-gray-900">Items total</span>
+      <span class="font-semibold text-gray-900"><%= number_to_currency(current_cart.subtotal) %></span>
+    </div>
+    <div class="mt-2 flex items-center justify-between text-xs text-gray-500">
+      <span>Shipping</span>
+      <span>Calculated at delivery</span>
+    </div>
+  </div>
+
+  <% if order_complete %>
+    <div class="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+      <p class="font-semibold">Success!</p>
+      <p>Your order confirmation has been recorded. This demo does not charge any card.</p>
+    </div>
+    <div class="flex items-center justify-end gap-3">
+      <%= link_to "Continue shopping", products_path, class: "rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500" %>
+    </div>
+  <% else %>
+    <div class="flex items-center justify-between text-sm text-gray-500">
+      <span>Payment method</span>
+      <span>Demo checkout</span>
+    </div>
+    <div class="flex items-center justify-end gap-3">
+      <%= link_to "Back", checkout_path(step: 2), data: { turbo_frame: "checkout_steps" }, class: "rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
+      <%= form_with url: checkout_path, method: :patch, data: { turbo_frame: "checkout_steps" }, class: "inline" do %>
+        <%= hidden_field_tag :step, "payment" %>
+        <button type="submit" class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500">Place order</button>
+      <% end %>
+    </div>
+  <% end %>
+</div>

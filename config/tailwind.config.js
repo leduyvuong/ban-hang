@@ -1,17 +1,18 @@
-const defaultTheme = require("tailwindcss/defaultTheme")
+const defaultTheme = require('tailwindcss/defaultTheme')
 
 module.exports = {
   content: [
-    "./app/views/**/*.{erb,html,rb}",
-    "./app/helpers/**/*.rb",
-    "./app/javascript/**/*.{js,jsx,ts,tsx}"
+    './public/*.html',
+    './app/helpers/**/*.rb',
+    './app/javascript/**/*.js',
+    './app/views/**/*.{erb,haml,html,slim}'
   ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", ...defaultTheme.fontFamily.sans]
-      }
-    }
+        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+      },
+    },
   },
   plugins: []
 }

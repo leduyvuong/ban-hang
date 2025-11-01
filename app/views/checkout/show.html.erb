@@ -1,0 +1,16 @@
+<div class="space-y-8">
+  <header class="space-y-2">
+    <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
+    <p class="text-sm text-gray-500">Complete your shipping details and review your items before placing the order.</p>
+  </header>
+
+  <div class="grid gap-8 lg:grid-cols-[2fr_1fr]">
+    <turbo-frame id="checkout_steps">
+      <%= render "checkout/step", step: @step, shipping_form: @shipping_form, order_complete: @order_complete %>
+    </turbo-frame>
+
+    <aside class="space-y-4">
+      <%= render "checkout/order_summary", cart: current_cart %>
+    </aside>
+  </div>
+</div>

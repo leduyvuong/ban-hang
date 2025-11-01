@@ -1,0 +1,6 @@
+<div class="flex items-center gap-2">
+  <% actions.each do |action| %>
+    <% classes = action[:style] == "primary" ? "inline-flex items-center gap-1 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" : "inline-flex items-center gap-1 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
+    <%= link_to action[:label], action[:url], class: classes %>
+  <% end %>
+</div>
