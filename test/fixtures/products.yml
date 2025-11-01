@@ -1,0 +1,11 @@
+one:
+  name: Sample Product
+  description: MyText
+  price: 9.99
+  image_url: https://example.com/sample.jpg
+
+two:
+  name: Another Product
+  description: Another description
+  price: 19.99
+  image_url: https://example.com/another.jpg

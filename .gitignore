@@ -1,0 +1,33 @@
+# Ignore bundler config.
+/.bundle
+
+# Ignore the default SQLite database.
+/db/*.sqlite3
+/db/*.sqlite3-journal
+
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+/public/assets
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+.byebug_history
+
+/storage/*
+!/storage/.keep
+
+/vendor/bundle
+
+# dotenv environment variables file
+.env
+.env.local
+.env.*.local
+
+# Rails credentials
+/config/master.key
+/config/credentials.yml.enc

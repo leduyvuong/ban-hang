@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# frozen_string_literal: true
+
+if ! command -v foreman >/dev/null 2>&1; then
+  echo "foreman is required to run bin/dev. Install with: gem install foreman" >&2
+  exit 1
+fi
+
+foreman start -f Procfile.dev "$@"
