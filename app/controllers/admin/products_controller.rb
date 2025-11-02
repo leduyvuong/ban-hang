@@ -6,7 +6,19 @@ module Admin
     before_action :load_categories, only: %i[new create edit update]
 
     def index
-      @products = Product.order(created_at: :desc)
+      @query = params[:query].to_s.strip
+      @category_filter = params[:category].presence
+      @stock_filter = params[:stock_status].presence
+
+      scope = Product.includes(:category, image_attachment: { blob: :variant_records })
+      scope = scope.matching_query(@query)
+      scope = scope.with_category_slug(@category_filter) if @category_filter.present?
+      scope = scope.with_stock_status(@stock_filter) if @stock_filter.present?
+      scope = scope.order(created_at: :desc)
+
+      @pagy, @products = pagy(scope, items: 20)
+      @categories = Category.order(:name)
+
       set_admin_page(
         title: "Products",
         subtitle: "Manage your catalogue",
@@ -26,6 +38,7 @@ module Admin
       if @product.save
         redirect_to admin_product_path(@product), notice: "Product created successfully."
       else
+        flash.now[:error] = @product.errors.full_messages.to_sentence
         set_admin_page(title: "New product", subtitle: "Add a product to your catalogue")
         render :new, status: :unprocessable_entity
       end
@@ -40,9 +53,12 @@ module Admin
     end
 
     def update
+      purge_image_if_requested
+
       if @product.update(product_params)
         redirect_to admin_product_path(@product), notice: "Product updated successfully."
       else
+        flash.now[:error] = @product.errors.full_messages.to_sentence
         set_admin_page(title: "Edit product", subtitle: @product.name)
         render :edit, status: :unprocessable_entity
       end
@@ -60,11 +76,19 @@ module Admin
     end
 
     def product_params
-      params.require(:product).permit(:name, :description, :short_description, :price, :stock, :image_url, :category_id)
+      params.require(:product).permit(:name, :description, :short_description, :price, :stock, :image, :category_id)
     end
 
     def load_categories
-      @categories = Category.order(:name)
+      @categories = Rails.cache.fetch("admin/categories", expires_in: 1.hour) do
+        Category.order(:name).to_a
+      end
+    end
+
+    def purge_image_if_requested
+      return unless params.dig(:product, :remove_image) == "1"
+
+      @product.image.purge_later if @product.image.attached?
     end
   end
 end

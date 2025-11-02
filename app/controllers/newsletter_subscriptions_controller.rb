@@ -15,9 +15,8 @@ class NewsletterSubscriptionsController < ApplicationController
             partial: "pages/newsletter/success"
           )
         end
-        format.html do
-          redirect_to root_path, notice: "Thank you for subscribing!"
-        end
+        format.html { redirect_to root_path, notice: "Thank you for subscribing!" }
+        format.json { render json: { success: true }, status: :created }
       else
         format.turbo_stream do
           render turbo_stream: turbo_stream.replace(
@@ -27,8 +26,10 @@ class NewsletterSubscriptionsController < ApplicationController
           )
         end
         format.html do
-          redirect_to root_path, alert: @newsletter_subscription.errors.full_messages.to_sentence
+          flash[:error] = @newsletter_subscription.errors.full_messages.to_sentence
+          redirect_to root_path
         end
+        format.json { render json: { success: false, error: @newsletter_subscription.errors.full_messages.to_sentence }, status: :unprocessable_entity }
       end
     end
   end

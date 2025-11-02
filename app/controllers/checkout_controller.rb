@@ -53,7 +53,31 @@ class CheckoutController < ApplicationController
   def handle_payment_step
     return render_step(1) if session[:checkout_shipping].blank?
 
-    render_step(3, order_complete: true)
+    shipping_form = Checkout::ShippingForm.from_session(session[:checkout_shipping])
+    unless shipping_form.valid?
+      flash.now[:error] = "Please complete your shipping details before placing the order."
+      return render_step(1, shipping_form: shipping_form)
+    end
+
+    processor = Checkout::OrderProcessor.new(user: current_user, cart: current_cart, shipping: shipping_form.to_h)
+
+    begin
+      order = processor.call
+      current_cart.clear
+      persist_cart!
+      session.delete(:checkout_shipping)
+      @recent_order = order
+      render_step(3, shipping_form: shipping_form, order_complete: true)
+    rescue Checkout::OrderProcessor::StockError => e
+      flash.now[:error] = e.message
+      render_step(2, shipping_form: shipping_form)
+    rescue Checkout::OrderProcessor::CartEmptyError => e
+      redirect_to products_path, alert: e.message
+    rescue ActiveRecord::RecordInvalid => e
+      Rails.logger.error("[checkout] Order creation failed: #{e.message}")
+      flash.now[:error] = "We couldn't place your order. Please try again."
+      render_step(2, shipping_form: shipping_form)
+    end
   end
 
   def render_step(step, shipping_form: nil, order_complete: false)

@@ -1,0 +1,31 @@
+<%= form_with model: [:admin, @customer], class: "space-y-6" do |form| %>
+  <%= render "shared/form_errors", object: @customer %>
+
+  <div class="grid gap-5 md:grid-cols-2">
+    <div class="space-y-4">
+      <div>
+        <%= form.label :name, class: "text-sm font-semibold text-slate-700" %>
+        <%= form.text_field :name, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      </div>
+      <div>
+        <%= form.label :email, class: "text-sm font-semibold text-slate-700" %>
+        <%= form.email_field :email, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      </div>
+      <div>
+        <%= form.label :phone, class: "text-sm font-semibold text-slate-700" %>
+        <%= form.telephone_field :phone, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      </div>
+    </div>
+
+    <div>
+      <label class="text-sm font-semibold text-slate-700" for="user_addresses_text">Addresses (one per line)</label>
+      <%= text_area_tag "user[addresses_text]", @addresses_text || @customer.addresses.join("\n"), rows: 10, id: "user_addresses_text", class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      <p class="mt-1 text-xs text-slate-400">Use separate lines for each address.</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= form.submit "Save changes", class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500", data: { disable_with: "Saving..." } %>
+    <%= link_to "Cancel", admin_customer_path(@customer), class: "inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
+  </div>
+<% end %>

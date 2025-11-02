@@ -5,7 +5,14 @@ module Admin
     before_action :set_order, only: %i[show]
 
     def index
-      @orders = Order.order(created_at: :desc)
+      @query = params[:query].to_s.strip
+      @status_filter = params[:status].presence
+
+      scope = Order.includes(:user).order(created_at: :desc)
+      scope = scope.search(@query) if @query.present?
+      scope = scope.with_status(@status_filter) if @status_filter.present?
+
+      @pagy, @orders = pagy(scope, items: 20)
       set_admin_page(
         title: "Orders",
         subtitle: "Track customer orders",

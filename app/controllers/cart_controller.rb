@@ -87,6 +87,7 @@ class CartController < ApplicationController
 
   def render_cart_payload(status: :ok, message: nil)
     render json: {
+      success: true,
       mini: render_to_string(partial: "cart/mini", formats: [:html], locals: { cart: @cart }),
       drawer: render_to_string(partial: "cart/drawer", formats: [:html], locals: { cart: @cart }),
       full_items: render_to_string(partial: "cart/items", formats: [:html], locals: { cart: @cart, compact: false }),
@@ -99,10 +100,13 @@ class CartController < ApplicationController
 
   def handle_out_of_stock(error)
     respond_to do |format|
-      format.html { redirect_back fallback_location: cart_path, alert: error.message }
-      format.json { render json: { error: error.message }, status: :unprocessable_entity }
+      format.html do
+        flash[:error] = error.message
+        redirect_back fallback_location: cart_path
+      end
+      format.json { render json: { success: false, error: error.message, message: error.message }, status: :unprocessable_entity }
       format.turbo_stream do
-        flash[:alert] = error.message
+        flash[:error] = error.message
         redirect_back fallback_location: cart_path
       end
     end

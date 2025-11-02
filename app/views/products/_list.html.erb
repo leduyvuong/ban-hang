@@ -1,0 +1,44 @@
+<% cache(list_cache_key) do %>
+  <% if products.any? %>
+    <% total = pagy.count %>
+    <% from = pagy.from %>
+    <% to = pagy.to %>
+    <% sort_label = sort_options.fetch(selected_sort, sort_options["newest"]) %>
+    <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gray-200 bg-white px-5 py-4 text-sm text-gray-600 shadow-sm">
+      <span>
+        Showing
+        <span class="font-semibold text-gray-900"><%= number_with_delimiter(from) %></span>
+        –
+        <span class="font-semibold text-gray-900"><%= number_with_delimiter(to) %></span>
+        of
+        <span class="font-semibold text-gray-900"><%= number_with_delimiter(total) %></span>
+        <%= "product".pluralize(total) %>
+        <% if search_term.present? %>
+          for "<span class="font-semibold text-gray-900"><%= search_term %></span>"
+        <% end %>
+      </span>
+      <span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-600">
+        Sorted by <%= sort_label %>
+      </span>
+    </div>
+
+    <%= render "products/product_grid", products: products, search_term: search_term %>
+
+    <%= render "shared/pagination", pagy: pagy, frame: "product_list" %>
+  <% else %>
+    <div class="flex flex-col items-center justify-center gap-4 rounded-3xl border border-dashed border-gray-300 bg-white px-8 py-16 text-center">
+      <div class="flex h-14 w-14 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0011.303 11.303z" />
+        </svg>
+      </div>
+      <div class="space-y-2">
+        <h2 class="text-lg font-semibold text-gray-900">No products found</h2>
+        <p class="text-sm text-gray-500">Try broadening your search or adjusting the filters.</p>
+      </div>
+      <button type="button" class="inline-flex items-center rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500" data-action="click->product-filters#clearFilters">
+        Clear all filters
+      </button>
+    </div>
+  <% end %>
+<% end %>

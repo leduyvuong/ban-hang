@@ -1,22 +1,32 @@
 # frozen_string_literal: true
 
 class SessionsController < ApplicationController
-  def new; end
+  def new
+    @session_form = SessionForm.new
+  end
 
   def create
-    user = User.find_by(email: session_params[:email].to_s.downcase.strip)
+    @session_form = SessionForm.new(session_params)
 
-    if user&.authenticate(session_params[:password])
-      log_in(user)
-      if ActiveModel::Type::Boolean.new.cast(session_params[:remember_me])
-        remember(user)
+    if @session_form.valid?
+      user = User.find_by(email: @session_form.email.to_s.downcase.strip)
+
+      if user&.authenticate(@session_form.password)
+        log_in(user)
+        if @session_form.remember_me
+          remember(user)
+        else
+          forget(user)
+        end
+        merge_cart!(user)
+        redirect_back_or(after_login_path_for(user))
       else
-        forget(user)
+        @session_form.errors.add(:base, "Invalid email or password.")
+        flash.now[:error] = "Invalid email or password."
+        render :new, status: :unprocessable_entity
       end
-      merge_cart!(user)
-      redirect_back_or(after_login_path_for(user))
     else
-      flash.now[:alert] = "Invalid email or password."
+      flash.now[:error] = @session_form.errors.full_messages.to_sentence
       render :new, status: :unprocessable_entity
     end
   end
@@ -29,7 +39,7 @@ class SessionsController < ApplicationController
   private
 
   def session_params
-    params.require(:session).permit(:email, :password, :remember_me)
+    params.require(:session_form).permit(:email, :password, :remember_me)
   end
 
   def after_login_path_for(user)

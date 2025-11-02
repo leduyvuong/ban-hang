@@ -2,6 +2,8 @@
 
 Rails.application.routes.draw do
   root "pages#home"
+
+  get "/health", to: "health#show"
   get "home", to: "pages#home"
 
   resources :products, only: %i[index show] do
@@ -30,7 +32,19 @@ Rails.application.routes.draw do
   namespace :admin do
     root to: "dashboard#index"
 
+    get "login", to: "sessions#new", as: :login
+    post "login", to: "sessions#create"
+    delete "logout", to: "sessions#destroy", as: :logout
+
     resources :products
     resources :orders, only: %i[index show]
+    resources :customers do
+      patch :block, on: :member
+    end
+    resources :shops, only: %i[index show] do
+      resources :features, only: :index do
+        post :unlock, on: :member
+      end
+    end
   end
 end

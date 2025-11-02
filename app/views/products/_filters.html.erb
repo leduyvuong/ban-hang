@@ -1,0 +1,88 @@
+<%= form_with url: products_path, method: :get, class: "space-y-6", data: {
+  product_filters_target: "form",
+  turbo_frame: "product_list",
+  action: "turbo:submit-start->product-filters#handleSubmitStart turbo:submit-end->product-filters#handleSubmitEnd"
+} do |form| %>
+  <div class="space-y-2">
+    <label for="search" class="text-sm font-semibold text-gray-900">Search products</label>
+    <div class="relative">
+      <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-gray-400">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" class="h-5 w-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75 21 21" />
+          <circle cx="10.5" cy="10.5" r="7.5" />
+        </svg>
+      </span>
+      <%= form.text_field :search,
+        value: search_term,
+        placeholder: "Search by name or description…",
+        class: "w-full rounded-xl border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm focus:border-indigo-500 focus:outline-none",
+        data: { action: "input->product-filters#debouncedSearch" } %>
+    </div>
+  </div>
+
+  <div class="space-y-2">
+    <label for="category" class="text-sm font-semibold text-gray-900">Category</label>
+    <%= form.select :category,
+      [["All categories", "all"]] + categories.map { |category| [category.name, category.slug] },
+      { selected: selected_category },
+      class: "w-full rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-9 text-sm focus:border-indigo-500 focus:outline-none",
+      data: { action: "change->product-filters#submit" } %>
+  </div>
+
+  <div class="space-y-2">
+    <span class="text-sm font-semibold text-gray-900">Price range</span>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label for="min_price" class="sr-only">Minimum price</label>
+        <%= form.number_field :min_price,
+          value: min_price&.to_f,
+          step: 0.01,
+          min: 0,
+          placeholder: "Min",
+          class: "w-full rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-3 text-sm focus:border-indigo-500 focus:outline-none",
+          data: { action: "change->product-filters#submit" } %>
+      </div>
+      <div>
+        <label for="max_price" class="sr-only">Maximum price</label>
+        <%= form.number_field :max_price,
+          value: max_price&.to_f,
+          step: 0.01,
+          min: 0,
+          placeholder: "Max",
+          class: "w-full rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-3 text-sm focus:border-indigo-500 focus:outline-none",
+          data: { action: "change->product-filters#submit" } %>
+      </div>
+    </div>
+  </div>
+
+  <div class="space-y-2">
+    <label for="stock_status" class="text-sm font-semibold text-gray-900">Stock status</label>
+    <%= form.select :stock_status,
+      [["Any stock status", ""]] + stock_filters.map { |value, label| [label, value] },
+      { selected: stock_status },
+      class: "w-full rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-9 text-sm focus:border-indigo-500 focus:outline-none",
+      data: { action: "change->product-filters#submit" } %>
+  </div>
+
+  <div class="space-y-2">
+    <label for="sort" class="text-sm font-semibold text-gray-900">Sort</label>
+    <%= form.select :sort,
+      sort_options.map { |value, label| [label, value] },
+      { selected: selected_sort },
+      class: "w-full rounded-xl border border-gray-300 bg-white py-2 pl-3 pr-9 text-sm focus:border-indigo-500 focus:outline-none",
+      data: { action: "change->product-filters#submit" } %>
+  </div>
+
+  <%= form.hidden_field :page, value: params[:page], data: { product_filters_target: "page" } %>
+
+  <div class="flex flex-wrap items-center gap-3">
+    <button type="submit" class="inline-flex items-center rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500">
+      Update results
+    </button>
+    <% if has_active_filters %>
+      <button type="button" class="text-sm font-medium text-gray-500 underline decoration-dotted underline-offset-4 transition hover:text-indigo-600" data-action="click->product-filters#clearFilters">
+        Clear filters
+      </button>
+    <% end %>
+  </div>
+<% end %>

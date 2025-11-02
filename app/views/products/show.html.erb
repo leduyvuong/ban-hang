@@ -49,8 +49,8 @@
 
 <article class="mt-6 grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
   <div class="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200">
-    <% if @product.image_url.present? %>
-      <img src="<%= @product.image_url %>" alt="<%= @product.name %>" class="h-full w-full object-cover">
+    <% if (hero_image = @product.image_variant(width: 1200, height: 720)) %>
+      <%= image_tag hero_image, alt: @product.name, class: "h-full w-full object-cover", loading: "lazy" %>
     <% else %>
       <div class="flex h-full min-h-[320px] items-center justify-center bg-gray-100 text-gray-400">
         <span class="text-lg">No product image yet</span>
@@ -77,9 +77,15 @@
     <% end %>
 
     <div class="flex flex-wrap gap-3">
-      <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" data-action="click->cart#addItem" data-cart-product-id-param="<%= @product.to_param %>" data-cart-quantity-param="1" data-product-id="<%= @product.to_param %>" data-quantity="1">
-        Add to cart
-      </button>
+      <% if @product.stock.to_i.zero? %>
+        <span class="inline-flex items-center gap-2 rounded-full bg-gray-200 px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-gray-500">
+          Out of Stock
+        </span>
+      <% else %>
+        <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" data-action="click->cart#addItem" data-cart-product-id-param="<%= @product.to_param %>" data-cart-quantity-param="1" data-product-id="<%= @product.to_param %>" data-quantity="1">
+          Add to cart
+        </button>
+      <% end %>
       <%= link_to "View cart", cart_path, class: "inline-flex items-center gap-2 rounded-full border border-indigo-200 px-5 py-2.5 text-sm font-semibold text-indigo-600 transition hover:border-indigo-400 hover:text-indigo-700" %>
     </div>
 

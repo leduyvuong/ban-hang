@@ -1,3 +1,7 @@
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
 development:
   service: Disk
   root: <%= Rails.root.join("storage") %>
@@ -6,6 +10,16 @@ test:
   service: Disk
   root: <%= Rails.root.join("tmp/storage") %>
 
+amazon:
+  service: S3
+  access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV.fetch("AWS_REGION", "us-east-1") %>
+  bucket: <%= ENV.fetch("AWS_BUCKET", "banhang-production") %>
+
 production:
+  service: <%= ENV.fetch("ACTIVE_STORAGE_SERVICE", "amazon") %>
+
+ci:
   service: Disk
-  root: <%= ENV.fetch("RAILS_STORAGE_ROOT", Rails.root.join("storage")) %>
+  root: <%= Rails.root.join("tmp/storage") %>

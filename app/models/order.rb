@@ -15,6 +15,16 @@ class Order < ApplicationRecord
     refunded: "refunded"
   }
 
+  scope :with_status, ->(value) { statuses.key?(value) ? where(status: value) : all }
+  scope :search, lambda { |term|
+    return all if term.blank?
+
+    pattern = "%#{sanitize_sql_like(term)}%"
+    left_outer_joins(:user)
+      .where("orders.order_number ILIKE :pattern OR users.email ILIKE :pattern OR users.name ILIKE :pattern", pattern: pattern)
+      .distinct
+  }
+
   accepts_nested_attributes_for :order_items, allow_destroy: true
 
   before_validation :assign_order_number, on: :create

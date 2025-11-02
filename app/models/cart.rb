@@ -1,18 +1,29 @@
 # frozen_string_literal: true
 
+require "active_model"
 require "active_support/core_ext/string/inflections"
 
 class Cart
   class OutOfStockError < StandardError; end
 
-  Item = Class.new do
+  class Item
+    include ActiveModel::Validations
+
     attr_reader :product_id, :product
     attr_accessor :quantity
 
+    validates :product_id, numericality: { only_integer: true, greater_than: 0 }
+    validates :quantity, numericality: { only_integer: true, greater_than: 0 }
+    validate :product_available
+
     def initialize(product_id:, quantity: 1)
-      @product_id = product_id
-      @quantity = quantity
+      @product_id = product_id.to_i
+      self.quantity = quantity
       @product = nil
+    end
+
+    def quantity=(value)
+      @quantity = value.to_i
     end
 
     def product=(value)
@@ -24,6 +35,19 @@ class Cart
       return 0 unless product
 
       product.price * quantity
+    end
+
+    private
+
+    def product_available
+      return unless product
+
+      available = product.stock.to_i
+      if available.zero?
+        errors.add(:base, "#{product.name} is currently out of stock.")
+      elsif quantity > available
+        errors.add(:base, "Only #{available} #{'unit'.pluralize(available)} of #{product.name} available.")
+      end
     end
   end
 
@@ -65,11 +89,13 @@ class Cart
     ensure_stock!(product, desired_quantity)
 
     if item
-      item.quantity = desired_quantity
       item.product ||= product
+      item.quantity = desired_quantity
+      validate_item!(item)
     else
       new_item = Item.new(product_id: product.id, quantity: quantity)
       new_item.product = product
+      validate_item!(new_item)
       @items << new_item
     end
   end
@@ -93,8 +119,9 @@ class Cart
 
     product = find_product!(product_id)
     ensure_stock!(product, quantity)
-    item.quantity = quantity
     item.product ||= product
+    item.quantity = quantity
+    validate_item!(item)
   end
 
   def remove_item(product_id)
@@ -136,7 +163,7 @@ class Cart
     ids = items.map(&:product_id).uniq
     return if ids.empty?
 
-    products = Product.where(id: ids).index_by(&:id)
+    products = Product.with_attached_image.where(id: ids).index_by(&:id)
 
     items.select! do |item|
       product = products[item.product_id]
@@ -168,15 +195,15 @@ class Cart
   end
 
   def ensure_stock!(product, requested_quantity)
-    available = product.stock.to_i
-    return if available >= requested_quantity
+    candidate = Item.new(product_id: product.id, quantity: requested_quantity)
+    candidate.product = product
+    validate_item!(candidate)
+  end
 
-    message = if available.zero?
-      "#{product.name} is currently out of stock."
-    else
-      "Only #{available} #{'unit'.pluralize(available)} of #{product.name} available."
-    end
+  def validate_item!(item)
+    return if item.valid?
 
+    message = item.errors.full_messages.first || "Unable to update cart item."
     raise OutOfStockError, message
   end
 end

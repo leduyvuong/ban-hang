@@ -1,35 +1,98 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Handles progressive enhancement for the product listing filters.
-// The form still works without JavaScript, but with this controller
-// it submits via Turbo to refresh only the product grid and keeps the URL in sync.
+// Coordinates AJAX-powered product filtering, sorting, and pagination.
+// Keeps the URL in sync, shows a loading skeleton, and debounces search input.
 export default class extends Controller {
+  static targets = ["form", "frame", "skeleton", "page"]
+  static values = {
+    debounce: { type: Number, default: 250 }
+  }
+
   connect() {
-    this.submitEndHandler = this.updateHistory.bind(this)
-    this.element.addEventListener("turbo:submit-end", this.submitEndHandler)
+    this.searchTimeout = null
   }
 
   disconnect() {
-    this.element.removeEventListener("turbo:submit-end", this.submitEndHandler)
-  }
-
-  submit() {
-    if (typeof this.element.requestSubmit === "function") {
-      this.element.requestSubmit()
-    } else {
-      this.element.submit()
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout)
     }
   }
 
-  updateHistory(event) {
-    if (!event.detail || !event.detail.success) return
+  submit(event) {
+    if (event) event.preventDefault()
+    this.resetPage()
+    this.requestSubmit()
+  }
 
-    const fetchResponse = event.detail.fetchResponse
-    if (!fetchResponse) return
+  debouncedSearch(event) {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout)
+    }
 
-    const url = fetchResponse.response.url
+    this.searchTimeout = setTimeout(() => {
+      this.resetPage()
+      this.requestSubmit()
+    }, this.debounceValue)
+  }
+
+  handleSubmitStart() {
+    this.showSkeleton()
+  }
+
+  handleSubmitEnd(event) {
+    if (!event.detail.success) {
+      this.hideSkeleton()
+    }
+  }
+
+  handleBeforeFetchRequest() {
+    this.showSkeleton()
+  }
+
+  handleFrameLoad(event) {
+    this.hideSkeleton()
+
+    const url = event.detail?.fetchResponse?.response?.url
     if (url) {
-      window.history.replaceState({}, "", url)
+      window.history.pushState({}, "", url)
     }
+  }
+
+  clearFilters(event) {
+    event.preventDefault()
+
+    if (!this.hasFormTarget) return
+
+    this.formTarget.reset()
+    this.resetPage()
+    this.requestSubmit()
+  }
+
+  requestSubmit() {
+    if (!this.hasFormTarget) return
+
+    if (typeof this.formTarget.requestSubmit === "function") {
+      this.formTarget.requestSubmit()
+    } else {
+      this.formTarget.submit()
+    }
+  }
+
+  resetPage() {
+    if (this.hasPageTarget) {
+      this.pageTarget.value = ""
+    }
+  }
+
+  showSkeleton() {
+    if (!this.hasSkeletonTarget) return
+
+    this.skeletonTarget.classList.remove("hidden")
+  }
+
+  hideSkeleton() {
+    if (!this.hasSkeletonTarget) return
+
+    this.skeletonTarget.classList.add("hidden")
   }
 }

@@ -37,7 +37,7 @@
     <%= link_to "Back", checkout_path(step: 1), data: { turbo_frame: "checkout_steps" }, class: "rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
     <%= form_with url: checkout_path, method: :patch, data: { turbo_frame: "checkout_steps" }, class: "inline" do %>
       <%= hidden_field_tag :step, "review" %>
-      <button type="submit" class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500">Continue to payment</button>
+      <button type="submit" class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500" data-disable-with="Continuing...">Continue to payment</button>
     <% end %>
   </div>
 </div>

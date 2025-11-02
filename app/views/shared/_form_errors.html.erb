@@ -1,0 +1,11 @@
+<% object = local_assigns[:object] || local_assigns[:resource] %>
+<% if object&.errors&.any? %>
+  <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+    <p class="font-semibold"><%= t("form.errors.title", default: "Please correct the following errors") %>:</p>
+    <ul class="mt-1 list-disc pl-5">
+      <% object.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

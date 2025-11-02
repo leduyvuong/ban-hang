@@ -1,25 +1,18 @@
 <%= form_with model: [:admin, @product], class: "space-y-6" do |form| %>
-  <% if @product.errors.any? %>
-    <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-      <p class="font-semibold"><%= pluralize(@product.errors.count, "error") %> prevented saving:</p>
-      <ul class="mt-2 list-disc pl-5">
-        <% @product.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/form_errors", object: @product %>
 
   <div class="grid gap-5 lg:grid-cols-2">
     <div class="space-y-4">
       <div>
         <%= form.label :name, class: "text-sm font-semibold text-slate-700" %>
-        <%= form.text_field :name, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.text_field :name, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@product, :name)}" %>
+        <%= field_error(@product, :name) %>
       </div>
       <div>
         <%= form.label :short_description, class: "text-sm font-semibold text-slate-700" %>
-        <%= form.text_field :short_description, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.text_field :short_description, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@product, :short_description)}" %>
         <p class="mt-1 text-xs text-slate-400">Appears in SEO snippets and cards (180 characters max).</p>
+        <%= field_error(@product, :short_description) %>
       </div>
       <div>
         <%= form.label :category_id, "Category", class: "text-sm font-semibold text-slate-700" %>
@@ -27,27 +20,41 @@
       </div>
       <div>
         <%= form.label :price, class: "text-sm font-semibold text-slate-700" %>
-        <%= form.number_field :price, step: 0.01, min: 0, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.number_field :price, step: 0.01, min: 0, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@product, :price)}" %>
+        <%= field_error(@product, :price) %>
       </div>
       <div>
         <%= form.label :stock, class: "text-sm font-semibold text-slate-700" %>
-        <%= form.number_field :stock, min: 0, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.number_field :stock, min: 0, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@product, :stock)}" %>
+        <%= field_error(@product, :stock) %>
       </div>
-      <div>
-        <%= form.label :image_url, "Image URL", class: "text-sm font-semibold text-slate-700" %>
-        <%= form.text_field :image_url, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      <div class="space-y-2">
+        <%= form.label :image, "Product image", class: "text-sm font-semibold text-slate-700" %>
+        <%= form.file_field :image, direct_upload: true, accept: "image/png,image/jpeg,image/jpg,image/webp", class: "block w-full rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-6 text-sm text-slate-500 transition hover:border-indigo-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <% if @product.image.attached? %>
+          <div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <div class="h-16 w-16 overflow-hidden rounded-xl bg-white">
+              <%= image_tag @product.image_variant(width: 160, height: 160), alt: @product.name, class: "h-full w-full object-cover" %>
+            </div>
+            <label class="inline-flex items-center gap-2 text-sm text-slate-600">
+              <%= form.check_box :remove_image, value: "1" %>
+              <span>Remove current image</span>
+            </label>
+          </div>
+        <% end %>
       </div>
     </div>
 
     <div>
       <%= form.label :description, class: "text-sm font-semibold text-slate-700" %>
-      <%= form.text_area :description, rows: 10, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      <%= form.text_area :description, rows: 10, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@product, :description)}" %>
       <p class="mt-1 text-xs text-slate-400">Supports rich descriptions; use paragraphs for clarity.</p>
+      <%= field_error(@product, :description) %>
     </div>
   </div>
 
   <div class="flex items-center gap-3">
-    <%= form.submit class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500" %>
+    <%= form.submit @product.persisted? ? "Update product" : "Create product", class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500", data: { disable_with: "Saving..." } %>
     <%= link_to "Cancel", admin_products_path, class: "inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
   </div>
 <% end %>

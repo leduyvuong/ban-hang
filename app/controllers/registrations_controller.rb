@@ -15,6 +15,7 @@ class RegistrationsController < ApplicationController
       merge_cart!(@user)
       redirect_to after_signup_path, notice: "Welcome to BanHang, #{@user.name}!"
     else
+      flash.now[:error] = @user.errors.full_messages.to_sentence
       render :new, status: :unprocessable_entity
     end
   end
@@ -33,6 +34,7 @@ class RegistrationsController < ApplicationController
     if @user.update(attributes)
       redirect_to root_path, notice: "Profile updated successfully."
     else
+      flash.now[:error] = @user.errors.full_messages.to_sentence
       render :edit, status: :unprocessable_entity
     end
   end

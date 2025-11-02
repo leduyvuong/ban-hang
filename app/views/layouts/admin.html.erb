@@ -25,17 +25,26 @@
               BanHang Admin
             </a>
             <p class="mt-2 text-sm text-slate-500">Manage products, orders, and store analytics.</p>
-            <% if current_user %>
-              <p class="mt-2 text-xs text-slate-400">Signed in as <span class="font-medium text-slate-600"><%= current_user.email %></span></p>
+            <% admin_identity = current_admin_user || current_user %>
+            <% if admin_identity %>
+              <p class="mt-2 text-xs text-slate-400">Signed in as <span class="font-medium text-slate-600"><%= admin_identity.email %></span></p>
             <% end %>
           </div>
 
           <nav class="flex-1 space-y-2 p-4 text-sm font-medium text-slate-600">
+            <% if current_admin_user&.is_master_admin? %>
+              <%= link_to admin_shops_path, class: admin_nav_class(admin_shops_path) do %>
+                <span>Shops</span>
+              <% end %>
+            <% end %>
             <%= link_to admin_root_path, class: admin_nav_class(admin_root_path) do %>
               <span>Dashboard</span>
             <% end %>
             <%= link_to admin_products_path, class: admin_nav_class(admin_products_path) do %>
               <span>Products</span>
+            <% end %>
+            <%= link_to admin_customers_path, class: admin_nav_class(admin_customers_path) do %>
+              <span>Customers</span>
             <% end %>
             <%= link_to admin_orders_path, class: admin_nav_class(admin_orders_path) do %>
               <span>Orders</span>
@@ -65,12 +74,17 @@
               </div>
             </div>
             <div class="flex items-center gap-4">
+              <% admin_identity = current_admin_user || current_user %>
               <div class="hidden text-right text-xs text-slate-500 sm:block">
-                <p class="font-semibold text-slate-900"><%= current_user&.name %></p>
-                <p><%= current_user&.email %></p>
+                <p class="font-semibold text-slate-900"><%= admin_identity&.respond_to?(:name) ? admin_identity.name : admin_identity&.email %></p>
+                <p><%= admin_identity&.email %></p>
               </div>
               <a href="/" class="rounded-full border border-slate-200 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600">Storefront</a>
-              <%= button_to "Logout", session_path, method: :delete, class: "rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100", form: { class: "inline" } %>
+              <% if current_admin_user %>
+                <%= button_to "Logout", admin_logout_path, method: :delete, class: "rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100", form: { class: "inline" } %>
+              <% else %>
+                <%= button_to "Logout", session_path, method: :delete, class: "rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-100", form: { class: "inline" } %>
+              <% end %>
             </div>
           </div>
         </header>

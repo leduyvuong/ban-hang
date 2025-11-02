@@ -1,18 +1,26 @@
-<div class="flex items-center justify-between gap-4 border-b border-gray-200 pb-4">
-  <div>
-    <h2 class="text-2xl font-semibold text-gray-900"><%= active_category ? active_category[:name] : "All Products" %></h2>
-    <p class="text-sm text-gray-500"><%= active_category ? active_category[:description] : "Browse all available products" %></p>
-  </div>
-  <p class="text-sm text-gray-400"><%= pluralize(products.size, "product") %></p>
-</div>
+<% highlight_term = local_assigns[:search_term] %>
 
-<% if products.any? %>
-  <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-    <% products.each do |product| %>
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  <% products.each do |product| %>
+    <% highlighted_name = if highlight_term.present?
+      highlight(product.name, highlight_term, highlighter: '<mark class="rounded bg-yellow-200 px-1 text-indigo-900">%s</mark>')
+    else
+      product.name
+    end %>
+
+    <% description_source = product.short_description.presence || product.description %>
+    <% description_snippet = truncate(strip_tags(description_source.to_s), length: 100) %>
+    <% highlighted_description = if highlight_term.present?
+      highlight(description_snippet, highlight_term, highlighter: '<mark class="rounded bg-yellow-200 px-1 text-indigo-900">%s</mark>')
+    else
+      description_snippet
+    end %>
+
+    <% cache([product, highlight_term]) do %>
       <article class="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg" itemscope itemtype="https://schema.org/Product">
         <div class="relative h-52 w-full bg-gray-100">
-          <% if product.image_url.present? %>
-            <img src="<%= product.image_url %>" alt="<%= product.name %>" class="absolute inset-0 h-full w-full object-cover" loading="lazy" itemprop="image">
+          <% if (thumb = product.thumbnail(width: 520, height: 320)) %>
+            <%= image_tag thumb, alt: product.name, class: "absolute inset-0 h-full w-full object-cover", loading: "lazy", itemprop: "image" %>
           <% else %>
             <div class="flex h-full w-full items-center justify-center text-sm text-gray-400">No image</div>
           <% end %>
@@ -22,27 +30,29 @@
             <% if product.category.present? %>
               <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-600"><%= product.category.name %></span>
             <% end %>
-            <h3 class="text-lg font-semibold text-gray-900" itemprop="name">
-              <%= link_to product.name, product_path(product), class: "transition hover:text-indigo-600" %>
+            <h3 class="mt-2 text-lg font-semibold text-gray-900" itemprop="name">
+              <%= link_to highlighted_name.html_safe, product_path(product), class: "transition hover:text-indigo-600" %>
             </h3>
-            <% if product.description.present? %>
-              <p class="mt-1 text-sm text-gray-500" itemprop="description"><%= truncate(product.description, length: 90) %></p>
+            <% if description_snippet.present? %>
+              <p class="mt-1 text-sm text-gray-500" itemprop="description"><%= highlighted_description.html_safe %></p>
             <% end %>
           </div>
-          <div class="mt-auto flex flex-wrap items-center justify-between gap-3">
+          <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-2">
             <span class="text-xl font-bold text-indigo-600" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
               <meta itemprop="priceCurrency" content="USD">
               <span itemprop="price"><%= number_to_currency(product.price) %></span>
             </span>
             <%= link_to "View details", product_path(product), class: "rounded-full border border-indigo-600 px-4 py-2 text-sm font-semibold text-indigo-600 transition hover:bg-indigo-600 hover:text-white" %>
-            <button type="button" class="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" data-action="click->cart#addItem" data-cart-product-id-param="<%= product.to_param %>" data-cart-quantity-param="1" data-product-id="<%= product.to_param %>" data-quantity="1" data-turbo="false">
-              Add to cart
-            </button>
+            <% if product.stock.to_i.zero? %>
+              <span class="rounded-full bg-gray-200 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-gray-500">Out of Stock</span>
+            <% else %>
+              <button type="button" class="rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" data-action="click->cart#addItem" data-cart-product-id-param="<%= product.to_param %>" data-cart-quantity-param="1" data-product-id="<%= product.to_param %>" data-quantity="1" data-turbo="false">
+                Add to cart
+              </button>
+            <% end %>
           </div>
         </div>
       </article>
     <% end %>
-  </div>
-<% else %>
-  <p class="mt-6 rounded-xl border border-dashed border-gray-300 bg-white p-6 text-center text-sm text-gray-500">No products found. Adjust your filters to see more items.</p>
-<% end %>
+  <% end %>
+</div>

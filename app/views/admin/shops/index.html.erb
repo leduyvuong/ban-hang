@@ -1,0 +1,55 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between gap-4">
+    <p class="text-sm text-gray-600">Review shop accounts and manage their feature access.</p>
+    <div class="text-sm text-gray-500">
+      <span class="font-medium text-gray-900"><%= @total_features %></span>
+      total features available
+    </div>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+    <table class="min-w-full divide-y divide-gray-200 bg-white">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Shop Name</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Owner Email</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Subscription Plan</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Features Unlocked</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500"><span class="sr-only">Manage</span></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @shops.each do |shop| %>
+          <% owner = shop.admin_users.find { |admin| admin.shop_owner? } %>
+          <% unlocked_count = @unlocked_counts[shop.id].to_i %>
+          <tr class="transition hover:bg-gray-50/50">
+            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+              <%= shop.name %>
+            </td>
+            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
+              <%= owner&.email || "N/A" %>
+            </td>
+            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">
+              <%= shop.try(:subscription_plan).presence || "Standard" %>
+            </td>
+            <td class="whitespace-nowrap px-6 py-4 text-sm">
+              <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
+                <%= "#{unlocked_count}/#{@total_features}" %>
+              </span>
+            </td>
+            <td class="whitespace-nowrap px-6 py-4 text-right text-sm">
+              <%= link_to "Manage Features", admin_shop_features_path(shop), class: "inline-flex items-center rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @shops.empty? %>
+          <tr>
+            <td colspan="5" class="px-6 py-12 text-center text-sm text-gray-500">
+              No shops available yet.
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

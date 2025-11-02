@@ -5,7 +5,32 @@
         <h2 class="text-lg font-semibold text-slate-900">Product catalogue</h2>
         <p class="text-sm text-slate-500">Manage pricing, descriptions, and availability.</p>
       </div>
-      <%= link_to "Add product", new_admin_product_path, class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500" %>
+      <div class="flex flex-wrap items-center gap-2">
+        <%= form_with url: admin_products_path, method: :get, local: true, class: "flex flex-wrap items-center gap-2" do |form| %>
+          <div class="relative">
+            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75 21 21" />
+                <circle cx="10.5" cy="10.5" r="7.5" />
+              </svg>
+            </span>
+            <%= form.text_field :query, value: @query, placeholder: "Search products", class: "w-56 rounded-full border border-slate-200 bg-white py-2 pl-9 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+          </div>
+
+          <%= form.select :category,
+                options_for_select([["All categories", ""]] + @categories.map { |category| [category.name, category.slug] }, @category_filter),
+                {},
+                class: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+
+          <%= form.select :stock_status,
+                options_for_select([["Any stock", ""], ["In stock", "in_stock"], ["Out of stock", "out_of_stock"]], @stock_filter),
+                {},
+                class: "rounded-full border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+
+          <%= form.submit "Filter", class: "inline-flex items-center rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500" %>
+        <% end %>
+        <%= link_to "Add product", new_admin_product_path, class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500" %>
+      </div>
     </div>
 
     <% if @products.any? %>
@@ -25,8 +50,8 @@
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
                     <div class="h-12 w-12 overflow-hidden rounded-xl bg-slate-100">
-                      <% if product.image_url.present? %>
-                        <img src="<%= product.image_url %>" alt="<%= product.name %>" class="h-full w-full object-cover">
+                      <% if (thumb = product.image_variant(width: 120, height: 120)) %>
+                        <%= image_tag thumb, alt: product.name, class: "h-full w-full object-cover", loading: "lazy" %>
                       <% else %>
                         <div class="flex h-full items-center justify-center text-xs text-slate-400">No image</div>
                       <% end %>
@@ -59,5 +84,9 @@
         No products yet. Start by adding your first product.
       </div>
     <% end %>
+
+    <div class="mt-4">
+      <%= render "shared/pagination", pagy: @pagy %>
+    </div>
   </div>
 </div>

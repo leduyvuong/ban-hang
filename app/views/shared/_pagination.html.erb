@@ -1,0 +1,38 @@
+<% return if pagy.pages <= 1 %>
+
+<nav class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-3 text-sm shadow-sm" aria-label="Pagination">
+  <% frame_id = local_assigns[:frame] %>
+  <% data_attributes = frame_id.present? ? { turbo_frame: frame_id } : {} %>
+
+  <div>
+    <% if pagy.prev %>
+      <%= link_to "Previous", pagy_url_for(pagy, pagy.prev), class: "inline-flex items-center rounded-full border border-gray-300 px-3 py-1.5 font-medium text-gray-700 transition hover:border-indigo-400 hover:text-indigo-600", data: data_attributes %>
+    <% else %>
+      <span class="inline-flex items-center rounded-full border border-gray-200 px-3 py-1.5 font-medium text-gray-300">Previous</span>
+    <% end %>
+  </div>
+
+  <ul class="flex items-center gap-1">
+    <% pagy.series.each do |item| %>
+      <% if item == :gap %>
+        <li class="px-2 text-gray-400">…</li>
+      <% elsif item == pagy.page %>
+        <li>
+          <span class="inline-flex items-center rounded-full bg-indigo-600 px-3 py-1.5 font-semibold text-white"><%= item %></span>
+        </li>
+      <% else %>
+        <li>
+          <%= link_to item, pagy_url_for(pagy, item), class: "inline-flex items-center rounded-full border border-transparent px-3 py-1.5 font-medium text-gray-700 transition hover:border-indigo-400 hover:text-indigo-600", data: data_attributes %>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+
+  <div>
+    <% if pagy.next %>
+      <%= link_to "Next", pagy_url_for(pagy, pagy.next), class: "inline-flex items-center rounded-full border border-gray-300 px-3 py-1.5 font-medium text-gray-700 transition hover:border-indigo-400 hover:text-indigo-600", data: data_attributes %>
+    <% else %>
+      <span class="inline-flex items-center rounded-full border border-gray-200 px-3 py-1.5 font-medium text-gray-300">Next</span>
+    <% end %>
+  </div>
+</nav>

@@ -4,40 +4,35 @@
     <p class="text-sm text-gray-500">Update your personal details and login credentials.</p>
   </header>
 
-  <% if @user.errors.any? %>
-    <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-      <p class="font-semibold"><%= pluralize(@user.errors.count, "error") %> prevented saving your profile:</p>
-      <ul class="mt-2 list-disc pl-5">
-        <% @user.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "shared/form_errors", object: @user %>
 
   <%= form_with model: @user, url: profile_path, method: :patch, local: true, class: "space-y-5" do |form| %>
     <div class="space-y-1">
       <%= form.label :name, class: "text-sm font-medium text-gray-700" %>
-      <%= form.text_field :name, required: true, class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      <%= form.text_field :name, required: true, class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@user, :name)}" %>
+      <%= field_error(@user, :name) %>
     </div>
     <div class="space-y-1">
       <%= form.label :email, class: "text-sm font-medium text-gray-700" %>
-      <%= form.email_field :email, required: true, class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      <%= form.email_field :email, required: true, class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@user, :email)}" %>
+      <%= field_error(@user, :email) %>
     </div>
     <div class="grid gap-4 md:grid-cols-2">
       <div class="space-y-1">
         <%= form.label :password, class: "text-sm font-medium text-gray-700" %>
-        <%= form.password_field :password, placeholder: "••••••••", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.password_field :password, placeholder: "••••••••", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@user, :password)}" %>
         <p class="text-xs text-gray-400">Leave blank to keep current password.</p>
+        <%= field_error(@user, :password) %>
       </div>
       <div class="space-y-1">
         <%= form.label :password_confirmation, class: "text-sm font-medium text-gray-700" %>
-        <%= form.password_field :password_confirmation, placeholder: "••••••••", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.password_field :password_confirmation, placeholder: "••••••••", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@user, :password_confirmation)}" %>
+        <%= field_error(@user, :password_confirmation) %>
       </div>
     </div>
 
     <div class="flex items-center gap-3">
-      <%= form.submit "Save changes", class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500" %>
+      <%= form.submit "Save changes", class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500", data: { disable_with: "Saving..." } %>
       <%= link_to "Cancel", root_path, class: "inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
     </div>
   <% end %>

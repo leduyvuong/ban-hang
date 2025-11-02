@@ -33,8 +33,8 @@
     <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <h3 class="text-lg font-semibold text-slate-900">Preview</h3>
       <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-        <% if @product.image_url.present? %>
-          <img src="<%= @product.image_url %>" alt="<%= @product.name %>" class="h-48 w-full object-cover">
+        <% if (thumb = @product.image_variant(width: 480, height: 320)) %>
+          <%= image_tag thumb, alt: @product.name, class: "h-48 w-full object-cover", loading: "lazy" %>
         <% else %>
           <div class="flex h-48 items-center justify-center text-sm text-slate-400">No product image</div>
         <% end %>

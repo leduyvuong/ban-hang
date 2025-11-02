@@ -9,8 +9,8 @@
 
     <div class="grid gap-6 p-6 sm:grid-cols-[1fr_1fr] sm:p-8">
       <div class="overflow-hidden rounded-2xl bg-gray-100">
-        <% if product.image_url.present? %>
-          <img src="<%= product.image_url %>" alt="<%= product.name %>" class="h-full w-full object-cover">
+        <% if (thumb = product.image_variant(width: 640, height: 400)) %>
+          <%= image_tag thumb, alt: product.name, class: "h-full w-full object-cover", loading: "lazy" %>
         <% else %>
           <div class="flex h-full min-h-[220px] items-center justify-center text-gray-400">
             <span>No image available</span>
@@ -37,9 +37,15 @@
         <% end %>
 
         <div class="flex flex-wrap gap-3">
-          <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" data-action="click->cart#addItem" data-cart-product-id-param="<%= product.to_param %>" data-cart-quantity-param="1" data-product-id="<%= product.to_param %>" data-quantity="1">
-            Add to cart
-          </button>
+          <% if product.stock.to_i.zero? %>
+            <span class="inline-flex items-center gap-2 rounded-full bg-gray-200 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
+              Out of Stock
+            </span>
+          <% else %>
+            <button type="button" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2" data-action="click->cart#addItem" data-cart-product-id-param="<%= product.to_param %>" data-cart-quantity-param="1" data-product-id="<%= product.to_param %>" data-quantity="1">
+              Add to cart
+            </button>
+          <% end %>
           <a href="<%= product_path(product) %>" class="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2">
             View full details
           </a>

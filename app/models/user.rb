@@ -7,15 +7,35 @@ class User < ApplicationRecord
 
   enum role: { customer: 0, admin: 1 }, _default: :customer
 
+  belongs_to :shop, optional: true
   has_many :orders, dependent: :nullify
 
   before_validation :normalize_email
+  before_save :sanitize_addresses
 
   validates :name, presence: true, length: { maximum: 120 }
   validates :email, presence: true, uniqueness: { case_sensitive: false }, length: { maximum: 255 }, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, if: -> { new_record? || password.present? }
+  validates :phone, length: { maximum: 30 }, allow_blank: true
 
   scope :with_reset_token, ->(token) { where(reset_password_token: token) }
+  scope :customers, -> { where(role: roles[:customer]) }
+  scope :for_shop, ->(shop) { where(shop: shop) }
+  scope :search, lambda { |term|
+    return all if term.blank?
+
+    pattern = "%#{sanitize_sql_like(term)}%"
+    where("users.name ILIKE :pattern OR users.email ILIKE :pattern", pattern: pattern)
+  }
+  scope :with_order_stats, lambda {
+    left_joins(:orders)
+      .select(<<~SQL.squish)
+        users.*,
+        COUNT(orders.id) AS orders_count,
+        COALESCE(SUM(orders.total), 0) AS total_spent
+      SQL
+      .group("users.id")
+  }
 
   def remember!(expires_in: 30.days)
     token = generate_token
@@ -68,10 +88,54 @@ class User < ApplicationRecord
     reset_password_sent_at.present? && reset_password_sent_at < 2.hours.ago
   end
 
+  def blocked?
+    blocked_at.present?
+  end
+
+  def can_access_feature?(feature_slug)
+    return true if shop.blank?
+
+    shop.feature_unlocked?(feature_slug)
+  end
+
+  def orders_count
+    return orders.length if orders.loaded?
+
+    if has_attribute?(:orders_count)
+      self[:orders_count].to_i
+    else
+      orders.count
+    end
+  end
+
+  def total_spent
+    if orders.loaded?
+      return orders.sum { |order| BigDecimal(order.total.to_s) }
+    end
+
+    if has_attribute?(:total_spent)
+      BigDecimal(self[:total_spent].to_s)
+    else
+      orders.sum(:total)
+    end
+  end
+
+  def addresses
+    Array(self[:addresses]).map(&:to_s)
+  end
+
+  def addresses=(value)
+    super(Array(value))
+  end
+
   private
 
   def normalize_email
     self.email = email.to_s.strip.downcase
+  end
+
+  def sanitize_addresses
+    self.addresses = addresses.map(&:to_s).map(&:strip).reject(&:blank?)
   end
 
   def generate_token

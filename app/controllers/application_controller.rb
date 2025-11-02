@@ -1,12 +1,41 @@
 # frozen_string_literal: true
-# frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  include Pagy::Backend
   protect_from_forgery with: :exception
 
   helper_method :current_cart, :current_user, :logged_in?, :admin?
 
+  rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
+  rescue_from StandardError, with: :handle_internal_error unless Rails.env.development?
+
   private
+
+  def handle_not_found(exception)
+    Rails.logger.warn("[404] #{exception.class}: #{exception.message}")
+    respond_with_error("We couldn't find what you were looking for.", status: :not_found)
+  end
+
+  def handle_internal_error(exception)
+    Rails.logger.error("[500] #{exception.class}: #{exception.message}\nParams: #{request.filtered_parameters.inspect}\n#{exception.backtrace&.first(5)&.join("\n")}")
+    respond_with_error("Something went wrong on our side. Please try again.", status: :internal_server_error)
+  end
+
+  def respond_with_error(message, status:, redirect: root_path)
+    respond_to do |format|
+      format.html do
+        flash[:error] = message
+        redirect_back fallback_location: redirect, status: :see_other
+      end
+      format.turbo_stream do
+        flash[:error] = message
+        redirect_back fallback_location: redirect, status: :see_other
+      end
+      format.json do
+        render json: { success: false, error: message }, status: status
+      end
+    end
+  end
 
   def set_page_metadata(title: nil, description: nil, canonical: nil, robots: nil)
     @page_title = title if title.present?
@@ -43,13 +72,15 @@ class ApplicationController < ActionController::Base
     return if logged_in?
 
     store_location
-    redirect_to new_session_path, alert: "Please log in to continue."
+    flash[:error] = "Please log in to continue."
+    redirect_to new_session_path
   end
 
   def require_admin!
     return if admin?
 
-    redirect_to root_path, alert: "You are not authorized to access that page."
+    flash[:error] = "You are not authorized to access that page."
+    redirect_to root_path
   end
 
   def current_cart
@@ -99,7 +130,12 @@ class ApplicationController < ActionController::Base
     user_cart = Cart.from_user(user)
     session_cart = Cart.from_session(session[:cart])
 
-    user_cart.merge!(session_cart)
+    begin
+      user_cart.merge!(session_cart)
+    rescue Cart::OutOfStockError => e
+      flash[:error] = e.message
+    end
+
     user.update_cart!(user_cart)
     session[:cart] = user_cart.serialize
     @current_cart = user_cart

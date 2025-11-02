@@ -1,0 +1,117 @@
+<div class="space-y-6">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-semibold text-slate-900"><%= @customer.name %></h1>
+      <p class="text-sm text-slate-500">Joined <%= @customer.created_at.strftime("%B %-d, %Y") %></p>
+      <% if @customer.blocked? %>
+        <span class="mt-2 inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-red-600">Blocked</span>
+      <% end %>
+    </div>
+    <div class="flex flex-wrap items-center gap-2 text-sm font-semibold">
+      <%= link_to "Send Email", "mailto:#{@customer.email}", class: "inline-flex items-center gap-2 rounded-full border border-indigo-200 px-4 py-2 text-indigo-600 transition hover:bg-indigo-50" %>
+      <%= link_to(@customer.blocked? ? "Unblock Customer" : "Block Customer", block_admin_customer_path(@customer), method: :patch, class: "inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-amber-600 transition hover:bg-amber-100", data: { turbo_confirm: @customer.blocked? ? "Unblock #{@customer.name}?" : "Block #{@customer.name}?" }) %>
+      <% unless @customer == current_user %>
+        <%= link_to "Delete", admin_customer_path(@customer), method: :delete, class: "inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-red-600 transition hover:bg-red-100", data: { turbo_confirm: "Delete #{@customer.name}?" } %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+    <div class="space-y-6">
+      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-slate-900">Customer information</h2>
+        <dl class="mt-4 grid gap-3 text-sm text-slate-600">
+          <div class="grid grid-cols-[120px_1fr] gap-4">
+            <dt class="font-medium text-slate-500">Email</dt>
+            <dd><%= mail_to @customer.email, @customer.email, class: "text-indigo-600 hover:text-indigo-500" %></dd>
+          </div>
+          <div class="grid grid-cols-[120px_1fr] gap-4">
+            <dt class="font-medium text-slate-500">Phone</dt>
+            <dd><%= @customer.phone.presence || "—" %></dd>
+          </div>
+          <div class="grid grid-cols-[120px_1fr] gap-4">
+            <dt class="font-medium text-slate-500">Total spent</dt>
+            <dd class="font-semibold text-slate-900"><%= number_to_currency(@total_spent) %></dd>
+          </div>
+          <div class="grid grid-cols-[120px_1fr] gap-4">
+            <dt class="font-medium text-slate-500">Orders</dt>
+            <dd class="font-semibold text-slate-900"><%= @orders.size %></dd>
+          </div>
+          <div class="grid grid-cols-[120px_1fr] gap-4">
+            <dt class="font-medium text-slate-500">Addresses</dt>
+            <dd>
+              <% if @customer.addresses.any? %>
+                <ul class="space-y-1">
+                  <% @customer.addresses.each do |address| %>
+                    <li class="rounded-xl bg-slate-50 px-3 py-2 text-slate-600"><%= address %></li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <span>—</span>
+              <% end %>
+            </dd>
+          </div>
+        </dl>
+        <div class="mt-6">
+          <%= link_to "Edit profile", edit_admin_customer_path(@customer), class: "inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
+        </div>
+      </div>
+
+      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-slate-900">Recent activity</h2>
+        <ul class="mt-4 space-y-3 text-sm text-slate-600">
+          <% if @recent_orders.any? %>
+            <% @recent_orders.each do |order| %>
+              <li class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div class="flex items-center justify-between">
+                  <span class="font-semibold text-slate-900">Order <%= order.order_number %></span>
+                  <span class="text-xs uppercase tracking-wide text-indigo-600"><%= order.status.humanize %></span>
+                </div>
+                <div class="mt-1 flex items-center justify-between text-xs text-slate-500">
+                  <span><%= order.created_at.strftime("%b %-d, %Y") %></span>
+                  <span class="font-semibold text-slate-900"><%= number_to_currency(order.total) %></span>
+                </div>
+              </li>
+            <% end %>
+          <% else %>
+            <li class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-slate-500">No recent activity yet.</li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <aside class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-900">Order history</h2>
+      <% if @orders.any? %>
+        <div class="mt-4 -mx-4 overflow-x-auto">
+          <table class="min-w-full divide-y divide-slate-200 text-sm text-slate-600">
+            <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <tr>
+                <th scope="col" class="px-4 py-3 text-left">Order #</th>
+                <th scope="col" class="px-4 py-3 text-left">Date</th>
+                <th scope="col" class="px-4 py-3 text-left">Status</th>
+                <th scope="col" class="px-4 py-3 text-right">Total</th>
+                <th scope="col" class="px-4 py-3 text-right"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <% @orders.each do |order| %>
+                <tr class="hover:bg-indigo-50/40">
+                  <td class="px-4 py-3 font-semibold text-slate-900"><%= order.order_number %></td>
+                  <td class="px-4 py-3"><%= order.created_at.strftime("%b %-d, %Y") %></td>
+                  <td class="px-4 py-3"><span class="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-indigo-600"><%= order.status.humanize %></span></td>
+                  <td class="px-4 py-3 text-right font-semibold text-slate-900"><%= number_to_currency(order.total) %></td>
+                  <td class="px-4 py-3 text-right">
+                    <%= link_to "View", admin_order_path(order), class: "inline-flex items-center rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="mt-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-500">No orders yet.</p>
+      <% end %>
+    </aside>
+  </div>
+</div>

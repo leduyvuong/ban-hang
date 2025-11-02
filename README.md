@@ -18,11 +18,39 @@ rails new . -d postgresql --css tailwind
    bin/rails db:prepare
    bin/rails db:seed
    ```
-5. Start the development servers:
+5. Copy `.env.example` to `.env` (or configure environment variables another way) and populate values for local SMTP/Redis if needed.
+6. Start the development services:
    ```sh
-   bin/dev
+   bin/dev      # Rails + Tailwind
+   bundle exec sidekiq -C config/sidekiq.yml
    ```
    This runs both the Rails server and Tailwind watcher (via Foreman).
+
+## Testing
+
+RSpec is configured alongside the existing Minitest suite.
+
+```sh
+bundle exec rspec
+```
+
+To run the legacy Minitest suite:
+
+```sh
+bundle exec rails test
+```
+
+## Deployment Checklist
+
+- Provision PostgreSQL and Redis; expose connection strings via `DATABASE_URL` and `REDIS_URL`.
+- Configure `DEFAULT_MAILER_FROM`, `DEFAULT_ADMIN_EMAIL`, and SMTP credentials for Action Mailer.
+- Precompile assets: `bundle exec rails assets:precompile`.
+- Run migrations (including Active Storage and index optimisations).
+- Ensure Sidekiq is running (`bundle exec sidekiq -C config/sidekiq.yml`).
+- Set `SENTRY_DSN` (or equivalent) for error monitoring.
+- Verify `/health` endpoint is reachable by the load balancer.
+- Enable `RAILS_SERVE_STATIC_FILES` if using the built-in file server.
+- Update CDN/static caches after deploy to honor long-lived cache headers.
 
 ## Seeds
 

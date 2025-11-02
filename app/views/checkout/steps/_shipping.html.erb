@@ -8,43 +8,39 @@
   <%= form_with url: checkout_path, method: :patch, data: { turbo_frame: "checkout_steps" }, class: "space-y-4" do |form| %>
     <%= hidden_field_tag :step, "shipping" %>
 
-    <% if shipping_form.errors.any? %>
-      <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-        <p class="font-semibold"><%= pluralize(shipping_form.errors.count, "error") %> prevented continuing:</p>
-        <ul class="mt-2 list-disc pl-5">
-          <% shipping_form.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+    <%= render "shared/form_errors", object: shipping_form %>
 
     <div class="grid gap-4 md:grid-cols-2">
       <div class="md:col-span-2 space-y-1">
         <label class="text-sm font-medium text-gray-700" for="shipping_name">Full name</label>
-        <%= form.text_field :name, value: shipping_form.name, name: "shipping[name]", id: "shipping_name", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.text_field :name, value: shipping_form.name, name: "shipping[name]", id: "shipping_name", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(shipping_form, :name)}" %>
+        <%= field_error(shipping_form, :name) %>
       </div>
       <div class="md:col-span-2 space-y-1">
         <label class="text-sm font-medium text-gray-700" for="shipping_address">Street address</label>
-        <%= form.text_field :address, value: shipping_form.address, name: "shipping[address]", id: "shipping_address", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.text_field :address, value: shipping_form.address, name: "shipping[address]", id: "shipping_address", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(shipping_form, :address)}" %>
+        <%= field_error(shipping_form, :address) %>
       </div>
       <div class="space-y-1">
         <label class="text-sm font-medium text-gray-700" for="shipping_city">City</label>
-        <%= form.text_field :city, value: shipping_form.city, name: "shipping[city]", id: "shipping_city", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.text_field :city, value: shipping_form.city, name: "shipping[city]", id: "shipping_city", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(shipping_form, :city)}" %>
+        <%= field_error(shipping_form, :city) %>
       </div>
       <div class="space-y-1">
         <label class="text-sm font-medium text-gray-700" for="shipping_postal_code">Postal code</label>
-        <%= form.text_field :postal_code, value: shipping_form.postal_code, name: "shipping[postal_code]", id: "shipping_postal_code", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.text_field :postal_code, value: shipping_form.postal_code, name: "shipping[postal_code]", id: "shipping_postal_code", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(shipping_form, :postal_code)}" %>
+        <%= field_error(shipping_form, :postal_code) %>
       </div>
       <div class="md:col-span-2 space-y-1">
         <label class="text-sm font-medium text-gray-700" for="shipping_phone">Phone number</label>
-        <%= form.telephone_field :phone, value: shipping_form.phone, name: "shipping[phone]", id: "shipping_phone", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <%= form.telephone_field :phone, value: shipping_form.phone, name: "shipping[phone]", id: "shipping_phone", class: "w-full rounded-2xl border border-gray-200 px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(shipping_form, :phone)}" %>
+        <%= field_error(shipping_form, :phone) %>
       </div>
     </div>
 
     <div class="flex items-center justify-end gap-3">
       <%= link_to "Cancel", cart_path, class: "rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-red-200 hover:text-red-600" %>
-      <button type="submit" class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500">Continue to review</button>
+      <button type="submit" class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500" data-disable-with="Continuing...">Continue to review</button>
     </div>
   <% end %>
 </div>

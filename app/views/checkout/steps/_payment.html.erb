@@ -47,7 +47,7 @@
       <%= link_to "Back", checkout_path(step: 2), data: { turbo_frame: "checkout_steps" }, class: "rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
       <%= form_with url: checkout_path, method: :patch, data: { turbo_frame: "checkout_steps" }, class: "inline" do %>
         <%= hidden_field_tag :step, "payment" %>
-        <button type="submit" class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500">Place order</button>
+        <button type="submit" class="rounded-full bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500" data-disable-with="Placing...">Place order</button>
       <% end %>
     </div>
   <% end %>
