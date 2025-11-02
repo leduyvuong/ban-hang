@@ -31,6 +31,23 @@ module Admin
       redirect_to admin_shop_features_path(@shop), alert: e.record.errors.full_messages.to_sentence
     end
 
+    def lock
+      feature = Feature.find(params[:id])
+
+      unless @shop.feature_unlocked?(feature.slug)
+        redirect_to admin_shop_features_path(@shop), alert: "#{feature.name} is already locked."
+        return
+      end
+
+      @shop.lock_feature!(feature.slug, locked_by: current_admin_user)
+
+      redirect_to admin_shop_features_path(@shop), notice: "#{feature.name} locked for #{@shop.name}."
+    rescue ActiveRecord::RecordNotFound
+      redirect_to admin_shop_features_path(@shop), alert: "Feature not found or not assigned to this shop."
+    rescue ActiveRecord::RecordInvalid
+      redirect_to admin_shop_features_path(@shop), alert: e.record.errors.full_messages.to_sentence
+    end
+
     private
 
     def set_shop

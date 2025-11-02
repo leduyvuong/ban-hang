@@ -44,6 +44,7 @@ Rails.application.routes.draw do
     resources :shops, only: %i[index show] do
       resources :features, only: :index do
         post :unlock, on: :member
+        post :lock, on: :member
       end
     end
   end

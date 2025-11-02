@@ -40,14 +40,23 @@
             <%= link_to admin_root_path, class: admin_nav_class(admin_root_path) do %>
               <span>Dashboard</span>
             <% end %>
-            <%= link_to admin_products_path, class: admin_nav_class(admin_products_path) do %>
-              <span>Products</span>
+            
+            <% if shop_feature_available?('product_management') %>
+              <%= link_to admin_products_path, class: admin_nav_class(admin_products_path) do %>
+                <span>Products</span>
+              <% end %>
             <% end %>
-            <%= link_to admin_customers_path, class: admin_nav_class(admin_customers_path) do %>
-              <span>Customers</span>
+            
+            <% if shop_feature_available?('customer_management') %>
+              <%= link_to admin_customers_path, class: admin_nav_class(admin_customers_path) do %>
+                <span>Customers</span>
+              <% end %>
             <% end %>
-            <%= link_to admin_orders_path, class: admin_nav_class(admin_orders_path) do %>
-              <span>Orders</span>
+            
+            <% if shop_feature_available?('order_management') %>
+              <%= link_to admin_orders_path, class: admin_nav_class(admin_orders_path) do %>
+                <span>Orders</span>
+              <% end %>
             <% end %>
           </nav>
 

@@ -43,4 +43,18 @@ module ApplicationHelper
 
     content_tag(:p, object.errors.full_messages_for(attribute).first, class: "mt-1 text-xs text-rose-600")
   end
+
+  # Feature availability check
+  # For multi-tenant apps, this checks if the current shop has the feature unlocked
+  def feature_available?(feature_slug, shop = nil)
+    # If no shop context, assume feature is available (for single-tenant or testing)
+    return true if shop.nil?
+    
+    shop.feature_unlocked?(feature_slug)
+  end
+
+  # Check if feature is locked
+  def feature_locked?(feature_slug, shop = nil)
+    !feature_available?(feature_slug, shop)
+  end
 end

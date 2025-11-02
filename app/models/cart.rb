@@ -163,7 +163,7 @@ class Cart
     ids = items.map(&:product_id).uniq
     return if ids.empty?
 
-    products = Product.with_attached_image.where(id: ids).index_by(&:id)
+    products = Product.includes(image_attachment: { blob: :variant_records }).where(id: ids).index_by(&:id)
 
     items.select! do |item|
       product = products[item.product_id]

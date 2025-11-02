@@ -1,10 +1,17 @@
 <% current_step = step.to_i %>
 <% shipping_form ||= Checkout::ShippingForm.new %>
-<% case current_step %>
-<% when 1 %>
-  <%= render "checkout/steps/shipping", shipping_form: shipping_form %>
-<% when 2 %>
-  <%= render "checkout/steps/review", shipping_form: shipping_form %>
-<% else %>
-  <%= render "checkout/steps/payment", shipping_form: shipping_form, order_complete: order_complete %>
-<% end %>
+
+<div
+  data-controller="checkout"
+  data-checkout-step-value="<%= current_step %>"
+  data-checkout-order-complete-value="<%= order_complete ? "true" : "false" %>"
+>
+  <% case current_step %>
+  <% when 1 %>
+    <%= render "checkout/steps/shipping", shipping_form: shipping_form %>
+  <% when 2 %>
+    <%= render "checkout/steps/review", shipping_form: shipping_form %>
+  <% else %>
+    <%= render "checkout/steps/payment", shipping_form: shipping_form, order_complete: order_complete %>
+  <% end %>
+</div>

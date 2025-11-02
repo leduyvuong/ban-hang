@@ -53,7 +53,7 @@ class ProductsController < ApplicationController
     ]
 
     if turbo_frame_request?
-      render partial: "products/list",
+      render partial: "products/list_frame",
              locals: {
                products: @products,
                pagy: @pagy,
