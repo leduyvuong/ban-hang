@@ -5,6 +5,9 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   helper_method :current_cart, :current_user, :logged_in?, :admin?
+  helper_method :current_currency, :available_currencies
+
+  before_action :assign_current_currency
 
   rescue_from ActiveRecord::RecordNotFound, with: :handle_not_found
   rescue_from StandardError, with: :handle_internal_error unless Rails.env.development?
@@ -147,5 +150,33 @@ class ApplicationController < ActionController::Base
 
   def redirect_back_or(default)
     redirect_to(session.delete(:return_to) || default)
+  end
+
+  def assign_current_currency
+    requested_currency = params[:currency].presence ||
+      session[:currency].presence ||
+      cookies[:preferred_currency].presence
+
+    if requested_currency.present?
+      code = requested_currency.to_s.upcase
+      if available_currencies.include?(code)
+        session[:currency] = code
+        @current_currency = code
+      end
+    end
+
+    @current_currency ||= CurrencyRate::BASE_CURRENCY
+  rescue ActiveRecord::StatementInvalid, ActiveRecord::RecordNotFound
+    @current_currency = CurrencyRate::BASE_CURRENCY
+  end
+
+  def current_currency
+    @current_currency || CurrencyRate::BASE_CURRENCY
+  end
+
+  def available_currencies
+    @available_currencies ||= CurrencyRate.available_codes
+  rescue ActiveRecord::StatementInvalid
+    CurrencyRate::SUPPORTED_CURRENCIES.keys
   end
 end

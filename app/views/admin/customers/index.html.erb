@@ -54,7 +54,7 @@
             <td class="px-4 py-3"><%= mail_to customer.email, customer.email, class: "text-indigo-600 hover:text-indigo-500" %></td>
             <td class="px-4 py-3"><%= customer.phone.presence || "—" %></td>
             <td class="px-4 py-3 text-right font-semibold text-slate-900"><%= customer.orders_count %></td>
-            <td class="px-4 py-3 text-right font-semibold text-slate-900"><%= number_to_currency(customer.total_spent) %></td>
+            <td class="px-4 py-3 text-right font-semibold text-slate-900"><%= format_money(customer.total_spent) %></td>
             <td class="px-4 py-3"><%= customer.created_at.strftime("%b %-d, %Y") %></td>
             <td class="px-4 py-3 text-right">
               <div class="inline-flex items-center gap-2 text-xs font-semibold">

@@ -31,6 +31,8 @@ class Order < ApplicationRecord
 
   validates :order_number, presence: true, uniqueness: true
   validates :total, numericality: { greater_than_or_equal_to: 0 }
+  validates :total_local_amount, numericality: { greater_than_or_equal_to: 0 }
+  validates :currency, presence: true
   validates :status, presence: true
   validate :ensure_items_in_stock, on: :create
 
@@ -50,5 +52,9 @@ class Order < ApplicationRecord
         errors.add(:base, "Not enough stock for #{item.product.name}. Only #{item.product.stock} left.")
       end
     end
+  end
+
+  def total_in(currency_code)
+    CurrencyConverter.convert(total, from: CurrencyConverter.base_currency, to: currency_code)
   end
 end

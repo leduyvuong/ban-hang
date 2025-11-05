@@ -5,7 +5,9 @@ module Admin
     def index
       @products_count = Product.count
       @orders_count = Order.count if defined?(Order)
-      @recent_products = Product.order(created_at: :desc).limit(5)
+      @recent_products = Product.includes(:discount).order(created_at: :desc).limit(5)
+      @active_discounts = Discount.currently_active.order(Arel.sql("COALESCE(end_date, '9999-12-31') ASC"))
+      @upcoming_discounts = Discount.active.where("start_date > ?", Time.current).order(:start_date)
 
       set_admin_page(
         title: "Dashboard",

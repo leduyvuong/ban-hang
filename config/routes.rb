@@ -36,7 +36,13 @@ Rails.application.routes.draw do
     post "login", to: "sessions#create"
     delete "logout", to: "sessions#destroy", as: :logout
 
+    get "analytics", to: "analytics#index", as: :analytics
+    resource :currency_selection, only: :create
+    resources :currency_rates, except: %i[destroy show]
     resources :products
+    resources :discounts do
+      patch :toggle_active, on: :member
+    end
     resources :orders, only: %i[index show]
     resources :customers do
       patch :block, on: :member

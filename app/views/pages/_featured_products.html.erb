@@ -17,7 +17,9 @@
             <% else %>
               <div class="flex h-full items-center justify-center bg-gray-100 text-sm text-gray-400">No image</div>
             <% end %>
-            <% if product.category.present? %>
+            <% if product.discounted? %>
+              <span class="absolute left-4 top-4 inline-flex items-center rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white shadow"><%= product.discount_badge_label(currency: current_currency) %></span>
+            <% elsif product.category.present? %>
               <span class="absolute left-4 top-4 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-indigo-600 shadow-sm"><%= product.category.name %></span>
             <% end %>
             <span class="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[11px] font-medium text-white">
@@ -30,11 +32,22 @@
 
           <div class="flex flex-1 flex-col gap-4 p-6">
             <div class="space-y-2">
+              <% if product.category.present? %>
+                <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-indigo-600"><%= product.category.name %></span>
+              <% end %>
               <h3 class="text-lg font-semibold text-gray-900"><%= product.name %></h3>
               <p class="text-sm text-gray-600"><%= truncate(product.short_description.presence || product.description, length: 110) %></p>
             </div>
             <div class="mt-auto space-y-4">
-              <p class="text-xl font-bold text-indigo-600"><%= number_to_currency(product.price) %></p>
+              <% if product.discounted? %>
+                <div class="flex flex-col gap-1">
+                  <span class="text-2xl font-bold text-emerald-600"><%= format_money(product.discounted_price) %></span>
+                  <span class="text-sm text-gray-400 line-through"><%= format_money(product.price) %></span>
+                  <span class="text-xs font-semibold uppercase tracking-wide text-emerald-600">You save <%= format_money(product.discount_amount) %></span>
+                </div>
+              <% else %>
+                <p class="text-xl font-bold text-indigo-600"><%= format_money(product.price) %></p>
+              <% end %>
               <div class="flex flex-wrap gap-3">
                 <%= link_to "View Details", product_path(product), class: "inline-flex items-center justify-center rounded-full border border-indigo-200 px-4 py-2 text-sm font-semibold text-indigo-600 transition hover:border-indigo-300 hover:text-indigo-700" %>
                 <% if product.stock.to_i.zero? %>

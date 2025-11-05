@@ -1,0 +1,176 @@
+<% initial_range = @initial_payload&.dig(:range) || {} %>
+<% initial_start = initial_range[:start].present? ? (Time.zone.parse(initial_range[:start]) rescue nil) : nil %>
+<% initial_end = initial_range[:end].present? ? (Time.zone.parse(initial_range[:end]) rescue nil) : nil %>
+<% initial_json = (@initial_payload || {}).to_json %>
+
+<div
+  data-controller="analytics"
+  data-analytics-endpoint-value="<%= admin_analytics_path(format: :json) %>"
+  data-analytics-initial-value='<%= raw initial_json %>'
+  class="space-y-6"
+>
+  <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Filters</h2>
+        <p class="text-sm text-slate-500">Refine the dashboard by time period or custom dates.</p>
+      </div>
+      <form
+        data-analytics-target="form"
+        data-action="change->analytics#onFilterChange submit->analytics#preventSubmit"
+        class="flex flex-wrap items-center gap-3"
+      >
+        <label class="text-sm font-semibold text-slate-700">
+          Range
+          <select
+            name="range"
+            data-analytics-target="rangeSelect"
+            class="mt-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+          >
+            <% Analytics::DateRange::PRESETS.each_key do |key| %>
+              <% label = Analytics::DateRange::PRESETS[key][:label] %>
+              <option value="<%= key %>" <%= "selected" if initial_range[:preset] == key %>><%= label %></option>
+            <% end %>
+            <option value="custom" <%= "selected" if initial_range[:preset] == "custom" %>>Custom range</option>
+          </select>
+        </label>
+        <% custom_classes = ["items-end", "gap-3"] %>
+        <% custom_classes << "hidden" unless initial_range[:preset] == "custom" %>
+        <div data-analytics-target="customFields" class="<%= custom_classes.join(" ") %>">
+          <label class="text-sm font-semibold text-slate-700">
+            Start
+            <input
+              type="date"
+              name="start_date"
+              data-analytics-target="startDate"
+              value="<%= initial_range[:preset] == 'custom' ? initial_start&.to_date : nil %>"
+              class="mt-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+            >
+          </label>
+          <label class="text-sm font-semibold text-slate-700">
+            End
+            <input
+              type="date"
+              name="end_date"
+              data-analytics-target="endDate"
+              value="<%= initial_range[:preset] == 'custom' ? initial_end&.to_date : nil %>"
+              class="mt-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+            >
+          </label>
+          <button
+            type="submit"
+            class="inline-flex items-center rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500"
+          >
+            Apply
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="relative rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div data-analytics-target="loadingState" class="absolute inset-0 z-10 hidden items-center justify-center bg-white/70">
+      <div class="flex items-center gap-2 text-sm font-semibold text-indigo-600">
+        <svg class="h-5 w-5 animate-spin" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+        Updating dashboard…
+      </div>
+    </div>
+
+    <div data-analytics-target="content" class="space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Selected range</p>
+          <p class="text-lg font-semibold text-slate-900" data-analytics-target="rangeLabel"></p>
+        </div>
+        <div class="text-right text-xs text-slate-500 space-y-1">
+          <p data-analytics-target="rangeWindow"></p>
+          <p><span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 font-semibold uppercase tracking-wide text-slate-600" data-analytics-target="currencyLabel"></span></p>
+        </div>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-2xl border border-indigo-100 bg-indigo-50/60 p-5 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600">Revenue</p>
+          <p class="mt-2 text-2xl font-semibold text-slate-900" data-analytics-target="summaryValue" data-key="revenue.current_month" data-format="currency"></p>
+          <p class="mt-1 text-xs text-slate-600">Last month:
+            <span data-analytics-target="summaryValue" data-key="revenue.last_month" data-format="currency"></span>
+          </p>
+          <p class="mt-1 text-xs" data-analytics-target="trend" data-key="revenue.month_over_month_change" data-format="percent"></p>
+        </div>
+        <div class="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-emerald-600">Orders</p>
+          <p class="mt-2 text-2xl font-semibold text-slate-900" data-analytics-target="summaryValue" data-key="orders.current_month" data-format="number"></p>
+          <p class="mt-1 text-xs text-slate-600">Last month:
+            <span data-analytics-target="summaryValue" data-key="orders.last_month" data-format="number"></span>
+          </p>
+          <p class="mt-1 text-xs" data-analytics-target="trend" data-key="orders.month_over_month_change" data-format="percent"></p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Active customers</p>
+          <p class="mt-2 text-2xl font-semibold text-slate-900" data-analytics-target="summaryValue" data-key="active_customers.value" data-format="number"></p>
+          <p class="mt-1 text-xs text-slate-500">Customers with purchases in the last 90 days.</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Average order value</p>
+          <p class="mt-2 text-2xl font-semibold text-slate-900" data-analytics-target="summaryValue" data-key="average_order_value.value" data-format="currency"></p>
+          <p class="mt-1 text-xs text-slate-500">Conversion rate: <span data-analytics-target="summaryValue" data-key="conversion_rate.value" data-format="percent-or-na"></span></p>
+        </div>
+      </div>
+
+      <div class="grid gap-6 xl:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-900">Revenue over time</p>
+          </div>
+          <div class="mt-4 h-64">
+            <canvas data-analytics-target="revenueChart" class="h-full w-full"></canvas>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-900">Orders over time</p>
+          </div>
+          <div class="mt-4 h-64">
+            <canvas data-analytics-target="ordersChart" class="h-full w-full"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-900">Top products</p>
+            <p class="text-xs text-slate-500">Based on revenue</p>
+          </div>
+          <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+              <thead class="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <tr>
+                  <th class="px-4 py-2">Rank</th>
+                  <th class="px-4 py-2">Product</th>
+                  <th class="px-4 py-2 text-right">Units</th>
+                  <th class="px-4 py-2 text-right">Revenue</th>
+                  <th class="px-4 py-2 text-right">Share</th>
+                </tr>
+              </thead>
+              <tbody data-analytics-target="topProducts" class="divide-y divide-slate-100 text-slate-600">
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <p class="text-sm font-semibold text-slate-900">Customer acquisition</p>
+            <p class="text-xs text-slate-500">New customers over time</p>
+          </div>
+          <div class="mt-4 h-64">
+            <canvas data-analytics-target="customersChart" class="h-full w-full"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

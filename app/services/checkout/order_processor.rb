@@ -8,10 +8,11 @@ module Checkout
     class CartEmptyError < Error; end
     class StockError < Error; end
 
-    def initialize(user:, cart:, shipping:)
+    def initialize(user:, cart:, shipping:, currency: CurrencyConverter.base_currency)
       @user = user
       @cart = cart
       @shipping = shipping
+      @currency = currency.to_s.upcase.presence || CurrencyConverter.base_currency
     end
 
     def call
@@ -49,7 +50,9 @@ module Checkout
       order = Order.new(
         user: @user,
         status: "pending",
-        placed_at: Time.current
+        placed_at: Time.current,
+        currency: @currency,
+        exchange_rate: exchange_rate_for(@currency)
       )
 
       items.each do |item|
@@ -58,16 +61,24 @@ module Checkout
 
         unit_price = product.price
         total_price = unit_price * item.quantity
+        unit_price_local = CurrencyConverter.convert(unit_price, from: CurrencyConverter.base_currency, to: @currency)
+        total_price_local = unit_price_local * item.quantity
 
         order.order_items.build(
           product: product,
           quantity: item.quantity,
           unit_price: unit_price,
-          total_price: total_price
+          total_price: total_price,
+          currency: @currency,
+          exchange_rate: exchange_rate_for(@currency),
+          unit_price_local: unit_price_local,
+          total_price_local: total_price_local
         )
       end
 
       order.total = order.order_items.sum { |order_item| order_item.total_price }
+      order_total_local = CurrencyConverter.convert(order.total, from: CurrencyConverter.base_currency, to: @currency)
+      order.total_local_amount = order_total_local
       order
     end
 
@@ -100,6 +111,12 @@ module Checkout
     def enqueue_notifications(order, low_stock_ids)
       OrderConfirmationJob.perform_later(order.id)
       low_stock_ids.uniq.each { |product_id| LowStockAlertJob.perform_later(product_id) }
+    end
+
+    def exchange_rate_for(currency)
+      CurrencyRate.fetch_rate(currency).rate_to_base
+    rescue ActiveRecord::RecordNotFound
+      nil
     end
   end
 end

@@ -31,7 +31,7 @@
           </div>
           <div class="grid grid-cols-[120px_1fr] gap-4">
             <dt class="font-medium text-slate-500">Total spent</dt>
-            <dd class="font-semibold text-slate-900"><%= number_to_currency(@total_spent) %></dd>
+            <dd class="font-semibold text-slate-900"><%= format_money(@total_spent) %></dd>
           </div>
           <div class="grid grid-cols-[120px_1fr] gap-4">
             <dt class="font-medium text-slate-500">Orders</dt>
@@ -69,7 +69,7 @@
                 </div>
                 <div class="mt-1 flex items-center justify-between text-xs text-slate-500">
                   <span><%= order.created_at.strftime("%b %-d, %Y") %></span>
-                  <span class="font-semibold text-slate-900"><%= number_to_currency(order.total) %></span>
+                  <span class="font-semibold text-slate-900"><%= format_money(order.total) %></span>
                 </div>
               </li>
             <% end %>
@@ -100,7 +100,7 @@
                   <td class="px-4 py-3 font-semibold text-slate-900"><%= order.order_number %></td>
                   <td class="px-4 py-3"><%= order.created_at.strftime("%b %-d, %Y") %></td>
                   <td class="px-4 py-3"><span class="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-indigo-600"><%= order.status.humanize %></span></td>
-                  <td class="px-4 py-3 text-right font-semibold text-slate-900"><%= number_to_currency(order.total) %></td>
+                  <td class="px-4 py-3 text-right font-semibold text-slate-900"><%= format_money(order.total) %></td>
                   <td class="px-4 py-3 text-right">
                     <%= link_to "View", admin_order_path(order), class: "inline-flex items-center rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
                   </td>

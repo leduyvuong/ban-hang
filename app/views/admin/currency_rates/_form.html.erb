@@ -1,0 +1,30 @@
+<%= form_with model: [:admin, @currency_rate], class: "space-y-6" do |form| %>
+  <%= render "shared/form_errors", object: @currency_rate %>
+
+  <div class="grid gap-6 md:grid-cols-2">
+    <div>
+      <%= form.label :currency_code, "Currency code", class: "text-sm font-semibold text-slate-700" %>
+      <%= form.text_field :currency_code, class: "mt-1 w-full rounded-full border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      <p class="mt-1 text-xs text-slate-400">Use ISO code like USD, EUR, VND.</p>
+    </div>
+    <div>
+      <%= form.label :rate_to_base, "Rate to #{CurrencyRate::BASE_CURRENCY}", class: "text-sm font-semibold text-slate-700" %>
+      <%= form.number_field :rate_to_base, step: 0.0000000001, class: "mt-1 w-full rounded-full border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      <p class="mt-1 text-xs text-slate-400">1 unit of the currency equals this amount in <%= CurrencyRate::BASE_CURRENCY %>.</p>
+    </div>
+    <div>
+      <%= form.label :fetched_at, class: "text-sm font-semibold text-slate-700" %>
+      <%= form.datetime_field :fetched_at, class: "mt-1 w-full rounded-full border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+    </div>
+    <div>
+      <%= form.label :source, class: "text-sm font-semibold text-slate-700" %>
+      <%= form.text_field :source, class: "mt-1 w-full rounded-full border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      <p class="mt-1 text-xs text-slate-400">Optional: e.g., Open Exchange Rates, Manual update.</p>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= form.submit class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500", data: { disable_with: "Saving..." } %>
+    <%= link_to "Cancel", admin_currency_rates_path, class: "inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
+  </div>
+<% end %>

@@ -23,14 +23,46 @@
       <% current_cart.items_with_products.each do |item| %>
         <li class="flex items-center justify-between">
           <span><%= item.product.name %> × <%= item.quantity %></span>
-          <span class="font-semibold text-gray-900"><%= number_to_currency(item.subtotal) %></span>
+          <% if item.discount_applied? %>
+            <span class="text-right">
+              <span class="block text-xs text-gray-400 line-through"><%= format_money(item.regular_subtotal) %></span>
+              <span class="font-semibold text-emerald-600"><%= format_money(item.subtotal) %></span>
+            </span>
+          <% else %>
+            <span class="font-semibold text-gray-900"><%= format_money(item.subtotal) %></span>
+          <% end %>
         </li>
       <% end %>
     </ul>
-    <div class="mt-4 flex items-center justify-between border-t border-gray-200 pt-4 text-sm font-semibold text-gray-900">
-      <span>Order total</span>
-      <span><%= number_to_currency(current_cart.subtotal) %></span>
+    <% savings = current_cart.discount_total %>
+    <% has_savings = savings.positive? %>
+    <% regular_total = current_cart.regular_total %>
+    <% total_due = current_cart.subtotal %>
+    <div class="mt-4 space-y-2 border-t border-gray-200 pt-4 text-sm">
+      <div class="flex items-center justify-between text-gray-600">
+        <span>Items total (before discounts)</span>
+        <span>
+          <% if has_savings %>
+            <span class="text-xs text-gray-400 line-through"><%= format_money(regular_total) %></span>
+          <% else %>
+            <span class="font-semibold text-gray-900"><%= format_money(total_due) %></span>
+          <% end %>
+        </span>
+      </div>
+      <% if has_savings %>
+        <div class="flex items-center justify-between text-emerald-600">
+          <span>Discount savings</span>
+          <span>−<%= format_money(savings) %></span>
+        </div>
+      <% end %>
+      <div class="flex items-center justify-between text-sm font-semibold text-gray-900">
+        <span>Order total</span>
+        <span><%= format_money(total_due) %></span>
+      </div>
     </div>
+    <% if has_savings %>
+      <p class="mt-2 text-xs font-medium uppercase tracking-wide text-emerald-600">You saved <%= format_money(savings) %></p>
+    <% end %>
   </div>
 
   <div class="flex items-center justify-end gap-3">

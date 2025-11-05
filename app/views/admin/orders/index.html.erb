@@ -51,7 +51,7 @@
                   <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold capitalize text-slate-600"><%= order.status %></span>
                 </td>
                 <td class="px-4 py-3 align-middle text-xs text-slate-500"><%= (order.placed_at || order.created_at)&.strftime("%b %-d, %Y %H:%M") || "Pending" %></td>
-                <td class="px-4 py-3 align-middle text-right font-semibold text-slate-900"><%= number_to_currency(order.total) %></td>
+                <td class="px-4 py-3 align-middle text-right font-semibold text-slate-900"><%= format_money(order.total) %></td>
                 <td class="px-4 py-3 align-middle text-right">
                   <%= link_to "View", admin_order_path(order), class: "inline-flex items-center rounded-full border border-indigo-200 px-3 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50" %>
                 </td>

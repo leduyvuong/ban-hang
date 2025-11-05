@@ -2,9 +2,11 @@
 
 require "active_model"
 require "active_support/core_ext/string/inflections"
+require "bigdecimal"
 
 class Cart
   class OutOfStockError < StandardError; end
+  ZERO_MONEY = BigDecimal("0")
 
   class Item
     include ActiveModel::Validations
@@ -31,10 +33,38 @@ class Cart
       @product_id = value.id if value
     end
 
-    def subtotal
-      return 0 unless product
+    def unit_price
+      return money(0) unless product
 
-      product.price * quantity
+      money(product.discounted_price)
+    end
+
+    def regular_unit_price
+      return money(0) unless product
+
+      money(product.price)
+    end
+
+    def subtotal
+      return money(0) unless product
+
+      (unit_price * quantity).round(2)
+    end
+
+    def regular_subtotal
+      return money(0) unless product
+
+      (regular_unit_price * quantity).round(2)
+    end
+
+    def savings
+      return money(0) unless product
+
+      [regular_subtotal - subtotal, money(0)].max
+    end
+
+    def discount_applied?
+      savings.positive?
     end
 
     private
@@ -48,6 +78,10 @@ class Cart
       elsif quantity > available
         errors.add(:base, "Only #{available} #{'unit'.pluralize(available)} of #{product.name} available.")
       end
+    end
+
+    def money(value)
+      BigDecimal(value.to_s)
     end
   end
 
@@ -142,7 +176,16 @@ class Cart
   end
 
   def subtotal
-    items_with_products.sum(&:subtotal)
+    items_with_products.sum(ZERO_MONEY, &:subtotal)
+  end
+
+  def regular_total
+    items_with_products.sum(ZERO_MONEY, &:regular_subtotal)
+  end
+
+  def discount_total
+    discount = (regular_total - subtotal).round(2)
+    discount.positive? ? discount : ZERO_MONEY
   end
 
   def items_with_products
@@ -163,7 +206,7 @@ class Cart
     ids = items.map(&:product_id).uniq
     return if ids.empty?
 
-    products = Product.includes(image_attachment: { blob: :variant_records }).where(id: ids).index_by(&:id)
+    products = Product.includes({ product_discount: :discount }, image_attachment: { blob: :variant_records }).where(id: ids).index_by(&:id)
 
     items.select! do |item|
       product = products[item.product_id]

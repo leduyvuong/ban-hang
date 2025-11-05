@@ -10,6 +10,9 @@ ShopFeature.delete_all
 AdminUser.delete_all
 OrderItem.delete_all
 Order.delete_all
+CurrencyRate.delete_all
+ProductDiscount.delete_all
+Discount.delete_all
 Product.delete_all
 Category.delete_all
 Feature.delete_all
@@ -151,7 +154,8 @@ puts "Creating products..."
 
 products = 40.times.map do |index|
   category = categories.sample
-  price = Faker::Commerce.price(range: 20.0..350.0)
+  price = Faker::Commerce.price(range: 20.0..350.0).round(2)
+  price = 20.0 if price <= 0 # Ensure price is always > 0
   name = "#{Faker::Commerce.product_name} #{index + 1}"
   description = Faker::Lorem.paragraph(sentence_count: 5)
   short_description = Faker::Lorem.sentence(word_count: 14)
@@ -161,6 +165,8 @@ products = 40.times.map do |index|
     description: description,
     short_description: short_description,
     price: price,
+    price_currency: 'USD',
+    price_local_amount: price,
     stock: rand(10..80),
     category: category
   )
@@ -180,6 +186,42 @@ products = 40.times.map do |index|
   end
 
   product
+end
+
+puts "Creating discounts..."
+
+spring_sale = Discount.create!(
+  name: "Spring Launch Event",
+  discount_type: :percentage,
+  value: 20,
+  start_date: 1.week.ago,
+  end_date: 1.month.from_now,
+  active: true
+)
+
+clearance_boost = Discount.create!(
+  name: "Clearance Boost",
+  discount_type: :fixed_amount,
+  value: 25,
+  value_local_amount: 25,
+  currency: "USD",
+  start_date: 2.days.ago,
+  end_date: 2.weeks.from_now,
+  active: true
+)
+
+summer_preview = Discount.create!(
+  name: "Summer Preview",
+  discount_type: :percentage,
+  value: 15,
+  start_date: 1.week.from_now,
+  end_date: 2.months.from_now,
+  active: true
+)
+
+if products.size >= 2
+  ProductDiscount.create!(product: products.first, discount: spring_sale)
+  ProductDiscount.create!(product: products.second, discount: clearance_boost)
 end
 
 # --- Users ---
@@ -247,3 +289,9 @@ puts "Seed complete!"
 puts "Products: #{Product.count}, Customers: #{User.customers.count}, Orders: #{Order.count}"
 puts "Admin login: admin@banhang.test / password123"
 puts "Master admin login: master@admin.local / password123"
+# --- Currency Rates ---
+puts "Configuring currency rates..."
+CurrencyRate.upsert_all([
+  { currency_code: "EUR", rate_to_base: 1.08, fetched_at: Time.current, source: "Seed" },
+  { currency_code: "VND", rate_to_base: 0.00004, fetched_at: Time.current, source: "Seed" }
+], unique_by: :currency_code)

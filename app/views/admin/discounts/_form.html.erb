@@ -1,0 +1,67 @@
+<%= form_with model: [:admin, @discount], class: "space-y-6" do |form| %>
+  <%= render "shared/form_errors", object: @discount %>
+
+  <div class="grid gap-6 lg:grid-cols-2">
+    <div class="space-y-4">
+      <div>
+        <%= form.label :name, class: "text-sm font-semibold text-slate-700" %>
+        <%= form.text_field :name, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@discount, :name)}" %>
+        <%= field_error(@discount, :name) %>
+      </div>
+
+      <div>
+        <%= form.label :discount_type, class: "text-sm font-semibold text-slate-700" %>
+        <%= form.select :discount_type,
+              Discount.discount_types.keys.map { |key| [key.humanize, key] },
+              {},
+              class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+      </div>
+
+      <div class="grid gap-3 md:grid-cols-[1fr_auto]">
+        <div>
+          <%= form.label :value_local_amount, "Value", class: "text-sm font-semibold text-slate-700" %>
+          <%= form.number_field :value_local_amount, step: 0.01, min: 0, value: (@discount.value_local_amount.presence || @discount.value), class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 #{error_class(@discount, :value_local_amount)}" %>
+          <p class="mt-1 text-xs text-slate-400">For percentage discounts enter the percent (e.g., 20). For fixed amounts enter the savings in the selected currency.</p>
+          <%= field_error(@discount, :value_local_amount) %>
+          <%= field_error(@discount, :value) %>
+        </div>
+        <div>
+          <%= form.label :currency, "Currency", class: "text-sm font-semibold text-slate-700" %>
+          <%= form.select :currency,
+                available_currencies.map { |code| [code, code] },
+                {},
+                class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+          <p class="mt-1 text-xs text-slate-400">Used for fixed amount discounts.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <%= form.label :start_date, "Start date", class: "text-sm font-semibold text-slate-700" %>
+        <%= form.datetime_field :start_date, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <p class="mt-1 text-xs text-slate-400">Leave blank to start immediately.</p>
+      </div>
+
+      <div>
+        <%= form.label :end_date, "End date", class: "text-sm font-semibold text-slate-700" %>
+        <%= form.datetime_field :end_date, class: "mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100" %>
+        <p class="mt-1 text-xs text-slate-400">Leave blank for an open-ended promotion.</p>
+        <%= field_error(@discount, :end_date) %>
+      </div>
+
+      <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+        <%= form.check_box :active, class: "h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" %>
+        <div>
+          <span class="text-sm font-semibold text-slate-700">Active</span>
+          <p class="text-xs text-slate-500">Uncheck to temporarily disable the discount.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= form.submit(@discount.persisted? ? "Update discount" : "Create discount", class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500", data: { disable_with: "Saving..." }) %>
+    <%= link_to "Cancel", admin_discounts_path, class: "inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
+  </div>
+<% end %>

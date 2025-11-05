@@ -93,7 +93,9 @@ class CartController < ApplicationController
       full_items: render_to_string(partial: "cart/items", formats: [:html], locals: { cart: @cart, compact: false }),
       summary: render_to_string(partial: "cart/summary", formats: [:html], locals: { cart: @cart, compact: false }),
       count: @cart.total_items,
-      subtotal: helpers.number_to_currency(@cart.subtotal),
+      subtotal: helpers.format_money(@cart.subtotal),
+      regular_total: helpers.format_money(@cart.regular_total),
+      discount_total: helpers.format_money(@cart.discount_total),
       message: message
     }, status: status
   end

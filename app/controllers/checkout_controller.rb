@@ -59,7 +59,7 @@ class CheckoutController < ApplicationController
       return render_step(1, shipping_form: shipping_form)
     end
 
-    processor = Checkout::OrderProcessor.new(user: current_user, cart: current_cart, shipping: shipping_form.to_h)
+    processor = Checkout::OrderProcessor.new(user: current_user, cart: current_cart, shipping: shipping_form.to_h, currency: current_currency)
 
     begin
       order = processor.call

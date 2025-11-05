@@ -25,4 +25,20 @@ module AdminHelper
 
     capture(&block)
   end
+
+  def discount_status_badge(discount)
+    now = Time.current
+    label, style =
+      if !discount.active?
+        ["Inactive", "bg-slate-100 text-slate-600"]
+      elsif discount.end_date.present? && discount.end_date < now
+        ["Expired", "bg-rose-100 text-rose-700"]
+      elsif discount.start_date.present? && discount.start_date > now
+        ["Scheduled", "bg-amber-100 text-amber-700"]
+      else
+        ["Active", "bg-emerald-100 text-emerald-700"]
+      end
+
+    content_tag(:span, label, class: "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide #{style}")
+  end
 end

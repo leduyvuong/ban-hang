@@ -1,0 +1,51 @@
+<div class="space-y-6">
+  <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-semibold text-slate-900">Exchange rates</h2>
+        <p class="text-sm text-slate-500">Base currency: <strong><%= @base_currency %></strong>. Rates are stored as 1 unit of currency equals how many <%= @base_currency %>.</p>
+      </div>
+      <%= link_to "Add currency", new_admin_currency_rate_path, class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500" %>
+    </div>
+
+    <% if @currency_rates.any? %>
+      <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+          <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <tr>
+              <th class="px-4 py-3 text-left">Currency</th>
+              <th class="px-4 py-3 text-left">Rate to <%= @base_currency %></th>
+              <th class="px-4 py-3 text-left">Last updated</th>
+              <th class="px-4 py-3 text-left">Source</th>
+              <th class="px-4 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 bg-white text-slate-600">
+            <tr class="bg-slate-50/80">
+              <td class="px-4 py-3 font-semibold text-slate-900"><%= @base_currency %></td>
+              <td class="px-4 py-3">1.0</td>
+              <td class="px-4 py-3">—</td>
+              <td class="px-4 py-3">System default</td>
+              <td class="px-4 py-3 text-right text-xs text-slate-400">Base currency</td>
+            </tr>
+            <% @currency_rates.each do |rate| %>
+              <tr class="hover:bg-slate-50">
+                <td class="px-4 py-3 font-semibold text-slate-900"><%= rate.currency_code %></td>
+                <td class="px-4 py-3"><%= rate.rate_to_base %></td>
+                <td class="px-4 py-3"><%= rate.fetched_at ? l(rate.fetched_at, format: :long) : "—" %></td>
+                <td class="px-4 py-3"><%= rate.source.presence || "Manual" %></td>
+                <td class="px-4 py-3 text-right">
+                  <%= link_to "Edit", edit_admin_currency_rate_path(rate), class: "rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-12 text-center text-sm text-slate-500">
+        No currency rates yet. Add one to start converting totals.
+      </div>
+    <% end %>
+  </div>
+</div>

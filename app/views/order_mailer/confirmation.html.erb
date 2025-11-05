@@ -4,10 +4,13 @@
 
 <ul>
   <% @order.order_items.each do |item| %>
-    <li><%= item.quantity %> × <%= item.product.name %> — <%= number_to_currency(item.total_price) %></li>
+    <li><%= item.quantity %> × <%= item.product.name %> — <%= format_money(item.total_price) %></li>
   <% end %>
 </ul>
 
-<p>Total: <strong><%= number_to_currency(@order.total) %></strong></p>
+<p>Total: <strong><%= format_money(@order.total) %></strong></p>
+<% if @order.total_local_amount.positive? %>
+  <p>Original amount: <%= format_money_from(@order.total_local_amount, from_currency: @order.currency, to_currency: @order.currency) %></p>
+<% end %>
 
 <p>We will notify you when your items ship.</p>

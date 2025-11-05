@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_01_091100) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_01_091500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -79,6 +79,34 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_01_091100) do
     t.index ["slug"], name: "index_categories_on_slug", unique: true
   end
 
+  create_table "currency_rates", force: :cascade do |t|
+    t.string "currency_code", null: false
+    t.string "base_currency", default: "USD", null: false
+    t.decimal "rate_to_base", precision: 18, scale: 10, null: false
+    t.datetime "fetched_at"
+    t.string "source"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["currency_code"], name: "index_currency_rates_on_currency_code", unique: true
+  end
+
+  create_table "discounts", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "discount_type", default: 0, null: false
+    t.decimal "value", precision: 8, scale: 2, null: false
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "currency", default: "USD", null: false
+    t.decimal "value_local_amount", precision: 15, scale: 2, default: "0.0", null: false
+    t.index ["active"], name: "index_discounts_on_active"
+    t.index ["currency"], name: "index_discounts_on_currency"
+    t.index ["end_date"], name: "index_discounts_on_end_date"
+    t.index ["start_date"], name: "index_discounts_on_start_date"
+  end
+
   create_table "features", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -105,6 +133,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_01_091100) do
     t.decimal "total_price", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "currency", default: "USD", null: false
+    t.decimal "unit_price_local", precision: 15, scale: 2, default: "0.0", null: false
+    t.decimal "total_price_local", precision: 15, scale: 2, default: "0.0", null: false
+    t.decimal "exchange_rate", precision: 18, scale: 10
+    t.index ["currency"], name: "index_order_items_on_currency"
     t.index ["order_id", "product_id"], name: "index_order_items_on_order_id_and_product_id"
     t.index ["order_id"], name: "index_order_items_on_order_id"
     t.index ["product_id"], name: "index_order_items_on_product_id"
@@ -118,10 +151,23 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_01_091100) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
+    t.string "currency", default: "USD", null: false
+    t.decimal "total_local_amount", precision: 15, scale: 2, default: "0.0", null: false
+    t.decimal "exchange_rate", precision: 18, scale: 10
+    t.index ["currency"], name: "index_orders_on_currency"
     t.index ["order_number"], name: "index_orders_on_order_number", unique: true
     t.index ["status"], name: "index_orders_on_status"
     t.index ["user_id", "status"], name: "index_orders_on_user_id_and_status"
     t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
+  create_table "product_discounts", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.bigint "discount_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discount_id"], name: "index_product_discounts_on_discount_id"
+    t.index ["product_id"], name: "index_product_discounts_on_product_id", unique: true
   end
 
   create_table "products", force: :cascade do |t|
@@ -134,7 +180,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_01_091100) do
     t.string "short_description", limit: 180
     t.bigint "category_id"
     t.integer "stock", default: 0, null: false
+    t.string "price_currency", default: "USD", null: false
+    t.decimal "price_local_amount", precision: 15, scale: 2, default: "0.0", null: false
     t.index ["category_id"], name: "index_products_on_category_id"
+    t.index ["price_currency"], name: "index_products_on_price_currency"
     t.index ["slug"], name: "index_products_on_slug", unique: true
   end
 
@@ -195,6 +244,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_01_091100) do
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users"
+  add_foreign_key "product_discounts", "discounts"
+  add_foreign_key "product_discounts", "products"
   add_foreign_key "products", "categories"
   add_foreign_key "shop_features", "admin_users", column: "unlocked_by_id"
   add_foreign_key "shop_features", "features"

@@ -2,6 +2,7 @@
 
 module ApplicationHelper
   include Pagy::Frontend
+  include CurrencyHelper
   DEFAULT_META_TITLE = "BanHang"
   DEFAULT_META_DESCRIPTION = "Shop curated Vietnamese products delivered fast with BanHang."
 

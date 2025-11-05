@@ -32,7 +32,7 @@ class ProductsController < ApplicationController
       canonical: canonical_listing_url
     )
 
-    base_scope = Product.includes(:category, image_attachment: { blob: :variant_records })
+    base_scope = Product.includes(:category, { product_discount: :discount }, image_attachment: { blob: :variant_records })
     scoped_products = apply_filters(base_scope)
     freshness_token = scoped_products.reorder(nil).maximum(:updated_at)&.to_i
     @pagy, @products = pagy(scoped_products, items: 12, page: sanitized_page)
@@ -115,7 +115,7 @@ class ProductsController < ApplicationController
   end
 
   def set_product
-    @product = Product.includes(:category, image_attachment: { blob: :variant_records }).find_by_slug_or_id!(params[:id])
+    @product = Product.includes(:category, { product_discount: :discount }, image_attachment: { blob: :variant_records }).find_by_slug_or_id!(params[:id])
   end
 
   def load_categories

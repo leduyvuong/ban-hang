@@ -8,13 +8,18 @@
     </button>
 
     <div class="grid gap-6 p-6 sm:grid-cols-[1fr_1fr] sm:p-8">
-      <div class="overflow-hidden rounded-2xl bg-gray-100">
+      <div class="relative overflow-hidden rounded-2xl bg-gray-100">
         <% if (thumb = product.image_variant(width: 640, height: 400)) %>
           <%= image_tag thumb, alt: product.name, class: "h-full w-full object-cover", loading: "lazy" %>
         <% else %>
           <div class="flex h-full min-h-[220px] items-center justify-center text-gray-400">
             <span>No image available</span>
           </div>
+        <% end %>
+        <% if product.discounted? %>
+          <span class="absolute left-4 top-4 inline-flex items-center rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-sm">
+            <%= product.discount_badge_label(currency: current_currency) %>
+          </span>
         <% end %>
       </div>
 
@@ -27,7 +32,21 @@
           <% if product.short_description.present? %>
             <p class="text-sm text-gray-600"><%= product.short_description %></p>
           <% end %>
-          <p class="text-lg font-semibold text-indigo-600"><%= number_to_currency(product.price) %></p>
+         <% if product.discounted? %>
+           <div class="flex items-baseline gap-2">
+             <p class="text-2xl font-bold text-emerald-600"><%= format_money(product.discounted_price) %></p>
+             <p class="text-sm text-gray-400 line-through"><%= format_money(product.price) %></p>
+           </div>
+           <p class="text-xs font-semibold uppercase tracking-wide text-emerald-700"><%= product.discount_badge_label(currency: current_currency) %></p>
+            <% if product.price_currency.present? && product.price_currency != current_currency %>
+              <p class="text-xs text-gray-500">Original price: <%= format_money_from(product.price_local_amount, from_currency: product.price_currency, to_currency: product.price_currency) %></p>
+            <% end %>
+          <% else %>
+            <p class="text-lg font-semibold text-indigo-600"><%= format_money(product.price) %></p>
+            <% if product.price_currency.present? && product.price_currency != current_currency %>
+              <p class="text-xs text-gray-500">Original price: <%= format_money_from(product.price_local_amount, from_currency: product.price_currency, to_currency: product.price_currency) %></p>
+            <% end %>
+          <% end %>
         </header>
 
         <% if product.description.present? %>

@@ -1,16 +1,22 @@
 # frozen_string_literal: true
 
 require "securerandom"
+require "bigdecimal"
 
 class Product < ApplicationRecord
   belongs_to :category, optional: true
   has_one_attached :image
+  has_one :product_discount, dependent: :destroy
+  has_one :discount, through: :product_discount
 
   before_validation :ensure_slug!
+  before_validation :apply_currency_conversion
 
   validates :name, presence: true
   validates :price, presence: true, numericality: { greater_than: 0 }
   validates :stock, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :price_currency, presence: true
+  validates :price_local_amount, numericality: { greater_than_or_equal_to: 0 }
   validates :slug, presence: true, uniqueness: { case_sensitive: false }
   validates :short_description, length: { maximum: 180 }, allow_blank: true
   validate :acceptable_image
@@ -46,6 +52,10 @@ class Product < ApplicationRecord
 
     where(arel_table[:price].lteq(amount))
   end
+
+  scope :with_active_discounts, lambda {
+    joins(product_discount: :discount).merge(Discount.currently_active)
+  }
 
   scope :with_stock_status, ->(status) do
     case status
@@ -83,6 +93,46 @@ class Product < ApplicationRecord
     image.variant(resize_to_fill: [width, height], saver: { quality: 85 }).processed
   end
 
+  def active_discount
+    discount if discount&.currently_active?
+  end
+
+  def discounted_price
+    active = active_discount
+    return price.to_d unless active
+
+    active.apply_to(price).round(2)
+  end
+
+  def price_in(currency_code)
+    CurrencyConverter.convert(BigDecimal(price.to_s), from: CurrencyConverter.base_currency, to: currency_code)
+  end
+
+  def local_price
+    price_local_amount.presence || price
+  end
+
+  def discount_amount
+    (price.to_d - discounted_price).clamp(0, price.to_d)
+  end
+
+  def discount_percentage
+    return 0 if price.to_d.zero?
+
+    ((discount_amount / price.to_d) * 100).round(2)
+  end
+
+  def discount_badge_label(currency: CurrencyConverter.base_currency)
+    active = active_discount
+    return if active.blank?
+
+    active.formatted_value(currency: currency)
+  end
+
+  def discounted?
+    discount_amount.positive?
+  end
+
   def acceptable_image
     return unless image.attached?
 
@@ -117,5 +167,23 @@ class Product < ApplicationRecord
     end
 
     candidate
+  end
+
+  def apply_currency_conversion
+    return if price_currency.blank? && price_local_amount.blank?
+
+    currency_code = price_currency.presence || CurrencyConverter.base_currency
+    local_amount = price_local_amount.presence || price
+
+    return if local_amount.blank?
+
+    local_amount = BigDecimal(local_amount.to_s)
+
+    converted = CurrencyConverter.convert(local_amount, from: currency_code, to: CurrencyConverter.base_currency)
+    self.price = converted
+    self.price_currency = currency_code.upcase
+    self.price_local_amount = local_amount
+  rescue CurrencyConverter::ConversionError => e
+    errors.add(:base, e.message)
   end
 end

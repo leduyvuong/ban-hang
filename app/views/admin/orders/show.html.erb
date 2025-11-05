@@ -11,8 +11,14 @@
       <div class="mt-6 space-y-2 text-sm text-slate-600">
         <div class="flex items-center justify-between">
           <span>Order total</span>
-          <span class="text-lg font-semibold text-slate-900"><%= number_to_currency(@order.total) %></span>
+          <span class="text-lg font-semibold text-slate-900"><%= format_money(@order.total) %></span>
         </div>
+        <% if @order.total_local_amount.positive? %>
+          <div class="flex items-center justify-between text-xs text-slate-500">
+            <span>Original amount</span>
+            <span><%= format_money_from(@order.total_local_amount, from_currency: @order.currency, to_currency: @order.currency) %></span>
+          </div>
+        <% end %>
         <div class="flex items-center justify-between text-xs text-slate-500">
           <span>Created</span>
           <span><%= @order.created_at&.strftime("%b %-d, %Y %H:%M %Z") %></span>

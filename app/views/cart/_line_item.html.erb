@@ -21,14 +21,29 @@
         <% end %>
       </div>
       <div class="text-right text-sm text-gray-500">
-        <span class="text-base font-semibold text-gray-900"><%= number_to_currency(product.price) %></span>
+        <% if product.discounted? %>
+          <div class="flex flex-col items-end gap-1">
+            <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700"><%= product.discount_badge_label(currency: current_currency) %></span>
+            <span class="text-base font-semibold text-emerald-600"><%= format_money(product.discounted_price) %></span>
+            <span class="text-xs text-gray-400 line-through"><%= format_money(product.price) %></span>
+          </div>
+        <% else %>
+          <span class="text-base font-semibold text-gray-900"><%= format_money(product.price) %></span>
+        <% end %>
       </div>
     </div>
 
     <% if compact %>
       <div class="flex items-center justify-between text-sm text-gray-600">
         <span>Qty: <%= item.quantity %></span>
-        <span class="font-semibold text-gray-900"><%= number_to_currency(item.subtotal) %></span>
+        <span class="flex flex-col items-end">
+          <% if item.discount_applied? %>
+            <span class="text-xs text-gray-400 line-through"><%= format_money(item.regular_subtotal) %></span>
+            <span class="font-semibold text-emerald-600"><%= format_money(item.subtotal) %></span>
+          <% else %>
+            <span class="font-semibold text-gray-900"><%= format_money(item.subtotal) %></span>
+          <% end %>
+        </span>
       </div>
     <% else %>
       <div class="flex flex-wrap items-center justify-between gap-4">
@@ -38,7 +53,15 @@
           <button type="button" class="px-2 text-gray-500 transition hover:text-indigo-600" aria-label="Increase quantity" data-action="click->cart#incrementItem" data-cart-product-id-param="<%= product.to_param %>" data-product-id="<%= product.to_param %>">+</button>
         </div>
         <div class="flex items-center gap-4">
-          <span class="text-base font-semibold text-gray-900"><%= number_to_currency(item.subtotal) %></span>
+          <% if item.discount_applied? %>
+            <div class="text-right">
+              <span class="block text-sm text-gray-400 line-through"><%= format_money(item.regular_subtotal) %></span>
+              <span class="text-base font-semibold text-emerald-600"><%= format_money(item.subtotal) %></span>
+              <span class="block text-xs font-medium text-emerald-700">You save <%= format_money(item.savings) %></span>
+            </div>
+          <% else %>
+            <span class="text-base font-semibold text-gray-900"><%= format_money(item.subtotal) %></span>
+          <% end %>
           <button type="button" class="text-sm font-medium text-red-500 transition hover:text-red-600" data-action="click->cart#removeItem" data-cart-product-id-param="<%= product.to_param %>" data-product-id="<%= product.to_param %>">Remove</button>
         </div>
       </div>
