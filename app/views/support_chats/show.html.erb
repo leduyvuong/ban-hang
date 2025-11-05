@@ -1,27 +1,28 @@
-<%= turbo_stream_from [current_user, @conversation] %>
+<turbo-frame id="support_chat_panel">
 
-<div class="flex h-full w-full flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-gray-200">
-  <header class="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
-    <%= user_avatar_tag(@support_agent, size: :sm) %>
-    <div class="min-w-0">
-      <h2 class="truncate text-sm font-semibold text-gray-900"><%= @support_agent.name %></h2>
-      <p class="text-xs text-gray-500">Our team typically replies in a few minutes.</p>
+  <div class="flex h-full w-full flex-col overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-gray-200">
+    <header class="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
+      <%= user_avatar_tag(@support_agent, size: :sm) %>
+      <div class="min-w-0">
+        <h2 class="truncate text-sm font-semibold text-gray-900"><%= @support_agent.name %></h2>
+        <p class="text-xs text-gray-500">Our team typically replies in a few minutes.</p>
+      </div>
+      <button type="button" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition hover:text-gray-600" data-action="chat-widget#close">
+        <span class="sr-only">Close chat</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+          <path fill-rule="evenodd" d="M10 8.586 4.95 3.536 3.536 4.95 8.586 10l-5.05 5.05 1.414 1.414L10 11.414l5.05 5.05 1.414-1.414L11.414 10l5.05-5.05-1.414-1.414L10 8.586z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </header>
+    <div class="flex-1 overflow-y-auto bg-gray-50" data-controller="scroll">
+      <div id="messages_conversation_<%= @conversation.id %>" class="space-y-4 px-4 py-4">
+        <% @messages.each do |message| %>
+          <%= render partial: "messages/message", locals: { message: message, viewer: current_user } %>
+        <% end %>
+      </div>
     </div>
-    <button type="button" class="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition hover:text-gray-600" data-action="chat-widget#close">
-      <span class="sr-only">Close chat</span>
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-        <path fill-rule="evenodd" d="M10 8.586 4.95 3.536 3.536 4.95 8.586 10l-5.05 5.05 1.414 1.414L10 11.414l5.05 5.05 1.414-1.414L11.414 10l5.05-5.05-1.414-1.414L10 8.586z" clip-rule="evenodd" />
-      </svg>
-    </button>
-  </header>
-  <div class="flex-1 overflow-y-auto bg-gray-50" data-controller="scroll">
-    <div id="messages_conversation_<%= @conversation.id %>" class="space-y-4 px-4 py-4">
-      <% @messages.each do |message| %>
-        <%= render partial: "messages/message", locals: { message: message, viewer: current_user } %>
-      <% end %>
+    <div class="border-t border-gray-200 bg-white px-4 py-3">
+      <%= render partial: "messages/form", locals: { conversation: @conversation, message: @message } %>
     </div>
   </div>
-  <div class="border-t border-gray-200 bg-white px-4 py-3">
-    <%= render partial: "messages/form", locals: { conversation: @conversation, message: @message } %>
-  </div>
-</div>
+</turbo-frame>

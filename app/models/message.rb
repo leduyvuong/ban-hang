@@ -21,8 +21,10 @@ class Message < ApplicationRecord
 
   def notify_participants
     conversation.mark_as_read!(user)
+    is_first_message = conversation.messages.count == 1
 
     conversation.participants.find_each do |participant|
+      # Broadcast message to conversation view
       broadcast_append_to(
         [participant, conversation],
         target: "messages_conversation_#{conversation_id}",
@@ -30,6 +32,7 @@ class Message < ApplicationRecord
         locals: { message: self, viewer: participant }
       )
 
+      # Update conversation in sidebar
       broadcast_replace_to(
         [participant, :conversations],
         target: "conversation_#{conversation_id}",
@@ -38,12 +41,31 @@ class Message < ApplicationRecord
       )
 
       if participant.admin?
-        broadcast_replace_to(
-          [participant, :admin_conversations],
-          target: "admin_conversation_#{conversation_id}",
-          partial: "admin/messages/conversation",
-          locals: { conversation: conversation, viewer: participant }
-        )
+        # If this is first message in a new conversation, append it to the list
+        if is_first_message
+          broadcast_append_to(
+            [participant, :admin_conversations],
+            target: "admin_conversation_list",
+            partial: "admin/messages/conversation",
+            locals: { conversation: conversation, viewer: participant }
+          )
+          
+          # Also broadcast subscription for the new conversation
+          broadcast_action_to(
+            [participant, :admin_conversations],
+            action: :append,
+            target: "admin_subscriptions",
+            html: turbo_stream_from_tag([participant, conversation])
+          )
+        else
+          # Update existing conversation in admin sidebar
+          broadcast_replace_to(
+            [participant, :admin_conversations],
+            target: "admin_conversation_#{conversation_id}",
+            partial: "admin/messages/conversation",
+            locals: { conversation: conversation, viewer: participant }
+          )
+        end
       else
         broadcast_replace_to(
           [participant, :support_chat],
@@ -53,5 +75,9 @@ class Message < ApplicationRecord
         )
       end
     end
+  end
+
+  def turbo_stream_from_tag(streamable)
+    "<turbo-cable-stream-source channel=\"Turbo::StreamsChannel\" signed-stream-name=\"#{Turbo::StreamsChannel.signed_stream_name(streamable)}\"></turbo-cable-stream-source>".html_safe
   end
 end

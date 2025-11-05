@@ -2,7 +2,17 @@
   <%= button_to "Mark all as read", admin_messages_mark_all_read_path, method: :patch, class: "inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-teal-200 hover:text-teal-600" if @conversations.any? %>
 <% end %>
 
-<%= turbo_stream_from [@support_agent, :admin_conversations] %>
+<%= turbo_stream_from [current_user, :admin_conversations] %>
+<div id="admin_subscriptions">
+  <% if @conversations.any? %>
+    <% @conversations.each do |conversation| %>
+      <%= turbo_stream_from [current_user, conversation] %>
+    <% end %>
+    <!-- Subscribed to <%= @conversations.size %> conversations for user <%= current_user.id %> -->
+  <% else %>
+    <!-- No conversations to subscribe -->
+  <% end %>
+</div>
 
 <div class="grid gap-6 lg:grid-cols-[minmax(0,0.32fr)_minmax(0,1fr)]">
   <aside class="flex min-h-[60vh] flex-col overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-200">
@@ -38,7 +48,6 @@
 
   <section class="min-h-[60vh] rounded-3xl bg-white shadow-lg ring-1 ring-gray-200">
     <% if @selected_conversation %>
-      <%= turbo_stream_from [@support_agent, @selected_conversation] %>
       <% customer = @selected_conversation.other_participant(@support_agent) || @support_agent %>
       <header class="flex items-center gap-3 border-b border-gray-200 px-6 py-4">
         <%= user_avatar_tag(customer) %>

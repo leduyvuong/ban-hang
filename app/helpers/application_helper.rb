@@ -68,6 +68,13 @@ module ApplicationHelper
     user.email.to_s.first(2).upcase
   end
 
+  def set_page_metadata(title: nil, description: nil, canonical: nil, robots: nil)
+    @page_title = title if title.present?
+    @page_description = description if description.present?
+    @canonical_url = canonical if canonical.present?
+    @meta_robots = robots if robots.present?
+  end
+
   def user_avatar_tag(user, size: :md, class_name: "")
     size_classes = {
       sm: "h-9 w-9 text-xs",

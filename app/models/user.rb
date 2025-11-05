@@ -152,7 +152,12 @@ class User < ApplicationRecord
   def secure_compare(token_a, token_b)
     return false if token_a.blank? || token_b.blank?
 
-    ActiveSupport::SecurityUtils.secure_compare(token_a, token_b)
+    begin
+      ActiveSupport::SecurityUtils.secure_compare(token_a.to_s, token_b.to_s)
+    rescue StandardError => e
+      Rails.logger.error("Token comparison error: #{e.message}")
+      false
+    end
   end
 
   class << self

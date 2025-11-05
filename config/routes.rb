@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   get "/health", to: "health#show"
   get "home", to: "pages#home"
 
+  # Mount Action Cable for WebSocket connections
+  mount ActionCable.server => "/cable"
+
   resources :products, only: %i[index show] do
     member do
       get :modal
