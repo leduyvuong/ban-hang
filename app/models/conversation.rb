@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Conversation < ApplicationRecord
+  SUPPORT_EMAIL = "admin@banhang.test"
+
   has_many :conversation_participants, dependent: :destroy, inverse_of: :conversation
   has_many :participants, through: :conversation_participants, source: :user
   has_many :messages, dependent: :destroy, inverse_of: :conversation
@@ -16,6 +18,29 @@ class Conversation < ApplicationRecord
       .group(:id)
       .having("COUNT(DISTINCT conversation_participants.user_id) = ?", user_ids.size)
       .first
+  end
+
+  def self.find_or_create_between(user_a, user_b)
+    transaction do
+      conversation = between(user_a, user_b)
+      return conversation if conversation
+
+      conversation = create!
+      conversation.conversation_participants.create!(user: user_a)
+      conversation.conversation_participants.create!(user: user_b)
+      conversation
+    end
+  end
+
+  def self.support_agent
+    User.find_by(email: SUPPORT_EMAIL)
+  end
+
+  def self.support_conversation_for(user)
+    agent = support_agent
+    return unless agent
+
+    between(user, agent)
   end
 
   def unread_count_for(user)

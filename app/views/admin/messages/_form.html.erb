@@ -1,0 +1,15 @@
+<%= turbo_frame_tag "admin_new_message_form" do %>
+  <%= form_with(url: admin_conversation_messages_path(conversation), model: message, data: { controller: "reset-form", action: "turbo:submit-end->reset-form#submitEnd" }) do |form| %>
+    <div class="space-y-3">
+      <div>
+        <%= form.text_area :content, rows: 3, placeholder: "Write a reply...", class: "w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 shadow-sm transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100", required: true %>
+        <% if message.errors[:content].present? %>
+          <p class="mt-1 text-xs text-rose-600"><%= message.errors[:content].first %></p>
+        <% end %>
+      </div>
+      <div class="flex items-center justify-end">
+        <%= form.submit "Send", class: "inline-flex items-center justify-center rounded-full bg-teal-500 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:ring-offset-2" %>
+      </div>
+    </div>
+  <% end %>
+<% end %>

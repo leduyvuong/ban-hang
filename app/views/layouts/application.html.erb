@@ -90,6 +90,7 @@
     <div data-cart-target="drawer" class="hidden">
       <%= render partial: "cart/drawer", locals: { cart: current_cart } %>
     </div>
+    <%= render "shared/chat_widget" if logged_in? && !admin? %>
     <div class="pointer-events-none fixed top-5 right-5 z-50 space-y-3" data-cart-target="notifications"></div>
   </body>
 </html>

@@ -1,0 +1,32 @@
+<% viewer = local_assigns.fetch(:viewer) { @support_agent } %>
+<% other_user = conversation.other_participant(viewer) || viewer %>
+<% last_message = conversation.last_message %>
+<% unread_count = conversation.unread_count_for(viewer) %>
+<% selected_id = local_assigns[:selected_conversation_id] %>
+
+<div id="admin_conversation_<%= conversation.id %>" class="px-2">
+  <%= link_to admin_messages_path(conversation_id: conversation.id, query: params[:query].presence), class: "group flex items-start gap-3 rounded-2xl px-3 py-3 transition hover:bg-teal-50 #{'bg-teal-50 ring-1 ring-teal-200/60 shadow-sm' if selected_id == conversation.id}" do %>
+    <%= user_avatar_tag(other_user, size: :sm) %>
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center justify-between gap-2">
+        <div class="min-w-0">
+          <p class="truncate text-sm font-semibold text-gray-900"><%= other_user.name %></p>
+          <p class="truncate text-xs text-gray-500"><%= other_user.email %></p>
+        </div>
+        <% if last_message %>
+          <time class="shrink-0 text-xs text-gray-400" datetime="<%= last_message.created_at.iso8601 %>"><%= time_ago_in_words(last_message.created_at) %> ago</time>
+        <% end %>
+      </div>
+      <p class="mt-1 truncate text-xs text-gray-600 group-hover:text-gray-700">
+        <% if last_message %>
+          <%= truncate(last_message.content, length: 50) %>
+        <% else %>
+          No messages yet
+        <% end %>
+      </p>
+    </div>
+    <% if unread_count.positive? %>
+      <span class="ml-2 inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-rose-500 px-1.5 text-xs font-semibold text-white shadow"><%= unread_count %></span>
+    <% end %>
+  <% end %>
+</div>

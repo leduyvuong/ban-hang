@@ -36,6 +36,22 @@ class Message < ApplicationRecord
         partial: "conversations/conversation",
         locals: { conversation: conversation, current_user: participant }
       )
+
+      if participant.admin?
+        broadcast_replace_to(
+          [participant, :admin_conversations],
+          target: "admin_conversation_#{conversation_id}",
+          partial: "admin/messages/conversation",
+          locals: { conversation: conversation, viewer: participant }
+        )
+      else
+        broadcast_replace_to(
+          [participant, :support_chat],
+          target: "chat_widget_toggle",
+          partial: "shared/chat_widget_toggle",
+          locals: { conversation: conversation, viewer: participant }
+        )
+      end
     end
   end
 end

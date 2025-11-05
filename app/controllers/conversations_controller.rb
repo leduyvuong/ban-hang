@@ -23,13 +23,7 @@ class ConversationsController < ApplicationController
       return redirect_to conversations_path
     end
 
-    conversation = Conversation.between(current_user, other_user)
-
-    unless conversation
-      conversation = Conversation.create!
-      conversation.conversation_participants.create!(user: current_user, last_read_at: Time.current)
-      conversation.conversation_participants.create!(user: other_user)
-    end
+    conversation = Conversation.find_or_create_between(current_user, other_user)
 
     conversation.mark_as_read!(current_user)
 
