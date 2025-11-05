@@ -1,5 +1,6 @@
-<% viewer = local_assigns.fetch(:viewer) { current_user } %>
-<% mine = message.user_id == viewer.id %>
+<% viewer = local_assigns[:viewer] %>
+<% viewer_id = viewer&.id || local_assigns[:viewer_id] %>
+<% mine = viewer_id.present? && message.user_id == viewer_id %>
 <% alignment = mine ? "justify-end" : "justify-start" %>
 <% bubble_classes = mine ? "bg-teal-500 text-white" : "bg-white text-slate-900" %>
 <% meta_classes = mine ? "justify-end" : "justify-start" %>

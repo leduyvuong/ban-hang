@@ -22,14 +22,14 @@ class Message < ApplicationRecord
   def notify_participants
     conversation.mark_as_read!(user)
 
-    broadcast_append_to(
-      conversation,
-      target: "messages_conversation_#{conversation_id}",
-      partial: "messages/message",
-      locals: { message: self }
-    )
+    conversation.participants.find_each do |participant|
+      broadcast_append_to(
+        [participant, conversation],
+        target: "messages_conversation_#{conversation_id}",
+        partial: "messages/message",
+        locals: { message: self, viewer: participant }
+      )
 
-    conversation.participants.includes(:conversation_participants).each do |participant|
       broadcast_replace_to(
         [participant, :conversations],
         target: "conversation_#{conversation_id}",

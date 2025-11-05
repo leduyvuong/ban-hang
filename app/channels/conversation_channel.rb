@@ -5,7 +5,7 @@ class ConversationChannel < ApplicationCable::Channel
     conversation = current_user.conversations.find_by(id: params[:id])
 
     if conversation
-      stream_for conversation
+      stream_for [current_user, conversation]
       stream_for [conversation, :sidebar]
     else
       reject
