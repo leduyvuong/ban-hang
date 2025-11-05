@@ -1,0 +1,13 @@
+<% conversation = local_assigns[:conversation] %>
+<% viewer = local_assigns.fetch(:viewer) { current_user } %>
+<% unread_count = conversation ? conversation.unread_count_for(viewer) : 0 %>
+
+<button type="button" class="relative flex h-14 w-14 items-center justify-center rounded-full bg-teal-500 text-white shadow-xl transition hover:bg-teal-600 focus:outline-none focus:ring-4 focus:ring-teal-200" data-action="click->chat-widget#toggle">
+  <span class="sr-only">Open support chat</span>
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3h5.25M21 12a9 9 0 10-18 0 9 9 0 0015.856 5.533.75.75 0 011.167.948A10.488 10.488 0 0112 22.5C6.201 22.5 1.5 17.799 1.5 12S6.201 1.5 12 1.5 22.5 6.201 22.5 12" />
+  </svg>
+  <span data-chat-widget-target="badge" class="absolute -top-1 -right-1 inline-flex min-h-[1.5rem] min-w-[1.5rem] items-center justify-center rounded-full bg-rose-500 px-1.5 text-xs font-semibold text-white shadow-lg <%= 'hidden' unless unread_count.positive? %>">
+    <%= unread_count %>
+  </span>
+</button>

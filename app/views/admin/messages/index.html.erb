@@ -1,0 +1,86 @@
+<% content_for :page_actions do %>
+  <%= button_to "Mark all as read", admin_messages_mark_all_read_path, method: :patch, class: "inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-teal-200 hover:text-teal-600" if @conversations.any? %>
+<% end %>
+
+<%= turbo_stream_from [current_user, :admin_conversations] %>
+<div id="admin_subscriptions">
+  <% if @conversations.any? %>
+    <% @conversations.each do |conversation| %>
+      <%= turbo_stream_from [current_user, conversation] %>
+    <% end %>
+    <!-- Subscribed to <%= @conversations.size %> conversations for user <%= current_user.id %> -->
+  <% else %>
+    <!-- No conversations to subscribe -->
+  <% end %>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-[minmax(0,0.32fr)_minmax(0,1fr)]">
+  <aside class="flex min-h-[60vh] flex-col overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-200">
+    <div class="border-b border-gray-200 p-4">
+      <h2 class="text-lg font-semibold text-gray-900">Customer conversations</h2>
+      <p class="text-sm text-gray-500">Search by name or email to jump into a chat.</p>
+      <%= form_with url: admin_messages_path, method: :get, class: "mt-4", local: true do |form| %>
+        <label class="sr-only" for="conversation-search">Search conversations</label>
+        <div class="relative">
+          <input id="conversation-search" type="search" name="query" value="<%= @query %>" placeholder="Search conversations" class="w-full rounded-2xl border border-gray-200 bg-gray-50 py-2 pl-4 pr-10 text-sm text-gray-900 transition focus:border-teal-500 focus:bg-white focus:outline-none" />
+          <button type="submit" class="absolute inset-y-0 right-3 flex items-center text-gray-400" aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+              <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 013.905 9.405l3.095 3.095-1.41 1.41-3.095-3.094A5.5 5.5 0 119 3.5zm0 2a3.5 3.5 0 100 7 3.5 3.5 0 000-7z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+      <% end %>
+    </div>
+    <div class="flex-1 overflow-y-auto">
+      <div id="admin_conversation_list" class="space-y-1 py-2">
+        <% if @conversations.any? %>
+          <% @conversations.each do |conversation| %>
+            <%= render "admin/messages/conversation", conversation: conversation, viewer: @support_agent, selected_conversation_id: @selected_conversation&.id %>
+          <% end %>
+        <% else %>
+          <div class="px-6 py-16 text-center text-sm text-gray-500">
+            No conversations yet.
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </aside>
+
+  <section class="min-h-[60vh] rounded-3xl bg-white shadow-lg ring-1 ring-gray-200">
+    <% if @selected_conversation %>
+      <% customer = @selected_conversation.other_participant(@support_agent) || @support_agent %>
+      <header class="flex items-center gap-3 border-b border-gray-200 px-6 py-4">
+        <%= user_avatar_tag(customer) %>
+        <div class="min-w-0">
+          <h3 class="truncate text-base font-semibold text-gray-900"><%= customer.name %></h3>
+          <p class="truncate text-sm text-gray-500"><%= customer.email %></p>
+        </div>
+        <span class="ml-auto text-xs text-gray-400">Last activity <%= time_ago_in_words(@selected_conversation.updated_at) %> ago</span>
+      </header>
+      <div class="flex h-[calc(60vh-8rem)] flex-col">
+        <div class="flex-1 overflow-y-auto bg-gray-50" data-controller="scroll">
+          <div id="messages_conversation_<%= @selected_conversation.id %>" class="space-y-4 px-6 py-6">
+            <% @messages.each do |message| %>
+              <%= render partial: "messages/message", locals: { message: message, viewer: @support_agent } %>
+            <% end %>
+          </div>
+        </div>
+        <div class="border-t border-gray-200 bg-white px-6 py-4">
+          <%= render "admin/messages/form", conversation: @selected_conversation, message: @new_message %>
+        </div>
+      </div>
+    <% else %>
+      <div class="flex h-full flex-col items-center justify-center gap-4 px-6 py-12 text-center">
+        <div class="rounded-full bg-teal-50 p-4 text-teal-500">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-8 w-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3h5.25M21 12a9 9 0 10-18 0 9 9 0 0015.856 5.533.75.75 0 011.167.948A10.488 10.488 0 0112 22.5C6.201 22.5 1.5 17.799 1.5 12S6.201 1.5 12 1.5 22.5 6.201 22.5 12" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">No conversation selected</h3>
+          <p class="mt-2 text-sm text-gray-500">Pick a conversation from the sidebar to start chatting with a customer.</p>
+        </div>
+      </div>
+    <% end %>
+  </section>
+</div>

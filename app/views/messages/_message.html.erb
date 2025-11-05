@@ -1,0 +1,30 @@
+<% viewer = local_assigns[:viewer] %>
+<% viewer_id = viewer&.id || local_assigns[:viewer_id] %>
+<% mine = viewer_id.present? && message.user_id == viewer_id %>
+<% alignment = mine ? "justify-end" : "justify-start" %>
+<% bubble_classes = mine ? "bg-teal-500 text-white" : "bg-white text-slate-900" %>
+<% meta_classes = mine ? "justify-end" : "justify-start" %>
+
+<div id="<%= dom_id(message) %>" class="flex flex-col gap-1 <%= alignment %>">
+  <div class="flex items-end gap-3 <%= alignment %>">
+    <% unless mine %>
+      <%= user_avatar_tag(message.user, size: :sm) %>
+    <% end %>
+    <div class="max-w-[80%] rounded-2xl px-4 py-2 text-sm shadow-sm <%= bubble_classes %>">
+      <%= simple_format(message.content, {}, wrapper_tag: :p) %>
+    </div>
+    <% if mine %>
+      <%= user_avatar_tag(message.user, size: :sm) %>
+    <% end %>
+  </div>
+  <div class="flex text-xs text-slate-500 <%= meta_classes %>">
+    <span>
+      <% if mine %>
+        You •
+      <% else %>
+        <%= message.user.name %> •
+      <% end %>
+      <%= time_ago_in_words(message.created_at) %> ago
+    </span>
+  </div>
+</div>

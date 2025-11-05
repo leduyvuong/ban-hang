@@ -1,0 +1,30 @@
+<% viewer = local_assigns.fetch(:current_user) { current_user } %>
+<% current_conversation = local_assigns.fetch(:current_conversation, nil) %>
+<% other_user = conversation.other_participant(viewer) || viewer %>
+<% last_message = conversation.last_message %>
+<% unread_count = conversation.unread_count_for(viewer) %>
+
+<div id="<%= dom_id(conversation) %>" class="px-1">
+  <%= link_to conversation_path(conversation), class: "group flex items-center gap-4 rounded-2xl px-4 py-3 transition hover:bg-teal-50/80 hover:shadow #{'bg-teal-50 shadow-inner ring-1 ring-teal-200/60' if current_conversation&.id == conversation.id}" do %>
+    <%= user_avatar_tag(other_user) %>
+    <div class="min-w-0 flex-1">
+      <div class="flex items-center justify-between">
+        <p class="truncate text-sm font-semibold text-slate-900"><%= other_user.name %></p>
+        <% if last_message %>
+          <time class="ml-2 whitespace-nowrap text-xs text-slate-500"><%= time_ago_in_words(last_message.created_at) %> ago</time>
+        <% end %>
+      </div>
+      <p class="mt-1 truncate text-xs text-slate-500 group-hover:text-slate-700">
+        <% if last_message %>
+          <% prefix = last_message.user_id == viewer.id ? 'You: ' : '' %>
+          <%= prefix + truncate(last_message.content, length: 80) %>
+        <% else %>
+          No messages yet
+        <% end %>
+      </p>
+    </div>
+    <% if unread_count.positive? %>
+      <span class="ml-3 inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-teal-500 px-2 py-1 text-xs font-semibold text-white shadow"><%= unread_count %></span>
+    <% end %>
+  <% end %>
+</div>

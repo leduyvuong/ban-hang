@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   get "/health", to: "health#show"
   get "home", to: "pages#home"
 
+  # Mount Action Cable for WebSocket connections
+  mount ActionCable.server => "/cable"
+
   resources :products, only: %i[index show] do
     member do
       get :modal
@@ -28,6 +31,12 @@ Rails.application.routes.draw do
   resource :profile, only: %i[edit update], controller: "registrations"
   resources :password_resets, only: %i[new create edit update], param: :token
   resources :orders, only: %i[index show]
+
+  resources :conversations, only: %i[index show create] do
+    resources :messages, only: :create
+  end
+
+  resource :support_chat, only: :show, controller: "support_chats"
 
   namespace :admin do
     root to: "dashboard#index"
@@ -52,6 +61,12 @@ Rails.application.routes.draw do
         post :unlock, on: :member
         post :lock, on: :member
       end
+    end
+
+    get "messages", to: "messages#index"
+    patch "messages/mark_all_read", to: "messages#mark_all_read", as: :messages_mark_all_read
+    resources :conversations, only: [] do
+      resources :messages, only: :create, controller: "conversation_messages"
     end
   end
 end

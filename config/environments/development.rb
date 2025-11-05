@@ -16,6 +16,13 @@ Rails.application.configure do
 
   config.active_storage.service = :local
 
+  # Action Cable configuration for real-time features
+  config.action_cable.url = "ws://localhost:3000/cable"
+  config.action_cable.allowed_request_origins = [
+    "http://localhost:3000",
+    /http:\/\/localhost:.*/
+  ]
+
   config.action_mailer.raise_delivery_errors = false
   config.action_mailer.perform_caching = false
 

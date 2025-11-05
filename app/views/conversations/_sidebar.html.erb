@@ -1,0 +1,22 @@
+<% wrapper_classes = local_assigns.fetch(:wrapper_classes, "flex h-full flex-col overflow-hidden rounded-3xl bg-white/95 shadow-2xl ring-1 ring-slate-200 backdrop-blur") %>
+
+<div class="<%= wrapper_classes %>">
+  <div class="border-b border-slate-200/80 px-6 py-4">
+    <h2 class="text-lg font-semibold text-slate-900">Conversations</h2>
+    <p class="mt-1 text-sm text-slate-500">Chat with other users in real time.</p>
+  </div>
+  <%= turbo_stream_from [current_user, :conversations] %>
+  <div class="flex-1 overflow-y-auto">
+    <% if conversations.any? %>
+      <div class="space-y-1 px-2 py-2">
+        <% conversations.each do |conversation| %>
+          <%= render partial: "conversations/conversation", locals: { conversation: conversation, current_user: current_user, current_conversation: local_assigns[:current_conversation] } %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="flex h-full items-center justify-center px-6 py-12 text-center text-sm text-slate-500">
+        You haven't started any conversations yet.
+      </div>
+    <% end %>
+  </div>
+</div>

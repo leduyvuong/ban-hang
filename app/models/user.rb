@@ -9,6 +9,9 @@ class User < ApplicationRecord
 
   belongs_to :shop, optional: true
   has_many :orders, dependent: :nullify
+  has_many :conversation_participants, dependent: :destroy, inverse_of: :user
+  has_many :conversations, through: :conversation_participants
+  has_many :messages, dependent: :destroy
 
   before_validation :normalize_email
   before_save :sanitize_addresses
@@ -149,7 +152,12 @@ class User < ApplicationRecord
   def secure_compare(token_a, token_b)
     return false if token_a.blank? || token_b.blank?
 
-    ActiveSupport::SecurityUtils.secure_compare(token_a, token_b)
+    begin
+      ActiveSupport::SecurityUtils.secure_compare(token_a.to_s, token_b.to_s)
+    rescue StandardError => e
+      Rails.logger.error("Token comparison error: #{e.message}")
+      false
+    end
   end
 
   class << self

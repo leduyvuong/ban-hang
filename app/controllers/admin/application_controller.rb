@@ -42,7 +42,7 @@ module Admin
     end
 
     def ensure_master_admin!
-      return if current_admin_user&.is_master_admin?
+      return if current_admin_user&.is_master_admin? || current_user&.admin?
 
       flash[:alert] = "Unauthorized"
       redirect_to admin_root_path
