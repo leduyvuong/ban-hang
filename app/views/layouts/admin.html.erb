@@ -32,7 +32,7 @@
           </div>
 
           <nav class="flex-1 space-y-2 p-4 text-sm font-medium text-slate-600">
-            <% if current_admin_user&.is_master_admin? %>
+            <% if current_admin_user&.is_master_admin? || current_user&.admin? %>
               <%= link_to admin_shops_path, class: admin_nav_class(admin_shops_path) do %>
                 <span>Shops</span>
               <% end %>
