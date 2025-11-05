@@ -58,4 +58,29 @@ module ApplicationHelper
   def feature_locked?(feature_slug, shop = nil)
     !feature_available?(feature_slug, shop)
   end
+
+  def user_initials(user)
+    name = user.name.to_s.strip
+    initials = name.split.map { |part| part.first }.join.upcase
+    initials = initials.first(2) if initials.length > 2
+    return initials if initials.present?
+
+    user.email.to_s.first(2).upcase
+  end
+
+  def user_avatar_tag(user, size: :md, class_name: "")
+    size_classes = {
+      sm: "h-9 w-9 text-xs",
+      md: "h-10 w-10 text-sm",
+      lg: "h-12 w-12 text-base"
+    }
+
+    classes = [
+      "flex items-center justify-center rounded-full bg-teal-500/10 font-semibold text-teal-600",
+      size_classes.fetch(size, size_classes[:md]),
+      class_name
+    ].reject(&:blank?).join(" ")
+
+    content_tag(:div, user_initials(user), class: classes)
+  end
 end

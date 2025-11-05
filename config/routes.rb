@@ -29,6 +29,10 @@ Rails.application.routes.draw do
   resources :password_resets, only: %i[new create edit update], param: :token
   resources :orders, only: %i[index show]
 
+  resources :conversations, only: %i[index show create] do
+    resources :messages, only: :create
+  end
+
   namespace :admin do
     root to: "dashboard#index"
 

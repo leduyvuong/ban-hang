@@ -1,0 +1,31 @@
+<% set_page_metadata(title: "Messages") %>
+
+<%= turbo_stream_from @conversation %>
+
+<div class="mx-auto w-full max-w-6xl px-4 py-8 lg:px-0">
+  <div class="grid gap-6 lg:grid-cols-[320px,1fr]">
+    <aside>
+      <%= render partial: "conversations/sidebar", locals: { conversations: @conversations, current_conversation: @conversation } %>
+    </aside>
+    <section class="flex min-h-[480px] flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-100">
+      <% other_user = @conversation.other_participant(current_user) || current_user %>
+      <header class="flex items-center gap-3 border-b border-slate-100 px-6 py-4">
+        <%= user_avatar_tag(other_user) %>
+        <div>
+          <h3 class="text-base font-semibold text-slate-900"><%= other_user.name %></h3>
+          <p class="text-sm text-slate-500">Chat in real time and see messages instantly.</p>
+        </div>
+      </header>
+      <div class="flex-1 overflow-y-auto bg-slate-50" data-controller="scroll">
+        <div id="messages_conversation_<%= @conversation.id %>" class="space-y-4 px-6 py-6">
+          <% @messages.each do |message| %>
+            <%= render partial: "messages/message", locals: { message: message, viewer: current_user } %>
+          <% end %>
+        </div>
+      </div>
+      <div class="border-t border-slate-100 px-6 py-4">
+        <%= render partial: "messages/form", locals: { conversation: @conversation, message: @message } %>
+      </div>
+    </section>
+  </div>
+</div>

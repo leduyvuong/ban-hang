@@ -1,0 +1,15 @@
+<% set_page_metadata(title: "Messages") %>
+
+<div class="mx-auto w-full max-w-6xl px-4 py-8 lg:px-0">
+  <div class="grid gap-6 lg:grid-cols-[320px,1fr]">
+    <aside>
+      <%= render partial: "conversations/sidebar", locals: { conversations: @conversations } %>
+    </aside>
+    <section class="flex min-h-[480px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white text-center shadow-sm">
+      <div class="mx-auto max-w-sm px-6 py-12">
+        <h3 class="text-lg font-semibold text-slate-900">Select a conversation</h3>
+        <p class="mt-2 text-sm text-slate-500">Choose a chat from the sidebar or start a new one to begin messaging.</p>
+      </div>
+    </section>
+  </div>
+</div>

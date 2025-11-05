@@ -9,6 +9,9 @@ class User < ApplicationRecord
 
   belongs_to :shop, optional: true
   has_many :orders, dependent: :nullify
+  has_many :conversation_participants, dependent: :destroy, inverse_of: :user
+  has_many :conversations, through: :conversation_participants
+  has_many :messages, dependent: :destroy
 
   before_validation :normalize_email
   before_save :sanitize_addresses

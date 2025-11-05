@@ -1,0 +1,41 @@
+# frozen_string_literal: true
+
+class Message < ApplicationRecord
+  belongs_to :conversation, touch: true
+  belongs_to :user
+
+  validates :content, presence: true, length: { maximum: 5000 }
+
+  before_validation :sanitize_content
+
+  after_create_commit :notify_participants
+
+  scope :recent, -> { order(created_at: :desc) }
+
+  private
+
+  def sanitize_content
+    sanitized = ActionView::Base.full_sanitizer.sanitize(content.to_s)
+    self.content = sanitized.strip
+  end
+
+  def notify_participants
+    conversation.mark_as_read!(user)
+
+    broadcast_append_to(
+      conversation,
+      target: "messages_conversation_#{conversation_id}",
+      partial: "messages/message",
+      locals: { message: self }
+    )
+
+    conversation.participants.includes(:conversation_participants).each do |participant|
+      broadcast_replace_to(
+        [participant, :conversations],
+        target: "conversation_#{conversation_id}",
+        partial: "conversations/conversation",
+        locals: { conversation: conversation, current_user: participant }
+      )
+    end
+  end
+end
