@@ -6,6 +6,8 @@ class Shop < ApplicationRecord
   has_many :audit_logs, dependent: :destroy
   has_many :admin_users
   has_many :users, dependent: :nullify
+  has_one :page_layout, dependent: :destroy
+  has_many :pages, dependent: :destroy
 
   validates :name, presence: true, length: { maximum: 200 }
   validates :slug, presence: true, uniqueness: true, length: { maximum: 200 }

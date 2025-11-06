@@ -52,6 +52,7 @@ Rails.application.routes.draw do
     resources :discounts do
       patch :toggle_active, on: :member
     end
+    resource :page_layout, only: %i[edit update], path: "page-layouts"
     resources :orders, only: %i[index show]
     resources :customers do
       patch :block, on: :member

@@ -1,0 +1,25 @@
+<div class="grid gap-4">
+  <div class="grid gap-4 sm:grid-cols-2">
+    <label class="flex flex-col text-xs font-medium text-slate-500">
+      Tiêu đề
+      <input type="text" value="<%= config["title"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="title" />
+    </label>
+    <label class="flex flex-col text-xs font-medium text-slate-500">
+      Phụ đề
+      <input type="text" value="<%= config["subtitle"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="subtitle" />
+    </label>
+    <label class="flex flex-col text-xs font-medium text-slate-500">
+      Màu nền
+      <input type="color" value="<%= config["background_color"] %>" class="mt-1 h-10 w-full rounded-lg border border-slate-200" data-action="input->layout-builder#updateField" data-field-name="background_color" />
+    </label>
+    <label class="flex flex-col text-xs font-medium text-slate-500">
+      Màu chữ
+      <input type="color" value="<%= config["text_color"] %>" class="mt-1 h-10 w-full rounded-lg border border-slate-200" data-action="input->layout-builder#updateField" data-field-name="text_color" />
+    </label>
+  </div>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Testimonials (JSON)
+    <textarea rows="4" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm font-mono text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateJsonCollection" data-field-name="testimonials"><%= JSON.pretty_generate(Array(config["testimonials"])) %></textarea>
+    <span class="mt-1 text-[11px] text-slate-400">Dán mảng JSON với các khóa quote, name, role.</span>
+  </label>
+</div>

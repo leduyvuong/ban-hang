@@ -1,0 +1,7 @@
+<section class="relative overflow-hidden rounded-3xl border border-dashed border-slate-300 bg-slate-50/70 p-6 text-slate-900 transition group-hover:border-blue-400 dark:border-slate-600 dark:bg-slate-800" data-preview-field="background_color" style="background-color: <%= config["background_color"] %>; color: <%= config["text_color"] %>" data-preview-field-text-color>
+  <div class="space-y-3">
+    <p class="text-xs font-semibold uppercase tracking-wide opacity-80" data-preview-field="subtitle"><%= config["subtitle"] %></p>
+    <h3 class="text-2xl font-bold" data-preview-field="title"><%= config["title"] %></h3>
+    <div class="h-40 rounded-2xl bg-slate-200/70 dark:bg-slate-700" data-preview-field="image_url" style="background-image: url(<%= config["image_url"] %>); background-size: cover;"></div>
+  </div>
+</section>

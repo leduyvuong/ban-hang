@@ -1,0 +1,37 @@
+<% component_definition = PageLayouts::ComponentRegistry.find(component_config["type"]) %>
+<% config = component_config["config"] || component_definition.default_config.deep_dup %>
+<div
+  class="group relative flex flex-col gap-4 rounded-3xl border border-slate-300 bg-white/90 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-400 hover:shadow-lg dark:border-slate-600 dark:bg-slate-800"
+  data-layout-builder-target="component"
+  data-component-type="<%= component_definition.type %>"
+  data-component-id="<%= component_config["id"] %>"
+  data-component-config="<%= json_escape(config.to_json) %>"
+  draggable="true"
+  data-action="dragstart->layout-builder#startCanvasDrag dragend->layout-builder#endCanvasDrag"
+>
+  <div class="flex items-start justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <span class="cursor-grab text-slate-400 transition group-hover:text-slate-600">
+        ⇅
+      </span>
+      <div>
+        <p class="text-sm font-semibold text-slate-500"><%= component_definition.label %></p>
+        <p class="text-xs text-slate-400"><%= component_definition.description %></p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button type="button" class="rounded-full border border-transparent bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-200" data-action="layout-builder#toggleComponentForm">
+        Chỉnh sửa
+      </button>
+      <button type="button" class="rounded-full border border-transparent bg-red-100 px-3 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-200" data-action="layout-builder#removeComponent">
+        Xóa
+      </button>
+    </div>
+  </div>
+  <div class="overflow-hidden rounded-2xl bg-slate-50 p-4 dark:bg-slate-900/70" data-layout-builder-target="preview">
+    <%= render component_definition.preview_partial, config: config %>
+  </div>
+  <div class="hidden space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-600 dark:bg-slate-900/70" data-layout-builder-target="form">
+    <%= render component_definition.form_partial, config: config %>
+  </div>
+</div>
