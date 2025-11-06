@@ -1,9 +1,9 @@
 <% if @layout_components.present? %>
   <div class="space-y-12 sm:space-y-16">
     <% @layout_components.each do |component_config| %>
-      <% component = PageLayouts::ComponentRegistry.find(component_config["type"]) %>
-      <% next unless component %>
-      <%= render component.component_class.new(config: component_config["config"] || component.default_config) %>
+      <% component_instance = PageLayouts::ComponentRegistry.build_component(component_config) %>
+      <% next unless component_instance %>
+      <%= render component_instance %>
     <% end %>
   </div>
 <% else %>

@@ -9,6 +9,7 @@ module PageLayouts
     :preview_partial,
     :form_partial,
     :default_config,
+    :areas,
     keyword_init: true
   )
 
@@ -26,8 +27,13 @@ module PageLayouts
           "subtitle" => "Khám phá bộ sưu tập mới nhất ngay hôm nay",
           "background_color" => "#0f172a",
           "text_color" => "#f8fafc",
-          "image_url" => "https://images.unsplash.com/photo-1521572267360-ee0c2909d518"
-        }
+          "image_url" => "https://images.unsplash.com/photo-1521572267360-ee0c2909d518",
+          "primary_button_text" => "Khám phá ngay",
+          "primary_button_url" => "#products",
+          "secondary_button_text" => "Bộ sưu tập",
+          "secondary_button_url" => "#collections"
+        },
+        areas: []
       ),
       Component.new(
         type: "product_grid",
@@ -42,7 +48,8 @@ module PageLayouts
           "background_color" => "#ffffff",
           "text_color" => "#0f172a",
           "product_ids" => []
-        }
+        },
+        areas: []
       ),
       Component.new(
         type: "testimonials",
@@ -60,7 +67,8 @@ module PageLayouts
             { "quote" => "Sản phẩm tuyệt vời và dịch vụ hỗ trợ nhanh chóng!", "name" => "Nguyễn Văn A", "role" => "Doanh nhân" },
             { "quote" => "Giao hàng nhanh và chất lượng vượt mong đợi.", "name" => "Trần Thị B", "role" => "Nội trợ" }
           ]
-        }
+        },
+        areas: []
       ),
       Component.new(
         type: "newsletter_signup",
@@ -75,7 +83,8 @@ module PageLayouts
           "background_color" => "#0f172a",
           "text_color" => "#f8fafc",
           "button_text" => "Đăng ký"
-        }
+        },
+        areas: []
       ),
       Component.new(
         type: "feature_section",
@@ -93,7 +102,8 @@ module PageLayouts
             { "title" => "Miễn phí giao hàng", "description" => "Áp dụng cho đơn hàng trên 500.000đ" },
             { "title" => "Hỗ trợ 24/7", "description" => "Luôn đồng hành cùng khách hàng" }
           ]
-        }
+        },
+        areas: []
       ),
       Component.new(
         type: "call_to_action",
@@ -109,7 +119,24 @@ module PageLayouts
           "text_color" => "#f8fafc",
           "button_text" => "Bắt đầu ngay",
           "button_url" => "/products"
-        }
+        },
+        areas: []
+      ),
+      Component.new(
+        type: "two_column_section",
+        label: "Bố cục 2 cột",
+        description: "Chứa tối đa 2 nhóm component với bố cục song song.",
+        component_class: PageLayouts::TwoColumnSectionComponent,
+        preview_partial: "admin/page_layouts/components/previews/two_column_section",
+        form_partial: "admin/page_layouts/components/forms/two_column_section",
+        default_config: {
+          "background_color" => "#ffffff",
+          "gap" => "lg"
+        },
+        areas: [
+          { "key" => "left", "label" => "Cột trái" },
+          { "key" => "right", "label" => "Cột phải" }
+        ]
       )
     ].freeze
 
@@ -123,6 +150,18 @@ module PageLayouts
 
     def self.default_config_for(type)
       find(type)&.default_config&.deep_dup
+    end
+
+    def self.build_component(component_config)
+      return unless component_config.is_a?(Hash)
+
+      component = find(component_config["type"])
+      return unless component
+
+      component.component_class.new(
+        config: component_config["config"] || component.default_config.deep_dup,
+        children: component_config["children"] || {}
+      )
     end
   end
 end

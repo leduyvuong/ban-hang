@@ -70,7 +70,6 @@
       <div
         class="relative min-h-[480px] rounded-3xl border border-dashed border-slate-300 bg-[radial-gradient(circle_at_1px_1px,_theme(colors.slate.200)_1px,_transparent_0)] bg-[length:20px_20px] p-6 transition dark:border-slate-600 dark:bg-[radial-gradient(circle_at_1px_1px,_theme(colors.slate.700)_1px,_transparent_0)]"
         data-layout-builder-target="canvas"
-        data-action="dragover->layout-builder#allowDrop dragenter->layout-builder#highlightDropZone dragleave->layout-builder#removeDropZoneHighlight drop->layout-builder#handleDrop"
       >
         <div class="space-y-4" data-layout-builder-target="emptyState" <%= "hidden" if @page_layout.components.any? %>>
           <div class="flex flex-col items-center justify-center gap-2 rounded-3xl border border-dashed border-slate-300 bg-white/60 p-10 text-center text-slate-500 dark:border-slate-600 dark:bg-slate-800/70 dark:text-slate-300">
@@ -79,7 +78,14 @@
           </div>
         </div>
 
-        <div class="flex flex-col gap-5" data-layout-builder-target="componentList">
+        <div
+          class="flex flex-col gap-5"
+          data-layout-builder-target="componentList dropzone"
+          data-dropzone="true"
+          data-dropzone-parent-id="root"
+          data-dropzone-slot="root"
+          data-action="dragover->layout-builder#allowDrop dragenter->layout-builder#highlightDropZone dragleave->layout-builder#removeDropZoneHighlight drop->layout-builder#handleDrop"
+        >
           <% @page_layout.ordered_components.each do |component_config| %>
             <%= render "admin/page_layouts/component", component_config: component_config %>
           <% end %>

@@ -1,11 +1,18 @@
 <% component_definition = PageLayouts::ComponentRegistry.find(component_config["type"]) %>
-<% config = component_config["config"] || component_definition.default_config.deep_dup %>
+<% if component_definition.present? %>
+<% config = component_definition.default_config.deep_dup.merge(component_config["config"] || {}) %>
+<% areas = component_definition.areas || [] %>
+<% base_children = component_config["children"] || {} %>
+<% children = areas.each_with_object({}) do |area, memo|
+     memo[area["key"]] = Array(base_children[area["key"]])
+   end %>
 <div
   class="group relative flex flex-col gap-4 rounded-3xl border border-slate-300 bg-white/90 p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-400 hover:shadow-lg dark:border-slate-600 dark:bg-slate-800"
   data-layout-builder-target="component"
   data-component-type="<%= component_definition.type %>"
   data-component-id="<%= component_config["id"] %>"
   data-component-config="<%= json_escape(config.to_json) %>"
+  data-component-areas="<%= json_escape(areas.to_json) %>"
   draggable="true"
   data-action="dragstart->layout-builder#startCanvasDrag dragend->layout-builder#endCanvasDrag"
 >
@@ -34,4 +41,35 @@
   <div class="hidden space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-600 dark:bg-slate-900/70" data-layout-builder-target="form">
     <%= render component_definition.form_partial, config: config %>
   </div>
+  <% if areas.any? %>
+    <div class="space-y-4">
+      <% areas.each do |area| %>
+        <% slot_children = Array(children[area["key"]]).sort_by { |child| child.fetch("order", 0).to_i } %>
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-xs font-semibold text-slate-500 dark:text-slate-300">
+            <span><%= area["label"] %></span>
+            <span class="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+              <%= slot_children.length %> component<%= 's' if slot_children.length > 1 %>
+            </span>
+          </div>
+          <div
+            class="flex flex-col gap-4 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-4 text-slate-400 transition dark:border-slate-600 dark:bg-slate-900/60"
+            data-dropzone="true"
+            data-dropzone-parent-id="<%= component_config["id"] %>"
+            data-dropzone-slot="<%= area["key"] %>"
+            data-action="dragover->layout-builder#allowDrop dragenter->layout-builder#highlightDropZone dragleave->layout-builder#removeDropZoneHighlight drop->layout-builder#handleDrop"
+            data-layout-builder-target="dropzone"
+          >
+            <div class="text-xs font-medium text-slate-400 dark:text-slate-500 <%= 'hidden' if slot_children.any? %>" data-slot-placeholder>
+              Thả component vào <%= area["label"].downcase %>
+            </div>
+            <% slot_children.each do |child_config| %>
+              <%= render "admin/page_layouts/component", component_config: child_config %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 </div>
+<% end %>

@@ -7,7 +7,8 @@ export default class extends Controller {
     "canvas",
     "componentList",
     "emptyState",
-    "template"
+    "template",
+    "dropzone"
   ]
 
   connect() {
@@ -16,19 +17,22 @@ export default class extends Controller {
     this.isPublishing = false
     this.layoutConfig = this.parseLayoutConfig(this.inputTarget.value)
     this.refreshEmptyState()
-    this.reconcileDomWithConfig()
+    this.syncState()
   }
 
   startSidebarDrag(event) {
     const { componentType, componentDefaultConfig } = event.currentTarget.dataset
     event.dataTransfer.effectAllowed = "copy"
     this.dragSource = "library"
-    event.dataTransfer.setData("text/plain", JSON.stringify({ source: "library", type: componentType, defaultConfig: componentDefaultConfig }))
-    this.canvasTarget.classList.add("ring", "ring-blue-400", "ring-offset-2")
+    event.dataTransfer.setData(
+      "text/plain",
+      JSON.stringify({ source: "library", type: componentType, defaultConfig: componentDefaultConfig })
+    )
+    this.highlightAllDropZones()
   }
 
   endSidebarDrag() {
-    this.removeDropZoneHighlight()
+    this.clearDropZoneHighlights()
     this.dragSource = null
   }
 
@@ -36,16 +40,20 @@ export default class extends Controller {
     const componentElement = event.currentTarget
     event.dataTransfer.effectAllowed = "move"
     this.dragSource = "canvas"
-    event.dataTransfer.setData("text/plain", JSON.stringify({ source: "canvas", id: componentElement.dataset.componentId }))
+    event.dataTransfer.setData(
+      "text/plain",
+      JSON.stringify({ source: "canvas", id: componentElement.dataset.componentId })
+    )
     componentElement.classList.add("opacity-60")
     this.draggedElement = componentElement
+    this.highlightAllDropZones()
   }
 
   endCanvasDrag(event) {
     event.currentTarget.classList.remove("opacity-60")
-    this.canvasTarget.classList.remove("ring", "ring-blue-400", "ring-offset-2")
     this.dragSource = null
     this.draggedElement = null
+    this.clearDropZoneHighlights()
   }
 
   allowDrop(event) {
@@ -58,35 +66,42 @@ export default class extends Controller {
     }
   }
 
-  highlightDropZone() {
-    this.canvasTarget.classList.add("ring", "ring-blue-400", "ring-offset-2")
+  highlightDropZone(event) {
+    if (event?.currentTarget) {
+      event.currentTarget.classList.add("ring", "ring-blue-400", "ring-offset-2")
+    }
   }
 
-  removeDropZoneHighlight() {
-    this.canvasTarget.classList.remove("ring", "ring-blue-400", "ring-offset-2")
+  removeDropZoneHighlight(event) {
+    if (event?.currentTarget && event.relatedTarget && event.currentTarget.contains(event.relatedTarget)) {
+      return
+    }
+    if (event?.currentTarget) {
+      event.currentTarget.classList.remove("ring", "ring-blue-400", "ring-offset-2")
+    }
   }
 
   handleDrop(event) {
     event.preventDefault()
+    const dropZone = event.currentTarget
     const data = this.safeParse(event.dataTransfer.getData("text/plain"))
     if (!data) return
 
     if (data.source === "library") {
-      this.insertNewComponent(data, event)
+      this.insertNewComponent(data, event, dropZone)
     } else if (data.source === "canvas" && data.id) {
-      this.reorderExistingComponent(data.id, event)
+      this.reorderExistingComponent(data.id, event, dropZone)
     }
 
-    this.removeDropZoneHighlight()
+    this.clearDropZoneHighlights()
     this.dragSource = null
     this.refreshEmptyState()
-    this.recomputeOrders()
-    this.persistConfig()
+    this.syncState()
   }
 
   toggleComponentForm(event) {
     const componentElement = event.currentTarget.closest("[data-component-id]")
-    const form = componentElement.querySelector("[data-layout-builder-target='form']")
+    const form = componentElement?.querySelector("[data-layout-builder-target='form']")
     if (!form) return
 
     form.classList.toggle("hidden")
@@ -94,12 +109,11 @@ export default class extends Controller {
 
   removeComponent(event) {
     const componentElement = event.currentTarget.closest("[data-component-id]")
-    const componentId = componentElement.dataset.componentId
+    if (!componentElement) return
+
     componentElement.remove()
-    this.layoutConfig.components = this.layoutConfig.components.filter((component) => component.id !== componentId)
     this.refreshEmptyState()
-    this.recomputeOrders()
-    this.persistConfig()
+    this.syncState()
   }
 
   updateField(event) {
@@ -145,38 +159,21 @@ export default class extends Controller {
 
   saveDraft() {
     this.isPublishing = false
-    this.persistConfig()
+    this.syncState()
   }
 
   publish() {
     this.isPublishing = true
-    this.persistConfig()
+    this.syncState()
   }
 
   beforeSubmit() {
-    this.persistConfig()
+    this.syncState()
   }
 
   // Helpers
 
-  reconcileDomWithConfig() {
-    const knownIds = new Set(this.layoutConfig.components.map((component) => component.id))
-    this.componentElements().forEach((element) => {
-      if (!knownIds.has(element.dataset.componentId)) {
-        const templateConfig = this.parseComponentConfig(element.dataset.componentConfig)
-        this.layoutConfig.components.push({
-          id: element.dataset.componentId,
-          type: element.dataset.componentType,
-          order: this.layoutConfig.components.length,
-          config: templateConfig?.config || templateConfig || {}
-        })
-      }
-    })
-    this.recomputeOrders()
-    this.persistConfig()
-  }
-
-  insertNewComponent(data, event) {
+  insertNewComponent(data, event, dropZone) {
     const templateElement = this.templateTargets.find((template) => template.dataset.componentType === data.type)
     if (!templateElement) return
 
@@ -189,58 +186,63 @@ export default class extends Controller {
     const defaultConfig = this.parseComponentConfig(data.defaultConfig) || {}
     componentElement.dataset.componentConfig = JSON.stringify(defaultConfig)
 
-    this.insertAtDropPosition(componentElement, event)
-
-    this.layoutConfig.components.push({
-      id: newId,
-      type: componentElement.dataset.componentType,
-      order: this.layoutConfig.components.length,
-      config: JSON.parse(JSON.stringify(defaultConfig.config || defaultConfig))
-    })
-
-    this.persistConfig()
+    this.insertAtDropPosition(componentElement, event, dropZone)
+    this.updateComponentInternalReferences(componentElement, newId)
   }
 
-  reorderExistingComponent(componentId, event) {
-    const componentElement = this.componentElements().find((element) => element.dataset.componentId === componentId)
+  reorderExistingComponent(componentId, event, dropZone) {
+    const componentElement = this.componentElementById(componentId)
     if (!componentElement) return
 
-    this.insertAtDropPosition(componentElement, event)
+    this.insertAtDropPosition(componentElement, event, dropZone)
   }
 
-  insertAtDropPosition(componentElement, event) {
+  insertAtDropPosition(componentElement, event, dropZone) {
     const reference = event.target.closest("[data-component-id]")
-    if (!reference) {
-      this.componentListTarget.appendChild(componentElement)
+    if (!reference || !dropZone.contains(reference)) {
+      dropZone.appendChild(componentElement)
       return
     }
 
     const bounds = reference.getBoundingClientRect()
     const shouldInsertBefore = event.clientY < bounds.top + bounds.height / 2
     if (shouldInsertBefore) {
-      this.componentListTarget.insertBefore(componentElement, reference)
+      dropZone.insertBefore(componentElement, reference)
     } else {
-      this.componentListTarget.insertBefore(componentElement, reference.nextElementSibling)
+      dropZone.insertBefore(componentElement, reference.nextElementSibling)
     }
   }
 
   ensureConfig(componentElement) {
+    if (!componentElement) return {}
     const componentId = componentElement.dataset.componentId
-    let componentConfig = this.layoutConfig.components.find((component) => component.id === componentId)
+    let componentConfig = this.findComponentById(componentId)
     if (!componentConfig) {
+      const parentZone = componentElement.parentElement?.closest("[data-dropzone-parent-id]")
+      const parentId = parentZone?.dataset.dropzoneParentId || "root"
+      const slot = parentZone?.dataset.dropzoneSlot || "root"
+      if (parentId !== "root") {
+        const parentElement = componentElement.parentElement?.closest("[data-component-id]")
+        if (parentElement) this.ensureConfig(parentElement)
+      }
       componentConfig = {
         id: componentId,
         type: componentElement.dataset.componentType,
-        order: this.layoutConfig.components.length,
-        config: this.parseComponentConfig(componentElement.dataset.componentConfig) || {}
+        order: 0,
+        config: this.parseComponentConfig(componentElement.dataset.componentConfig) || {},
+        children: this.initialChildrenFromDataset(componentElement)
       }
-      this.layoutConfig.components.push(componentConfig)
+      const targetCollection = this.findParentCollection(parentId, slot)
+      targetCollection.push(componentConfig)
+    }
+    if (!componentConfig.children) {
+      componentConfig.children = this.initialChildrenFromDataset(componentElement)
     }
     return componentConfig
   }
 
   updatePreview(componentElement, fieldName, value) {
-    const previewContainer = componentElement.querySelector("[data-layout-builder-target='preview']")
+    const previewContainer = componentElement?.querySelector("[data-layout-builder-target='preview']")
     if (!previewContainer) return
 
     if (fieldName === "background_color") {
@@ -269,25 +271,55 @@ export default class extends Controller {
   }
 
   componentElements() {
-    return Array.from(this.componentListTarget.querySelectorAll("[data-component-id]"))
+    return Array.from(this.element.querySelectorAll("[data-component-id]"))
+  }
+
+  componentElementById(id) {
+    return this.element.querySelector(`[data-component-id='${CSS.escape(id)}']`)
   }
 
   refreshEmptyState() {
     if (!this.hasEmptyStateTarget) return
-    if (this.componentElements().length === 0) {
+    const hasRootComponents = Array.from(this.componentListTarget.children).some(
+      (child) => child.dataset && child.dataset.componentId
+    )
+    if (!hasRootComponents) {
       this.emptyStateTarget.classList.remove("hidden")
     } else {
       this.emptyStateTarget.classList.add("hidden")
     }
   }
 
-  recomputeOrders() {
-    this.componentElements().forEach((element, index) => {
-      element.dataset.componentOrder = index
-      const config = this.ensureConfig(element)
-      config.order = index
+  syncState() {
+    this.componentElements().forEach((element) => this.ensureConfig(element))
+
+    const zones = [...this.dropzoneTargets]
+    zones.sort((a, b) => {
+      if ((a.dataset.dropzoneParentId || "root") === "root") return -1
+      if ((b.dataset.dropzoneParentId || "root") === "root") return 1
+      return 0
     })
+
+    zones.forEach((dropZone) => {
+      const parentId = dropZone.dataset.dropzoneParentId || "root"
+      const slot = dropZone.dataset.dropzoneSlot || "root"
+      const childElements = Array.from(dropZone.children).filter(
+        (child) => child.dataset && child.dataset.componentId
+      )
+      const collection = this.findParentCollection(parentId, slot)
+      collection.splice(0, collection.length)
+      childElements.forEach((childElement, index) => {
+        const config = this.findComponentById(childElement.dataset.componentId)
+        if (config) {
+          config.order = index
+          collection.push(config)
+        }
+      })
+    })
+
     this.layoutConfig.components.sort((a, b) => a.order - b.order)
+    this.persistConfig()
+    this.updateDropzonePlaceholders()
   }
 
   persistConfig() {
@@ -299,18 +331,31 @@ export default class extends Controller {
     try {
       const parsed = typeof value === "string" ? JSON.parse(value) : value
       if (parsed && parsed.components) {
-        parsed.components = parsed.components.map((component, index) => ({
-          id: component.id || this.generateId(),
-          type: component.type,
-          order: component.order ?? index,
-          config: component.config || {}
-        }))
+        parsed.components = parsed.components.map((component, index) => this.normalizeComponent(component, index))
       }
-      return parsed
+      return parsed || { components: [] }
     } catch (error) {
       console.warn("Không thể parse layout_config", error)
       return { components: [] }
     }
+  }
+
+  normalizeComponent(component, index = 0) {
+    const normalized = {
+      id: component.id || this.generateId(),
+      type: component.type,
+      order: component.order ?? index,
+      config: component.config || {},
+      children: {}
+    }
+
+    const children = component.children || {}
+    Object.keys(children).forEach((slot) => {
+      const slotChildren = Array.isArray(children[slot]) ? children[slot] : []
+      normalized.children[slot] = slotChildren.map((child, childIndex) => this.normalizeComponent(child, childIndex))
+    })
+
+    return normalized
   }
 
   safeParse(value) {
@@ -339,5 +384,75 @@ export default class extends Controller {
     }
 
     return `component-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`
+  }
+
+  highlightAllDropZones() {
+    if (this.hasCanvasTarget) {
+      this.canvasTarget.classList.add("ring", "ring-blue-400", "ring-offset-2")
+    }
+  }
+
+  clearDropZoneHighlights() {
+    if (this.hasCanvasTarget) {
+      this.canvasTarget.classList.remove("ring", "ring-blue-400", "ring-offset-2")
+    }
+    this.dropzoneTargets.forEach((zone) => {
+      zone.classList.remove("ring", "ring-blue-400", "ring-offset-2")
+    })
+  }
+
+  findComponentById(id, collection = this.layoutConfig.components) {
+    for (const component of collection) {
+      if (component.id === id) return component
+      const children = component.children || {}
+      for (const slot of Object.keys(children)) {
+        const found = this.findComponentById(id, children[slot])
+        if (found) return found
+      }
+    }
+    return null
+  }
+
+  findParentCollection(parentId, slot) {
+    if (parentId === "root") {
+      return this.layoutConfig.components
+    }
+    const parentComponent = this.findComponentById(parentId)
+    if (!parentComponent) return []
+    if (!parentComponent.children) parentComponent.children = {}
+    if (!parentComponent.children[slot]) parentComponent.children[slot] = []
+    return parentComponent.children[slot]
+  }
+
+  initialChildrenFromDataset(componentElement) {
+    const areas = this.safeParse(componentElement.dataset.componentAreas)
+    if (!areas || !Array.isArray(areas)) return {}
+    return areas.reduce((memo, area) => {
+      memo[area.key || area["key"]] = []
+      return memo
+    }, {})
+  }
+
+  updateComponentInternalReferences(componentElement, newId) {
+    componentElement.querySelectorAll("[data-dropzone-parent-id]").forEach((zone) => {
+      if (zone.dataset.dropzoneParentId === "__COMPONENT_ID__") {
+        zone.dataset.dropzoneParentId = newId
+      }
+    })
+  }
+
+  updateDropzonePlaceholders() {
+    this.dropzoneTargets.forEach((dropZone) => {
+      const placeholder = dropZone.querySelector("[data-slot-placeholder]")
+      if (!placeholder) return
+      const hasComponents = Array.from(dropZone.children).some(
+        (child) => child.dataset && child.dataset.componentId
+      )
+      if (hasComponents) {
+        placeholder.classList.add("hidden")
+      } else {
+        placeholder.classList.remove("hidden")
+      }
+    })
   }
 }

@@ -2,11 +2,12 @@
 
 module PageLayouts
   class BaseComponent < ViewComponent::Base
-    attr_reader :config
+    attr_reader :config, :children
 
-    def initialize(config: {})
+    def initialize(config: {}, children: {})
       super()
       @config = config || {}
+      @children = children || {}
     end
   end
 end

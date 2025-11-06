@@ -1,0 +1,18 @@
+<section class="rounded-3xl border border-slate-200 bg-white shadow-sm transition dark:border-slate-700 dark:bg-slate-900" style="background-color: <%= background_color %>">
+  <div class="grid p-8 sm:p-10 md:grid-cols-2 <%= gap_class %>">
+    <div class="space-y-6">
+      <% left_components.each do |component_config| %>
+        <% if (child_component = render_child(component_config)) %>
+          <%= render child_component %>
+        <% end %>
+      <% end %>
+    </div>
+    <div class="space-y-6">
+      <% right_components.each do |component_config| %>
+        <% if (child_component = render_child(component_config)) %>
+          <%= render child_component %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</section>

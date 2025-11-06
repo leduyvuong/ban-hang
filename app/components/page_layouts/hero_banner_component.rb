@@ -21,5 +21,21 @@ module PageLayouts
     def image_url
       config.fetch("image_url", nil)
     end
+
+    def primary_button_text
+      config.fetch("primary_button_text", "Khám phá ngay")
+    end
+
+    def primary_button_url
+      config.fetch("primary_button_url", "#products")
+    end
+
+    def secondary_button_text
+      config.fetch("secondary_button_text", "Bộ sưu tập")
+    end
+
+    def secondary_button_url
+      config.fetch("secondary_button_url", "#collections")
+    end
   end
 end

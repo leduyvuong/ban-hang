@@ -3,5 +3,9 @@
     <p class="text-xs font-semibold uppercase tracking-wide opacity-80" data-preview-field="subtitle"><%= config["subtitle"] %></p>
     <h3 class="text-2xl font-bold" data-preview-field="title"><%= config["title"] %></h3>
     <div class="h-40 rounded-2xl bg-slate-200/70 dark:bg-slate-700" data-preview-field="image_url" style="background-image: url(<%= config["image_url"] %>); background-size: cover;"></div>
+    <div class="flex flex-wrap gap-2 text-xs font-semibold">
+      <span class="rounded-full bg-white/70 px-3 py-1 text-slate-800" data-preview-field="primary_button_text"><%= config["primary_button_text"] %></span>
+      <span class="rounded-full border border-white/60 px-3 py-1" data-preview-field="secondary_button_text"><%= config["secondary_button_text"] %></span>
+    </div>
   </div>
 </section>
