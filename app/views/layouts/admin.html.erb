@@ -43,7 +43,11 @@
             <%= link_to admin_root_path, class: admin_nav_class(admin_root_path) do %>
               <span>Dashboard</span>
             <% end %>
-            
+
+            <%= link_to edit_admin_page_layout_path, class: admin_nav_class(edit_admin_page_layout_path) do %>
+              <span>Homepage builder</span>
+            <% end %>
+
             <% if shop_feature_available?('product_management') %>
               <%= link_to admin_products_path, class: admin_nav_class(admin_products_path) do %>
                 <span>Products</span>
