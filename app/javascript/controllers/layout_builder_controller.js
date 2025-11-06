@@ -198,18 +198,30 @@ export default class extends Controller {
   }
 
   insertAtDropPosition(componentElement, event, dropZone) {
-    const reference = event.target.closest("[data-component-id]")
-    if (!reference || !dropZone.contains(reference)) {
+    const siblings = Array.from(dropZone.children).filter(
+      (child) => child.dataset && child.dataset.componentId && child !== componentElement
+    )
+
+    if (siblings.length === 0) {
       dropZone.appendChild(componentElement)
       return
     }
 
-    const bounds = reference.getBoundingClientRect()
-    const shouldInsertBefore = event.clientY < bounds.top + bounds.height / 2
-    if (shouldInsertBefore) {
-      dropZone.insertBefore(componentElement, reference)
-    } else {
-      dropZone.insertBefore(componentElement, reference.nextElementSibling)
+    const pointerY = event.clientY || 0
+    let inserted = false
+
+    for (const sibling of siblings) {
+      const bounds = sibling.getBoundingClientRect()
+      const midpoint = bounds.top + bounds.height / 2
+      if (pointerY <= midpoint) {
+        dropZone.insertBefore(componentElement, sibling)
+        inserted = true
+        break
+      }
+    }
+
+    if (!inserted) {
+      dropZone.appendChild(componentElement)
     }
   }
 
