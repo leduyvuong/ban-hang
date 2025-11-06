@@ -1,0 +1,22 @@
+<div class="grid gap-4 sm:grid-cols-2">
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Tiêu đề
+    <input type="text" value="<%= config["title"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="title" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Phụ đề
+    <input type="text" value="<%= config["subtitle"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="subtitle" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Màu nền
+    <input type="color" value="<%= config["background_color"] %>" class="mt-1 h-10 w-full rounded-lg border border-slate-200" data-action="input->layout-builder#updateField" data-field-name="background_color" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Màu chữ
+    <input type="color" value="<%= config["text_color"] %>" class="mt-1 h-10 w-full rounded-lg border border-slate-200" data-action="input->layout-builder#updateField" data-field-name="text_color" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500 sm:col-span-2">
+    ID sản phẩm (ngăn cách bằng dấu phẩy)
+    <input type="text" value="<%= Array(config["product_ids"]).join(', ') %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateCollection" data-field-name="product_ids" placeholder="Ví dụ: 12, 45, 99" />
+  </label>
+</div>

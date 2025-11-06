@@ -1,0 +1,10 @@
+<section class="relative overflow-hidden rounded-3xl border border-slate-200 p-10 text-center shadow-sm transition dark:border-slate-700" style="background-color: <%= background_color %>; color: <%= text_color %>">
+  <div class="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 mix-blend-overlay"></div>
+  <div class="relative space-y-4">
+    <h2 class="text-3xl font-semibold"><%= title %></h2>
+    <p class="text-base opacity-90"><%= subtitle %></p>
+    <a href="<%= button_url %>" class="inline-flex items-center justify-center rounded-full bg-white px-8 py-3 text-sm font-semibold text-slate-900 shadow transition hover:-translate-y-0.5 hover:shadow-lg">
+      <%= button_text %>
+    </a>
+  </div>
+</section>

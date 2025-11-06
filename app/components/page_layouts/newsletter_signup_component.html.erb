@@ -1,0 +1,12 @@
+<section class="rounded-3xl border border-slate-200 p-10 shadow-sm transition dark:border-slate-700" style="background-color: <%= background_color %>; color: <%= text_color %>">
+  <div class="mx-auto max-w-2xl text-center">
+    <h2 class="text-2xl font-semibold"><%= title %></h2>
+    <p class="mt-2 text-base opacity-90"><%= subtitle %></p>
+  </div>
+  <div class="mx-auto mt-8 flex max-w-xl flex-col gap-4 sm:flex-row">
+    <input type="email" placeholder="Email của bạn" class="w-full rounded-full border border-transparent px-6 py-3 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" />
+    <button class="inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-blue-500">
+      <%= button_text %>
+    </button>
+  </div>
+</section>

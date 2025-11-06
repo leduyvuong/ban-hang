@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_01_091500) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_06_063826) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -187,6 +187,26 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_01_091500) do
     t.index ["slug"], name: "index_products_on_slug", unique: true
   end
 
+  create_table "page_layouts", force: :cascade do |t|
+    t.bigint "shop_id", null: false
+    t.jsonb "layout_config", default: {"components"=>[]}, null: false
+    t.datetime "published_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["published_at"], name: "index_page_layouts_on_published_at"
+    t.index ["shop_id"], name: "index_page_layouts_on_shop_id"
+  end
+
+  create_table "pages", force: :cascade do |t|
+    t.bigint "shop_id", null: false
+    t.jsonb "layout_config", default: {"components"=>[]}, null: false
+    t.datetime "published_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["published_at"], name: "index_pages_on_published_at"
+    t.index ["shop_id"], name: "index_pages_on_shop_id"
+  end
+
   create_table "shop_features", force: :cascade do |t|
     t.bigint "shop_id", null: false
     t.bigint "feature_id", null: false
@@ -244,6 +264,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_01_091500) do
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users"
+  add_foreign_key "page_layouts", "shops"
+  add_foreign_key "pages", "shops"
   add_foreign_key "product_discounts", "discounts"
   add_foreign_key "product_discounts", "products"
   add_foreign_key "products", "categories"

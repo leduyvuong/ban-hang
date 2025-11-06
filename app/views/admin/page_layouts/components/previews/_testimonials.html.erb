@@ -1,0 +1,11 @@
+<section class="rounded-3xl border border-dashed border-slate-300 bg-white/80 p-6 transition group-hover:border-blue-400 dark:border-slate-600 dark:bg-slate-800" data-preview-field="background_color" style="background-color: <%= config["background_color"] %>; color: <%= config["text_color"] %>">
+  <h3 class="text-xl font-semibold" data-preview-field="title"><%= config["title"] %></h3>
+  <p class="mt-1 text-sm opacity-70" data-preview-field="subtitle"><%= config["subtitle"] %></p>
+  <div class="mt-4 space-y-3" data-preview-field="testimonials">
+    <% Array(config["testimonials"]).first(2).each do |testimonial| %>
+      <blockquote class="rounded-2xl border border-slate-200 bg-white/90 p-4 text-sm text-slate-600 dark:border-slate-600 dark:bg-slate-900/70 dark:text-slate-200">
+        “<%= testimonial["quote"] %>” — <span class="font-semibold"><%= testimonial["name"] %></span>
+      </blockquote>
+    <% end %>
+  </div>
+</section>

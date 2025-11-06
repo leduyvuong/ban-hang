@@ -1,13 +1,23 @@
-<div class="space-y-16 sm:space-y-20">
-  <%= render "pages/hero_banner" %>
+<% if @layout_components.present? %>
+  <div class="space-y-12 sm:space-y-16">
+    <% @layout_components.each do |component_config| %>
+      <% component_instance = PageLayouts::ComponentRegistry.build_component(component_config) %>
+      <% next unless component_instance %>
+      <%= render component_instance %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="space-y-16 sm:space-y-20">
+    <%= render "pages/hero_banner" %>
 
-  <%= render "pages/featured_products" %>
+    <%= render "pages/featured_products" %>
 
-  <%= render "pages/categories" %>
+    <%= render "pages/categories" %>
 
-  <%= render "pages/promotional_banner" %>
+    <%= render "pages/promotional_banner" %>
 
-  <section class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
-    <%= render "pages/newsletter/form", newsletter_subscription: @newsletter_subscription %>
-  </section>
-</div>
+    <section class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
+      <%= render "pages/newsletter/form", newsletter_subscription: @newsletter_subscription %>
+    </section>
+  </div>
+<% end %>

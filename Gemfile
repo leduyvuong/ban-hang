@@ -25,6 +25,7 @@ gem "sentry-rails", "~> 5.15"
 gem "dotenv-rails", groups: %i[development test]
 gem "image_processing", "~> 1.2"
 gem "mini_magick", "~> 4.12"
+gem "view_component"
 
 group :development, :test do
   gem "debug", platforms: %i[mri truffleruby]

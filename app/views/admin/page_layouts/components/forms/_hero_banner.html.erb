@@ -1,0 +1,38 @@
+<div class="grid gap-4 sm:grid-cols-2">
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Tiêu đề
+    <input type="text" value="<%= config["title"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="title" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Phụ đề
+    <input type="text" value="<%= config["subtitle"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="subtitle" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Màu nền
+    <input type="color" value="<%= config["background_color"] %>" class="mt-1 h-10 w-full rounded-lg border border-slate-200" data-action="input->layout-builder#updateField" data-field-name="background_color" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Màu chữ
+    <input type="color" value="<%= config["text_color"] %>" class="mt-1 h-10 w-full rounded-lg border border-slate-200" data-action="input->layout-builder#updateField" data-field-name="text_color" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500 sm:col-span-2">
+    Ảnh nền (URL)
+    <input type="url" value="<%= config["image_url"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="image_url" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Nút chính - nội dung
+    <input type="text" value="<%= config["primary_button_text"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="primary_button_text" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Nút chính - liên kết
+    <input type="text" inputmode="url" value="<%= config["primary_button_url"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="primary_button_url" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Nút phụ - nội dung
+    <input type="text" value="<%= config["secondary_button_text"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="secondary_button_text" />
+  </label>
+  <label class="flex flex-col text-xs font-medium text-slate-500">
+    Nút phụ - liên kết
+    <input type="text" inputmode="url" value="<%= config["secondary_button_url"] %>" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none" data-action="input->layout-builder#updateField" data-field-name="secondary_button_url" />
+  </label>
+</div>

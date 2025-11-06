@@ -172,6 +172,7 @@ GEM
       net-smtp
     marcel (1.1.0)
     matrix (0.4.3)
+    method_source (1.0.0)
     mini_magick (4.13.1)
     mini_mime (1.1.5)
     minitest (5.26.0)
@@ -374,6 +375,11 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.1.0)
     uniform_notifier (1.18.0)
+    view_component (3.13.0)
+      activesupport (>= 5.2.0, < 8.0)
+      concurrent-ruby (~> 1.0)
+      method_source (~> 1.0)
+      zeitwerk (~> 2.6)
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -435,6 +441,7 @@ DEPENDENCIES
   stimulus-rails
   tailwindcss-rails (~> 2.0)
   turbo-rails
+  view_component
   web-console
   webdrivers
 
