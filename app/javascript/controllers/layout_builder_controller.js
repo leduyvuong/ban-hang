@@ -12,6 +12,7 @@ export default class extends Controller {
 
   connect() {
     this.draggedElement = null
+    this.dragSource = null
     this.isPublishing = false
     this.layoutConfig = this.parseLayoutConfig(this.inputTarget.value)
     this.refreshEmptyState()
@@ -21,13 +22,20 @@ export default class extends Controller {
   startSidebarDrag(event) {
     const { componentType, componentDefaultConfig } = event.currentTarget.dataset
     event.dataTransfer.effectAllowed = "copy"
+    this.dragSource = "library"
     event.dataTransfer.setData("text/plain", JSON.stringify({ source: "library", type: componentType, defaultConfig: componentDefaultConfig }))
     this.canvasTarget.classList.add("ring", "ring-blue-400", "ring-offset-2")
+  }
+
+  endSidebarDrag() {
+    this.removeDropZoneHighlight()
+    this.dragSource = null
   }
 
   startCanvasDrag(event) {
     const componentElement = event.currentTarget
     event.dataTransfer.effectAllowed = "move"
+    this.dragSource = "canvas"
     event.dataTransfer.setData("text/plain", JSON.stringify({ source: "canvas", id: componentElement.dataset.componentId }))
     componentElement.classList.add("opacity-60")
     this.draggedElement = componentElement
@@ -36,12 +44,18 @@ export default class extends Controller {
   endCanvasDrag(event) {
     event.currentTarget.classList.remove("opacity-60")
     this.canvasTarget.classList.remove("ring", "ring-blue-400", "ring-offset-2")
+    this.dragSource = null
     this.draggedElement = null
   }
 
   allowDrop(event) {
     event.preventDefault()
-    event.dataTransfer.dropEffect = "move"
+    const dropEffect = this.dragSource === "library" ? "copy" : "move"
+    try {
+      event.dataTransfer.dropEffect = dropEffect
+    } catch (error) {
+      // Một số trình duyệt không cho phép thiết lập dropEffect, bỏ qua
+    }
   }
 
   highlightDropZone() {
@@ -64,6 +78,7 @@ export default class extends Controller {
     }
 
     this.removeDropZoneHighlight()
+    this.dragSource = null
     this.refreshEmptyState()
     this.recomputeOrders()
     this.persistConfig()
@@ -169,7 +184,7 @@ export default class extends Controller {
     const componentElement = fragment.firstElementChild
     if (!componentElement) return
 
-    const newId = crypto.randomUUID()
+    const newId = this.generateId()
     componentElement.dataset.componentId = newId
     const defaultConfig = this.parseComponentConfig(data.defaultConfig) || {}
     componentElement.dataset.componentConfig = JSON.stringify(defaultConfig)
@@ -285,7 +300,7 @@ export default class extends Controller {
       const parsed = typeof value === "string" ? JSON.parse(value) : value
       if (parsed && parsed.components) {
         parsed.components = parsed.components.map((component, index) => ({
-          id: component.id || crypto.randomUUID(),
+          id: component.id || this.generateId(),
           type: component.type,
           order: component.order ?? index,
           config: component.config || {}
@@ -316,5 +331,13 @@ export default class extends Controller {
     const parsed = this.safeParse(value)
     if (!parsed) return {}
     return parsed.config ? parsed.config : parsed
+  }
+
+  generateId() {
+    if (typeof window !== "undefined" && window.crypto && typeof window.crypto.randomUUID === "function") {
+      return window.crypto.randomUUID()
+    }
+
+    return `component-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}`
   }
 }
