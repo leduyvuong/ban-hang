@@ -79,6 +79,10 @@ class ProductsController < ApplicationController
 
     assign_open_graph(description)
 
+    @reviews = @product.visible_reviews.includes(:user).recent_first
+    @user_review = current_user&.review_for(@product)
+    @wishlist_item_present = current_user&.wishlisted_product?(@product)
+
     respond_to(&:html)
   end
 

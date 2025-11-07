@@ -90,4 +90,14 @@ module ApplicationHelper
 
     content_tag(:div, user_initials(user), class: classes)
   end
+
+  def render_rating_stars(rating, max: 5)
+    filled = [[rating.to_f.round, 0].max, max].min
+    empty = max - filled
+
+    stars = []
+    stars << content_tag(:span, "★" * filled, class: "text-amber-500") if filled.positive?
+    stars << content_tag(:span, "☆" * empty, class: "text-gray-300") if empty.positive?
+    safe_join(stars)
+  end
 end

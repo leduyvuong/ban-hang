@@ -12,6 +12,9 @@ class User < ApplicationRecord
   has_many :conversation_participants, dependent: :destroy, inverse_of: :user
   has_many :conversations, through: :conversation_participants
   has_many :messages, dependent: :destroy
+  has_many :reviews, dependent: :destroy
+  has_many :wishlist_items, dependent: :destroy
+  has_many :wishlist_products, through: :wishlist_items, source: :product
 
   before_validation :normalize_email
   before_save :sanitize_addresses
@@ -129,6 +132,22 @@ class User < ApplicationRecord
 
   def addresses=(value)
     super(Array(value))
+  end
+
+  def reviewed_product?(product)
+    return false if product.blank?
+
+    reviews.exists?(product: product)
+  end
+
+  def review_for(product)
+    reviews.find_by(product: product)
+  end
+
+  def wishlisted_product?(product)
+    return false if product.blank?
+
+    wishlist_products.exists?(product.id)
   end
 
   private
