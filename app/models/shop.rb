@@ -3,7 +3,8 @@
 class Shop < ApplicationRecord
   enum homepage_variant: {
     classic: "classic",
-    modern: "modern"
+    modern: "modern",
+    template_3: "template_3"
   }, _suffix: true
 
   has_many :shop_features, dependent: :destroy

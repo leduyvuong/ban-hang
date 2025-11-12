@@ -1,0 +1,415 @@
+<% hero_image_url = "https://images.unsplash.com/photo-1511288599001-1e3f66f9ffb2?auto=format&fit=crop&w=1600&q=80" %>
+<% fallback_product_images = [
+  "https://images.unsplash.com/photo-1518116198551-414b9abca0fa?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1518544801976-3e159e86d6d5?auto=format&fit=crop&w=1200&q=80",
+  "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80"
+] %>
+<% safe_featured_products = Array(featured_products) %>
+<% fallback_showcase = [
+  {
+    category: "Signature Fragrance",
+    name: "Amber No. 5",
+    description: "Tinh dầu độc quyền phối trộn từ gỗ đàn hương và hổ phách dành cho tín đồ hương thơm cá tính.",
+    price: "6.500.000₫",
+    image: fallback_product_images[0],
+    path: products_path
+  },
+  {
+    category: "Tailored Essentials",
+    name: "Linen Atelier Set",
+    description: "Bộ suit linen thủ công với đường may tối giản tạo nên phom dáng chuẩn mực cho ngày hè sang trọng.",
+    price: "9.200.000₫",
+    image: fallback_product_images[1],
+    path: products_path
+  },
+  {
+    category: "Artisanal Leather",
+    name: "Heritage Weekender",
+    description: "Túi da thuộc thảo mộc nhuộm tay mang sắc nâu cognac dành cho những chuyến đi ngắn ngày.",
+    price: "12.400.000₫",
+    image: fallback_product_images[2],
+    path: products_path
+  },
+  {
+    category: "Home Rituals",
+    name: "Cashmere Throw",
+    description: "Chăn cashmere dệt kim mịn màng với gam màu trung tính giúp tái tạo năng lượng sau ngày dài.",
+    price: "7.800.000₫",
+    image: fallback_product_images[3],
+    path: products_path
+  },
+  {
+    category: "Modern Objects",
+    name: "Sculptural Vase",
+    description: "Bình gốm thủ công men mờ lấy cảm hứng từ kiến trúc đương đại cho không gian sống tinh giản.",
+    price: "3.900.000₫",
+    image: fallback_product_images[4],
+    path: products_path
+  }
+] %>
+<% showcase_items = safe_featured_products.first(5).map { |product| { product: product } } %>
+<% if showcase_items.size < 5 %>
+  <% fallback_showcase.first(5 - showcase_items.size).each do |fallback| %>
+    <% showcase_items << { fallback: fallback } %>
+  <% end %>
+<% end %>
+
+<% category_backgrounds = [
+  "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1514996937319-344454492b37?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1523475472560-d2df97ec485c?auto=format&fit=crop&w=900&q=80"
+] %>
+<% fallback_categories = [
+  { name: "Fragrance", tagline: "Tinh tế từng nốt hương", image: category_backgrounds[0], path: products_path(category: "fragrance") },
+  { name: "Womenswear", tagline: "Cắt may thủ công", image: category_backgrounds[1], path: products_path(category: "womenswear") },
+  { name: "Menswear", tagline: "Phong thái tối giản", image: category_backgrounds[2], path: products_path(category: "menswear") },
+  { name: "Home Living", tagline: "Chi tiết nâng niu", image: category_backgrounds[3], path: products_path(category: "home") },
+  { name: "Accessories", tagline: "Điểm nhấn hoàn hảo", image: category_backgrounds[4], path: products_path(category: "accessories") },
+  { name: "Gifts", tagline: "Tuyển chọn tinh tế", image: category_backgrounds[5], path: products_path(category: "gifts") }
+] %>
+<% safe_categories = Array(categories) %>
+<% category_cards = safe_categories.first(6).each_with_index.map do |category, index|
+  {
+    name: category.name,
+    tagline: category.respond_to?(:tagline) ? category.tagline : "Khám phá tuyển chọn",
+    image: category_backgrounds[index % category_backgrounds.length],
+    path: products_path(category: category.slug)
+  }
+end %>
+<% if category_cards.size < 6 %>
+  <% fallback_categories.first(6 - category_cards.size).each do |fallback| %>
+    <% category_cards << fallback %>
+  <% end %>
+<% end %>
+
+<% featured_collection = safe_featured_products.presence || [] %>
+<% fallback_collection = fallback_showcase %>
+
+<% testimonials = [
+  {
+    quote: "“BanHang giúp chúng tôi trình bày câu chuyện thương hiệu với cảm xúc và sự tinh giản mà khách hàng thượng lưu mong đợi.”",
+    name: "Lan Phương",
+    role: "Creative Director, Atelier No.9",
+    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=320&q=80"
+  },
+  {
+    quote: "“Từ trải nghiệm đầu tiên, khách hàng đã cảm nhận được sự khác biệt nhờ bố cục sang trọng và tốc độ tải mượt mà.”",
+    name: "Vũ Dũng",
+    role: "Founder, Maison Verdant",
+    avatar: "https://images.unsplash.com/photo-1529665253569-6d01c0eaf7b6?auto=format&fit=crop&w=320&q=80"
+  },
+  {
+    quote: "“Doanh số tăng 40% khi chúng tôi chuyển sang template mới với các section giàu cảm xúc và CTA rõ ràng.”",
+    name: "An Nhiên",
+    role: "Head of E-commerce, Lueur Studio",
+    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=320&q=80"
+  }
+] %>
+
+<% benefits = [
+  { title: "Sản phẩm tuyển chọn", description: "Chúng tôi chỉ giới thiệu những thiết kế giới hạn, chú trọng đến chất liệu và độ hoàn thiện." },
+  { title: "Giao hàng tận tay", description: "Dịch vụ vận chuyển cao cấp với lịch giao linh hoạt và đóng gói thủ công cẩn trọng." },
+  { title: "Trải nghiệm cá nhân hoá", description: "Stylist riêng tư hỗ trợ chọn lựa, lên ý tưởng quà tặng và chăm sóc hậu mãi." }
+] %>
+
+<div class="flex flex-col bg-[#f5f5f5] text-gray-900">
+  <section id="heroSection" class="relative w-full h-[70vh] md:h-[100vh] lg:h-screen overflow-hidden" data-controller="parallax" data-parallax-speed-value="0.2">
+    <div class="absolute inset-0" data-parallax-target="background">
+      <%= image_tag hero_image_url, alt: "Phong cách sống cao cấp với bộ sưu tập thời thượng", class: "h-full w-full object-cover" %>
+    </div>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-black/30 to-transparent"></div>
+    <div class="absolute bottom-12 left-4 right-4 md:bottom-24 md:left-8 lg:left-16 lg:max-w-xl">
+      <div class="flex flex-col gap-6 text-white">
+        <h1 class="text-5xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl">Khám Phá Bộ Sưu Tập Mới</h1>
+        <div class="w-full md:w-auto">
+          <%= link_to "Explore Now", products_path, class: "inline-flex w-full items-center justify-center border-2 border-white px-12 py-4 text-sm font-semibold uppercase tracking-wide text-white transition-all duration-300 hover:bg-white hover:text-black md:w-auto" %>
+        </div>
+      </div>
+    </div>
+    <div class="pointer-events-none absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center text-white">
+      <span class="text-xs uppercase tracking-[0.3em] text-white/80">Scroll</span>
+      <svg xmlns="http://www.w3.org/2000/svg" class="mt-2 h-6 w-6 animate-bounce" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25 12 15.75 4.5 8.25" />
+      </svg>
+    </div>
+  </section>
+
+  <section aria-labelledby="brand-intro" class="border-t border-gray-200 bg-white py-12 md:py-20">
+    <div class="mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 text-center">
+      <span aria-hidden="true" class="text-3xl text-[#d4a574]">✦</span>
+      <h2 id="brand-intro" class="text-2xl font-semibold text-gray-900 md:text-3xl">Crafted for those who appreciate quality</h2>
+      <p class="text-lg font-normal leading-relaxed text-gray-600">Chúng tôi tin rằng sự tinh giản cùng chất liệu đỉnh cao sẽ tạo nên những khoảnh khắc đáng nhớ trong cuộc sống thường nhật.</p>
+    </div>
+  </section>
+
+  <section id="collection" aria-labelledby="collection-heading" class="bg-white">
+    <% showcase_items.each_with_index do |item, index| %>
+      <% background_class = index.even? ? "bg-white" : "bg-[#faf8f6]" %>
+      <% image_order_classes = index.odd? ? "order-1 md:order-2" : "order-1 md:order-1" %>
+      <% text_order_classes = index.odd? ? "order-2 md:order-1" : "order-2 md:order-2" %>
+      <article class="#{background_class}">
+        <div class="grid grid-cols-1 md:grid-cols-5">
+          <% if item[:product] %>
+            <% product = item[:product] %>
+            <% product_image = product.image.attached? ? product.image.variant(resize_to_fill: [1200, 1500]) : fallback_product_images[index % fallback_product_images.length] %>
+            <figure class="group relative <%= image_order_classes %> md:col-span-3">
+              <div class="h-80 w-full overflow-hidden md:h-screen">
+                <%= image_tag product_image, alt: product.name, class: "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105", loading: "lazy" %>
+              </div>
+            </figure>
+            <div class="<%= text_order_classes %> flex flex-col justify-center bg-[#faf8f6] px-4 py-8 md:col-span-2 md:px-12 md:py-0">
+              <p class="text-xs font-semibold uppercase tracking-[0.3em] text-gray-500"><%= product.category&.name || "New Arrival" %></p>
+              <h3 class="mt-6 text-4xl font-bold text-gray-900 md:text-5xl"><%= product.name %></h3>
+              <p class="mt-4 text-lg text-gray-600 leading-relaxed"><%= product.short_description.presence || truncate(product.description.to_s, length: 160) %></p>
+              <p class="mt-6 text-3xl font-bold text-gray-900"><%= format_money(product.discounted? ? product.discounted_price : product.price) %></p>
+              <div class="mt-8">
+                <%= link_to "View Collection", product_path(product), class: "inline-block border-b-2 border-gray-900 pb-2 text-sm font-semibold uppercase tracking-wide text-gray-900 transition-colors duration-300 hover:border-[#d4a574] hover:text-[#d4a574]" %>
+              </div>
+            </div>
+          <% else %>
+            <% fallback = item[:fallback] %>
+            <figure class="group relative <%= image_order_classes %> md:col-span-3">
+              <div class="h-80 w-full overflow-hidden md:h-screen">
+                <%= image_tag fallback[:image], alt: fallback[:name], class: "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105", loading: "lazy" %>
+              </div>
+            </figure>
+            <div class="<%= text_order_classes %> flex flex-col justify-center bg-[#faf8f6] px-4 py-8 md:col-span-2 md:px-12 md:py-0">
+              <p class="text-xs font-semibold uppercase tracking-[0.3em] text-gray-500"><%= fallback[:category] %></p>
+              <h3 class="mt-6 text-4xl font-bold text-gray-900 md:text-5xl"><%= fallback[:name] %></h3>
+              <p class="mt-4 text-lg text-gray-600 leading-relaxed"><%= fallback[:description] %></p>
+              <p class="mt-6 text-3xl font-bold text-gray-900"><%= fallback[:price] %></p>
+              <div class="mt-8">
+                <%= link_to "View Collection", fallback[:path], class: "inline-block border-b-2 border-gray-900 pb-2 text-sm font-semibold uppercase tracking-wide text-gray-900 transition-colors duration-300 hover:border-[#d4a574] hover:text-[#d4a574]" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </article>
+    <% end %>
+  </section>
+
+  <section id="categories" aria-labelledby="category-heading" class="bg-white py-16 md:py-24">
+    <div class="mx-auto max-w-7xl px-4">
+      <div class="flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
+        <div>
+          <h2 id="category-heading" class="text-3xl font-bold text-gray-900 md:text-4xl">Danh mục chọn lọc</h2>
+          <p class="mt-2 text-lg text-gray-600">Khám phá các thế giới phong cách được tuyển chọn tinh tế dành riêng cho bạn.</p>
+        </div>
+        <%= link_to "View all", products_path, class: "inline-flex items-center gap-2 border-b border-gray-900 pb-1 text-sm font-semibold uppercase tracking-wide text-gray-900 transition-colors duration-300 hover:border-[#d4a574] hover:text-[#d4a574]" %>
+      </div>
+      <div class="mt-12 grid auto-rows-[200px] grid-cols-2 gap-4 md:auto-rows-[240px] md:grid-cols-3 lg:auto-rows-[280px] lg:grid-cols-4">
+        <% layout_classes = ["col-span-2 row-span-2", "", "", "col-span-2", "", ""] %>
+        <% category_cards.each_with_index do |card, index| %>
+          <% layout = layout_classes[index] || "" %>
+          <article class="group relative flex h-full w-full overflow-hidden bg-gray-900 text-white <%= layout %>">
+            <%= image_tag card[:image], alt: "#{card[:name]} category inspiration", class: "absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105", loading: "lazy" %>
+            <div class="absolute inset-0 bg-black/20 transition-all duration-300 group-hover:bg-black/40"></div>
+            <div class="relative z-10 flex h-full w-full flex-col items-center justify-center gap-3 px-4 text-center md:opacity-0 md:group-hover:opacity-100">
+              <h3 class="text-2xl font-semibold md:text-3xl"><%= card[:name] %></h3>
+              <p class="text-lg text-gray-200"><%= card[:tagline] %></p>
+              <%= link_to "Discover", card[:path], class: "inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-white transition-colors duration-300 hover:text-[#d4a574]" %>
+            </div>
+            <div class="relative z-10 flex h-full w-full items-end justify-start px-4 py-4 md:hidden">
+              <div class="space-y-1 text-left">
+                <h3 class="text-xl font-semibold"><%= card[:name] %></h3>
+                <p class="text-sm text-gray-200"><%= card[:tagline] %></p>
+              </div>
+            </div>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section id="featured-collection" class="bg-[#faf8f6] py-16 md:py-24">
+    <div class="mx-auto max-w-7xl px-4">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-bold text-gray-900 md:text-4xl">Featured Collection</h2>
+        <p class="mt-3 text-lg text-gray-600">Handpicked products</p>
+      </div>
+      <div class="mt-12 columns-1 gap-4 md:columns-2 lg:columns-3 xl:columns-4">
+        <% collection_items = featured_collection.presence || [] %>
+        <% if collection_items.empty? %>
+          <% fallback_collection.each do |item| %>
+            <article class="mb-4 break-inside-avoid">
+              <div class="group relative overflow-hidden">
+                <%= image_tag item[:image], alt: item[:name], class: "w-full object-cover transition-transform duration-500 group-hover:scale-105", loading: "lazy" %>
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100 md:opacity-0">
+                  <h3 class="text-2xl font-bold text-white"><%= item[:name] %></h3>
+                  <p class="text-xl text-gray-300"><%= item[:price] %></p>
+                  <%= link_to "Add to Cart", products_path, class: "inline-flex items-center justify-center bg-white px-6 py-2 text-sm font-semibold uppercase tracking-wide text-black transition-colors duration-300 hover:bg-gray-200" %>
+                </div>
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/30 md:hidden">
+                  <h3 class="text-xl font-bold text-white"><%= item[:name] %></h3>
+                  <p class="text-base text-gray-200"><%= item[:price] %></p>
+                </div>
+              </div>
+            </article>
+          <% end %>
+        <% else %>
+          <% collection_items.each_with_index do |product, idx|
+            image_source = product.image.attached? ? product.image.variant(resize_to_limit: [900, 1200]) : fallback_product_images[idx % fallback_product_images.length]
+          %>
+            <article class="mb-4 break-inside-avoid">
+              <div class="group relative overflow-hidden">
+                <%= image_tag image_source, alt: product.name, class: "w-full object-cover transition-transform duration-500 group-hover:scale-105", loading: "lazy" %>
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/60 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                  <h3 class="text-2xl font-bold text-white"><%= product.name %></h3>
+                  <p class="text-xl text-gray-300"><%= format_money(product.discounted? ? product.discounted_price : product.price) %></p>
+                  <%= link_to "Add to Cart", product_path(product), class: "inline-flex items-center justify-center bg-white px-6 py-2 text-sm font-semibold uppercase tracking-wide text-black transition-colors duration-300 hover:bg-gray-200" %>
+                </div>
+                <div class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/30 md:hidden">
+                  <h3 class="text-xl font-bold text-white"><%= product.name %></h3>
+                  <p class="text-base text-gray-200"><%= format_money(product.discounted? ? product.discounted_price : product.price) %></p>
+                </div>
+              </div>
+            </article>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section id="testimonials" class="bg-gray-50 py-16 md:py-24">
+    <div class="mx-auto max-w-6xl px-4">
+      <div class="mx-auto max-w-2xl text-center">
+        <h2 class="text-3xl font-bold text-gray-900 md:text-4xl">Testimonials</h2>
+        <p class="mt-3 text-lg text-gray-600">Những phản hồi chân thành từ khách hàng thân thiết.</p>
+      </div>
+      <div class="mt-16 space-y-16">
+        <% testimonials.each_with_index do |testimonial, index| %>
+          <% odd_layout = index.even? %>
+          <div class="grid grid-cols-1 gap-12 md:grid-cols-2 md:items-center md:gap-12 <%= odd_layout ? '' : 'md:flex-row-reverse' %>">
+            <div class="relative">
+              <span class="absolute -top-8 -left-4 text-6xl text-gray-300" aria-hidden="true">&ldquo;</span>
+              <blockquote class="text-2xl font-light italic text-gray-900 md:text-4xl">
+                <p><%= testimonial[:quote] %></p>
+              </blockquote>
+            </div>
+            <div class="flex flex-col items-center md:items-start">
+              <%= image_tag testimonial[:avatar], alt: "Ảnh chân dung của #{testimonial[:name]}", class: "h-24 w-24 rounded-full object-cover md:h-32 md:w-32", loading: "lazy" %>
+              <p class="mt-6 text-xl font-semibold text-gray-900"><%= testimonial[:name] %></p>
+              <p class="text-base italic text-gray-600"><%= testimonial[:role] %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section id="benefits" class="border-t border-gray-200 bg-white py-16 md:py-24">
+    <div class="mx-auto max-w-6xl px-4">
+      <div class="grid grid-cols-1 gap-12 md:grid-cols-3">
+        <% benefits.each do |benefit| %>
+          <article class="text-center">
+            <span class="mx-auto mb-4 flex h-12 w-12 items-center justify-center text-2xl text-gray-900">★</span>
+            <h3 class="text-2xl font-semibold text-gray-900"><%= benefit[:title] %></h3>
+            <p class="mt-4 text-lg leading-relaxed text-gray-600"><%= benefit[:description] %></p>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section id="newsletter" class="relative overflow-hidden bg-gray-900 py-20 md:py-28">
+    <div class="absolute inset-0 opacity-10">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="0 0 400 400" fill="none">
+        <defs>
+          <pattern id="diagonal-lines" patternUnits="userSpaceOnUse" width="40" height="40">
+            <path d="M0 40L40 0" stroke="white" stroke-width="0.5" />
+          </pattern>
+        </defs>
+        <rect width="400" height="400" fill="url(#diagonal-lines)" />
+      </svg>
+    </div>
+    <div class="relative z-10 mx-auto max-w-3xl px-4 text-center text-white">
+      <h2 class="text-4xl font-bold md:text-5xl">Join Our Community</h2>
+      <p class="mt-4 text-xl text-gray-300">Nhận thông tin phát hành giới hạn, câu chuyện hậu trường và ưu đãi dành riêng cho thành viên.</p>
+      <div class="mt-10">
+        <%= form_with model: newsletter_subscription, url: newsletter_subscriptions_path, local: true, class: "mx-auto flex max-w-md flex-col gap-3 md:flex-row" do |form| %>
+          <%= form.email_field :email, placeholder: "Enter your email", class: "flex-1 rounded-none bg-white px-4 py-4 text-gray-900 focus:outline-none", required: true %>
+          <%= form.submit "Subscribe", class: "rounded-none bg-gray-100 px-8 py-4 font-semibold text-gray-900 transition-colors duration-300 hover:bg-white", data: { turbo: false } %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-900 text-gray-300">
+    <div class="border-t border-gray-800">
+      <div class="mx-auto max-w-7xl px-4 py-12 md:py-16">
+        <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div>
+            <h3 class="text-white font-semibold">About</h3>
+            <ul class="mt-4 space-y-2 text-sm text-gray-400">
+              <li><%= link_to "About Us", home_path(anchor: "about"), class: "transition hover:text-white" %></li>
+              <li><%= link_to "Our Story", home_path(anchor: "story"), class: "transition hover:text-white" %></li>
+              <li><%= link_to "Careers", products_path(anchor: "careers"), class: "transition hover:text-white" %></li>
+              <li><%= link_to "Press", products_path(anchor: "press"), class: "transition hover:text-white" %></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-white font-semibold">Support</h3>
+            <ul class="mt-4 space-y-2 text-sm text-gray-400">
+              <li><%= link_to "Contact Us", new_session_path, class: "transition hover:text-white" %></li>
+              <li><%= link_to "FAQ", products_path(anchor: "faq"), class: "transition hover:text-white" %></li>
+              <li><%= link_to "Shipping Info", products_path(anchor: "shipping"), class: "transition hover:text-white" %></li>
+              <li><%= link_to "Returns", products_path(anchor: "returns"), class: "transition hover:text-white" %></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-white font-semibold">Legal</h3>
+            <ul class="mt-4 space-y-2 text-sm text-gray-400">
+              <li><%= link_to "Privacy Policy", products_path(anchor: "privacy"), class: "transition hover:text-white" %></li>
+              <li><%= link_to "Terms of Service", products_path(anchor: "terms"), class: "transition hover:text-white" %></li>
+              <li><%= link_to "Cookie Policy", products_path(anchor: "cookies"), class: "transition hover:text-white" %></li>
+              <li><%= link_to "Disclaimer", products_path(anchor: "disclaimer"), class: "transition hover:text-white" %></li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="text-white font-semibold">Newsletter</h3>
+            <p class="mt-4 text-sm text-gray-400">Get exclusive offers</p>
+            <%= form_with model: newsletter_subscription, url: newsletter_subscriptions_path, local: true, class: "mt-4 flex flex-col gap-2" do |form| %>
+              <%= form.email_field :email, placeholder: "Email address", class: "w-full rounded-none bg-white px-4 py-3 text-gray-900 focus:outline-none", required: true %>
+              <%= form.submit "Sign Up", class: "w-full rounded-none bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-900 transition-colors duration-300 hover:bg-white", data: { turbo: false } %>
+            <% end %>
+            <div class="mt-6 flex items-center gap-4 text-white">
+              <%= link_to "https://instagram.com", class: "h-10 w-10 rounded-full border border-white/40 transition hover:border-white/80", aria: { label: "Instagram" } do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full p-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="2.75" y="2.75" width="18.5" height="18.5" rx="4" ry="4"></rect>
+                  <circle cx="12" cy="12" r="3.5"></circle>
+                  <circle cx="17.5" cy="6.5" r="0.9" fill="currentColor"></circle>
+                </svg>
+              <% end %>
+              <%= link_to "https://facebook.com", class: "h-10 w-10 rounded-full border border-white/40 transition hover:border-white/80", aria: { label: "Facebook" } do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full p-2" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13.5 9H15V6h-1.5C11.57 6 10 7.57 10 9.5V11H8v3h2v7h3v-7h2.25l.75-3H13v-1.5c0-.414.336-.75.75-.75Z" />
+                </svg>
+              <% end %>
+              <%= link_to "https://pinterest.com", class: "h-10 w-10 rounded-full border border-white/40 transition hover:border-white/80", aria: { label: "Pinterest" } do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full p-2" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.478 2 2 6.201 2 11.5c0 3.68 2.299 6.842 5.586 8.154-.078-.691-.148-1.757.031-2.514.16-.685 1.03-4.357 1.03-4.357s-.263-.522-.263-1.292c0-1.21.703-2.116 1.58-2.116.744 0 1.103.552 1.103 1.215 0 .74-.471 1.847-.715 2.873-.203.86.432 1.561 1.279 1.561 1.535 0 2.712-1.616 2.712-3.949 0-2.063-1.484-3.506-3.603-3.506-2.455 0-3.896 1.841-3.896 3.744 0 .74.285 1.535.642 1.966.07.083.08.156.059.24-.065.26-.211.823-.239.939-.038.16-.127.195-.293.118-1.093-.507-1.775-2.095-1.775-3.373 0-2.742 1.995-5.26 5.75-5.26 3.018 0 5.367 2.151 5.367 5.028 0 3.003-1.895 5.42-4.523 5.42-.883 0-1.714-.459-1.998-1.002l-.543 2.073c-.199.76-.74 1.715-1.101 2.296A10.002 10.002 0 0 0 12 22c5.522 0 10-4.201 10-9.5S17.522 2 12 2Z" />
+                </svg>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="mt-10 border-t border-gray-800 pt-8 text-sm text-gray-500 md:flex md:items-center md:justify-between">
+          <p>&copy; <%= Time.current.year %> BanHang. All rights reserved.</p>
+          <div class="mt-4 flex items-center gap-3 md:mt-0">
+            <span class="text-gray-400">Payments:</span>
+            <span class="inline-flex items-center gap-2 text-white">
+              <span class="rounded border border-white/30 px-2 py-1 text-xs uppercase">Visa</span>
+              <span class="rounded border border-white/30 px-2 py-1 text-xs uppercase">Mastercard</span>
+              <span class="rounded border border-white/30 px-2 py-1 text-xs uppercase">Amex</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>

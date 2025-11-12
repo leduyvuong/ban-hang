@@ -28,6 +28,7 @@ Rails.application.routes.draw do
 
   resource :checkout, only: %i[show update], controller: "checkout"
   resource :wishlist, only: :show
+  resource :reviews, only: :show, controller: "reviews"
   resources :newsletter_subscriptions, only: :create
 
   resource :session, only: %i[new create destroy]
