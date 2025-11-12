@@ -232,8 +232,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_01_100000) do
     t.string "slug", null: false
     t.string "domain"
     t.string "time_zone"
+    t.string "homepage_variant", default: "classic", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["homepage_variant"], name: "index_shops_on_homepage_variant"
     t.index ["slug"], name: "index_shops_on_slug", unique: true
   end
 

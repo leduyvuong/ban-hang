@@ -1,0 +1,325 @@
+<% hero_image_url = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=960&q=80" %>
+<div class="flex flex-col" id="hero">
+  <section class="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 py-12 md:py-20 lg:py-24">
+    <div class="absolute inset-0">
+      <div class="absolute -top-24 -left-32 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
+      <div class="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-purple-500/30 blur-3xl"></div>
+    </div>
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+        <div class="space-y-8" data-controller="reveal" data-reveal-threshold-value="0.15">
+          <div class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 text-sm font-medium text-white/80">
+            <span class="inline-flex h-2 w-2 rounded-full bg-emerald-300"></span>
+            Trusted by 12k+ Vietnamese retailers
+          </div>
+          <div class="space-y-5">
+            <h1 class="text-5xl font-bold tracking-tight text-white md:text-6xl">
+              Xây dựng cửa hàng online chuyên nghiệp trong vài phút
+            </h1>
+            <p class="max-w-xl text-lg text-gray-100 md:text-2xl">
+              BanHang giúp bạn quản lý sản phẩm, đơn hàng và trải nghiệm khách hàng trong một nền tảng duy nhất được tối ưu cho thương mại điện tử Việt Nam.
+            </p>
+          </div>
+          <div class="flex flex-col items-start gap-4 sm:flex-row" role="group" aria-label="Primary call to action">
+            <%= link_to "Bắt đầu miễn phí", products_path, class: "inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-base font-semibold text-blue-600 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100" %>
+            <%= link_to "Xem gói dịch vụ", products_path(anchor: "pricing"), class: "inline-flex items-center justify-center rounded-full border-2 border-white px-6 py-3 text-base font-semibold text-white transition-all duration-300 hover:bg-white/10" %>
+          </div>
+          <dl class="grid w-full grid-cols-2 gap-6 text-white sm:grid-cols-4">
+            <div class="rounded-2xl border border-white/20 bg-white/5 p-4 text-left">
+              <dt class="text-sm text-white/70">Đơn hàng xử lý</dt>
+              <dd class="mt-1 text-2xl font-semibold">350K+</dd>
+            </div>
+            <div class="rounded-2xl border border-white/20 bg-white/5 p-4 text-left">
+              <dt class="text-sm text-white/70">Tăng trưởng doanh thu</dt>
+              <dd class="mt-1 text-2xl font-semibold">180%</dd>
+            </div>
+            <div class="rounded-2xl border border-white/20 bg-white/5 p-4 text-left">
+              <dt class="text-sm text-white/70">Đối tác logistics</dt>
+              <dd class="mt-1 text-2xl font-semibold">40+</dd>
+            </div>
+            <div class="rounded-2xl border border-white/20 bg-white/5 p-4 text-left">
+              <dt class="text-sm text-white/70">Đánh giá 5 sao</dt>
+              <dd class="mt-1 text-2xl font-semibold">12.4K</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="relative" data-controller="reveal" data-reveal-threshold-value="0.2">
+          <div class="relative overflow-hidden rounded-3xl bg-white/10 p-2 shadow-2xl ring-1 ring-white/20 backdrop-blur">
+            <div class="overflow-hidden rounded-2xl bg-white/80 shadow-lg">
+              <%= image_tag hero_image_url, alt: "Doanh nhân trẻ quản lý cửa hàng trực tuyến", class: "h-full w-full object-cover", loading: "lazy" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="bg-gray-50 py-16 sm:py-20 lg:py-24">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-3xl text-center" data-controller="reveal" data-reveal-threshold-value="0.2">
+        <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">Siêu tốc, thông minh và tối ưu cho thương mại điện tử</h2>
+        <p class="mt-4 text-lg text-gray-600">Bộ công cụ toàn diện giúp bạn vận hành cửa hàng online ở mọi quy mô, từ startup tới thương hiệu đã tăng trưởng.</p>
+      </div>
+      <% features = [
+        {
+          title: "Quản lý kho thông minh",
+          description: "Đồng bộ tồn kho theo thời gian thực giữa các kênh, cảnh báo tồn kho thấp và tự động đặt hàng lại.",
+          icon: "M3 3h1.5l1 2H21l-2.25 9H7.5l-1-2H3z"
+        },
+        {
+          title: "Thanh toán linh hoạt",
+          description: "Tích hợp 10+ cổng thanh toán và hỗ trợ COD để tối ưu tỉ lệ chuyển đổi đơn hàng.",
+          icon: "M12 6v6l3.5 2.1M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18z"
+        },
+        {
+          title: "Marketing cá nhân hóa",
+          description: "Gửi email, SMS và thông báo tự động dựa trên hành vi để nuôi dưỡng khách hàng trung thành.",
+          icon: "M21 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2m18 0v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8m18 0-9 6-9-6"
+        }
+      ] %>
+      <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3" role="list" aria-label="Feature benefits">
+        <% features.each do |feature| %>
+          <article class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-300 hover:shadow-lg" data-controller="reveal" data-reveal-threshold-value="0.1">
+            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="h-6 w-6" aria-hidden="true">
+                <path d="<%= feature[:icon] %>" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+            <h3 class="mt-6 text-xl font-semibold text-gray-900"><%= feature[:title] %></h3>
+            <p class="mt-3 text-gray-600"><%= feature[:description] %></p>
+          </article>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section id="testimonials" class="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-24">
+    <div class="absolute inset-0 bg-gradient-to-b from-blue-50/60 to-purple-50/40"></div>
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-3xl text-center" data-controller="reveal" data-reveal-threshold-value="0.2">
+        <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">Khách hàng nói gì về BanHang</h2>
+        <p class="mt-4 text-lg text-gray-600">Những câu chuyện thành công từ các thương hiệu Việt đang tăng trưởng nhanh cùng chúng tôi.</p>
+      </div>
+      <% testimonials = [
+        {
+          name: "Nguyễn Minh Anh",
+          role: "Founder, Saigon Brew",
+          quote: "“Nhờ BanHang, đội ngũ của tôi tiết kiệm hơn 20 giờ mỗi tuần khi xử lý đơn hàng và chăm sóc khách hàng.”",
+          avatar: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=240&q=80",
+          rating: 5
+        },
+        {
+          name: "Trần Quang",
+          role: "CEO, Nha Trang Seafoods",
+          quote: "“Hệ thống báo cáo trực quan giúp chúng tôi ra quyết định nhanh chóng và tối ưu tồn kho theo mùa vụ.”",
+          avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=240&q=80",
+          rating: 5
+        },
+        {
+          name: "Lê Thu Hà",
+          role: "E-commerce Manager, Chic Boutique",
+          quote: "“Từ khi dùng BanHang, doanh thu online tăng 160% nhờ các chiến dịch email automation được cá nhân hoá.”",
+          avatar: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=240&q=80",
+          rating: 5
+        }
+      ] %>
+      <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3" role="list" aria-label="Customer testimonials">
+        <% testimonials.each do |testimonial| %>
+          <figure class="flex h-full flex-col rounded-3xl border border-gray-200 bg-white p-8 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl" data-controller="reveal" data-reveal-threshold-value="0.15">
+            <div class="flex items-center gap-4">
+              <%= image_tag testimonial[:avatar], alt: "Ảnh chân dung của #{testimonial[:name]}", class: "h-16 w-16 rounded-full object-cover", loading: "lazy" %>
+              <div>
+                <figcaption class="text-lg font-semibold text-gray-900"><%= testimonial[:name] %></figcaption>
+                <p class="text-sm text-gray-500"><%= testimonial[:role] %></p>
+                <div class="mt-1 flex items-center text-yellow-400" aria-hidden="true">
+                  <% testimonial[:rating].times do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 0 0 .95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.034a1 1 0 0 0-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.034a1 1 0 0 0-1.176 0l-2.802 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 0 0-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 0 0 .951-.69l1.07-3.292Z" />
+                    </svg>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+            <blockquote class="mt-6 flex-1 text-gray-700">
+              <p class="text-base italic"><%= testimonial[:quote] %></p>
+            </blockquote>
+          </figure>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <section id="products" class="bg-white py-16 sm:py-20 lg:py-24">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between" data-controller="reveal" data-reveal-threshold-value="0.2">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">Bộ sưu tập nổi bật</h2>
+          <p class="mt-3 max-w-2xl text-lg text-gray-600">Khám phá những sản phẩm bán chạy nhất được cập nhật liên tục từ các đối tác trên toàn quốc.</p>
+        </div>
+        <%= link_to "Xem tất cả sản phẩm", products_path, class: "inline-flex items-center gap-2 rounded-full border border-blue-600 px-5 py-2.5 text-sm font-semibold text-blue-600 transition-all duration-300 hover:bg-blue-600 hover:text-white" %>
+      </div>
+      <% if featured_products.present? %>
+        <div class="mt-10 grid grid-cols-2 gap-6 md:grid-cols-4" role="list" aria-label="Featured products">
+          <% featured_products.each do |product| %>
+            <% thumb = product.thumbnail(width: 480, height: 480) %>
+            <article class="group flex h-full transform flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition-transform duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-xl" data-controller="reveal" data-reveal-threshold-value="0.1">
+              <div class="relative overflow-hidden">
+                <div class="aspect-square">
+                  <% if thumb.present? %>
+                    <%= image_tag thumb, alt: product.name, class: "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105", loading: "lazy" %>
+                  <% else %>
+                    <div class="flex h-full w-full items-center justify-center bg-gray-100 text-sm text-gray-400">Chưa có ảnh</div>
+                  <% end %>
+                </div>
+                <% if product.discounted? %>
+                  <span class="absolute left-3 top-3 inline-flex items-center rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow-md">Giảm giá</span>
+                <% end %>
+              </div>
+              <div class="flex flex-1 flex-col space-y-3 p-5">
+                <h3 class="text-lg font-semibold text-gray-900">
+                  <%= link_to product.name, product_path(product), class: "transition-colors hover:text-blue-600" %>
+                </h3>
+                <% if product.category.present? %>
+                  <p class="text-sm font-medium text-blue-600"><%= product.category.name %></p>
+                <% end %>
+                <div class="mt-auto flex flex-wrap items-center justify-between gap-3 pt-2">
+                  <span class="text-lg font-bold text-blue-600"><%= format_money(product.discounted? ? product.discounted_price : product.price) %></span>
+                  <% if product.stock.to_i.positive? %>
+                    <button type="button" class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" data-action="click->cart#addItem" data-cart-product-id-param="<%= product.to_param %>" data-cart-quantity-param="1" data-product-id="<%= product.to_param %>" data-quantity="1" data-turbo="false">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l1.036 3.878M7.5 14.25h10.128c.621 0 1.166-.401 1.342-.996l1.71-5.7a1.125 1.125 0 0 0-1.075-1.454H5.192m2.308 8.4-2.25 4.5m0 0a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Zm12-1.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z" />
+                      </svg>
+                      Thêm vào giỏ
+                    </button>
+                  <% else %>
+                    <span class="rounded-full bg-gray-100 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Hết hàng</span>
+                  <% end %>
+                </div>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="mt-10 rounded-3xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-gray-500">Hiện chưa có sản phẩm nổi bật. Hãy quay lại sau!</p>
+      <% end %>
+    </div>
+  </section>
+
+  <section id="contact" class="relative overflow-hidden py-20">
+    <div class="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
+    <div class="absolute inset-0 opacity-40" aria-hidden="true">
+      <div class="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/10 blur-3xl"></div>
+    </div>
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+        <div class="space-y-6 text-white" data-controller="reveal" data-reveal-threshold-value="0.2">
+          <h2 class="text-3xl font-bold sm:text-4xl">Sẵn sàng tăng tốc doanh thu online?</h2>
+          <p class="text-lg text-white/80">Gia nhập cộng đồng thương hiệu Việt tiên phong sử dụng nền tảng thương mại điện tử hiện đại. Đội ngũ hỗ trợ của chúng tôi sẽ đồng hành 24/7.</p>
+          <dl class="grid grid-cols-2 gap-6 text-sm font-semibold text-white/90">
+            <div>
+              <dt class="text-white/70">Thương hiệu đang hoạt động</dt>
+              <dd class="mt-1 text-2xl">8,500+</dd>
+            </div>
+            <div>
+              <dt class="text-white/70">Đánh giá trung bình</dt>
+              <dd class="mt-1 text-2xl">4.9/5.0</dd>
+            </div>
+            <div>
+              <dt class="text-white/70">Đơn vị vận chuyển kết nối</dt>
+              <dd class="mt-1 text-2xl">15+</dd>
+            </div>
+            <div>
+              <dt class="text-white/70">Đối tác hỗ trợ</dt>
+              <dd class="mt-1 text-2xl">120+</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="rounded-3xl bg-white/10 p-8 shadow-2xl backdrop-blur" data-controller="reveal" data-reveal-threshold-value="0.2">
+          <h3 class="text-2xl font-semibold text-white">Đăng ký nhận tư vấn</h3>
+          <p class="mt-2 text-white/80">Để lại email, chúng tôi sẽ liên hệ và giúp bạn khởi tạo cửa hàng nhanh chóng.</p>
+          <%= form_with model: newsletter_subscription, url: newsletter_subscriptions_path, class: "mt-6 space-y-4", data: { turbo: false }, local: true do |form| %>
+            <div>
+              <%= form.label :email, "Email của bạn", class: "block text-sm font-medium text-white/90" %>
+              <%= form.email_field :email, placeholder: "banhang@example.com", class: "mt-2 w-full rounded-full border border-white/40 bg-white/10 px-4 py-3 text-sm text-white placeholder-white/60 shadow-sm focus:border-white focus:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/60" %>
+              <%= field_error(newsletter_subscription, :email) %>
+            </div>
+            <div class="flex items-center gap-3">
+              <%= form.submit "Nhận tư vấn", class: "inline-flex flex-1 items-center justify-center rounded-full bg-white px-5 py-3 text-sm font-semibold text-blue-600 transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100" %>
+              <%= link_to "Tìm hiểu thêm", products_path(anchor: "features"), class: "inline-flex items-center justify-center rounded-full border border-white/40 px-5 py-3 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10" %>
+            </div>
+            <p class="text-xs text-white/60">Bằng việc gửi thông tin, bạn đồng ý với <a href="#" class="underline decoration-white/40 hover:decoration-white">chính sách bảo mật</a> của BanHang.</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="bg-gray-900 text-gray-300">
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+      <div class="space-y-5">
+        <div class="flex items-center gap-2 text-xl font-semibold text-white">
+          <svg class="h-8 w-8" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="40" height="40" rx="12" class="fill-blue-500"></rect>
+            <path d="M12 20c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M10 26c2.667 4 6.667 6 12 6s9.333-2 12-6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          BanHang
+        </div>
+        <p class="text-sm text-gray-400">Nền tảng thương mại điện tử giúp thương hiệu Việt tăng trưởng bền vững với trải nghiệm bán hàng hiện đại.</p>
+      </div>
+      <div class="space-y-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-white">Điều hướng nhanh</h3>
+        <ul class="space-y-2 text-sm text-gray-400">
+          <li><%= link_to "Trang chủ", root_path, class: "transition hover:text-white" %></li>
+          <li><%= link_to "Sản phẩm", products_path, class: "transition hover:text-white" %></li>
+          <li><a href="#features" class="transition hover:text-white">Tính năng</a></li>
+          <li><a href="#testimonials" class="transition hover:text-white">Khách hàng</a></li>
+          <li><a href="#contact" class="transition hover:text-white">Liên hệ</a></li>
+        </ul>
+      </div>
+      <div class="space-y-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-white">Hỗ trợ</h3>
+        <ul class="space-y-2 text-sm text-gray-400">
+          <li><a href="mailto:support@banhang.io" class="transition hover:text-white">support@banhang.io</a></li>
+          <li><a href="#" class="transition hover:text-white">Trung tâm trợ giúp</a></li>
+          <li><a href="#" class="transition hover:text-white">Tài liệu hướng dẫn</a></li>
+          <li><a href="#" class="transition hover:text-white">Chính sách bảo mật</a></li>
+          <li><a href="#" class="transition hover:text-white">Điều khoản sử dụng</a></li>
+        </ul>
+      </div>
+      <div class="space-y-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-white">Theo dõi chúng tôi</h3>
+        <p class="text-sm text-gray-400">Nhận tin tức mới nhất về sản phẩm và chương trình ưu đãi.</p>
+        <div class="flex items-center gap-3">
+          <a href="#" class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition hover:border-blue-500 hover:text-blue-400" aria-label="Theo dõi trên Facebook">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M22 12a10 10 0 1 0-11.5 9.87v-6.99h-2.3V12h2.3V9.8c0-2.27 1.35-3.53 3.42-3.53.99 0 2.03.18 2.03.18v2.24h-1.14c-1.12 0-1.47.69-1.47 1.4V12h2.5l-.4 2.88h-2.1v6.99A10 10 0 0 0 22 12Z" />
+            </svg>
+          </a>
+          <a href="#" class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition hover:border-blue-500 hover:text-blue-400" aria-label="Theo dõi trên Instagram">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 4.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm6.75-2.75a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Z" />
+            </svg>
+          </a>
+          <a href="#" class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition hover:border-blue-500 hover:text-blue-400" aria-label="Theo dõi trên YouTube">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M21.8 8.001a2.75 2.75 0 0 0-1.936-1.949C18.093 5.5 12 5.5 12 5.5s-6.093 0-7.864.552A2.75 2.75 0 0 0 2.2 8.001 28.744 28.744 0 0 0 2 12a28.744 28.744 0 0 0 .2 3.999 2.75 2.75 0 0 0 1.936 1.949C5.907 18.5 12 18.5 12 18.5s6.093 0 7.864-.552a2.75 2.75 0 0 0 1.936-1.949c.134-1.322.2-2.653.2-3.999s-.066-2.677-.2-3.999ZM10 14.75V9.25l4.5 2.75L10 14.75Z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-gray-800 bg-gray-950">
+      <div class="mx-auto flex flex-col gap-4 px-4 py-6 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <p>&copy; <%= Time.current.year %> BanHang. Bảo lưu mọi quyền.</p>
+        <div class="flex items-center gap-4">
+          <a href="#" class="transition hover:text-white">Điều khoản</a>
+          <a href="#" class="transition hover:text-white">Chính sách bảo mật</a>
+          <a href="mailto:support@banhang.io" class="transition hover:text-white">Hỗ trợ</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

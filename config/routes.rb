@@ -68,6 +68,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resource :storefront_settings, only: %i[show update], controller: "storefront_settings"
+
     get "messages", to: "messages#index"
     patch "messages/mark_all_read", to: "messages#mark_all_read", as: :messages_mark_all_read
     resources :conversations, only: [] do
