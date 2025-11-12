@@ -53,11 +53,11 @@
             <span class="hidden sm:inline text-gray-900">BanHang</span>
           <% end %>
           <div class="hidden lg:flex items-center gap-1 text-sm font-medium text-gray-600">
-            <%= link_to "Home", root_path, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white #{current_page?(root_path) ? 'text-blue-600' : ''}" %>
-            <%= link_to "Products", products_path, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white #{current_page?(products_path) ? 'text-blue-600' : ''}" %>
-            <%= link_to "Features", features_href, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white" %>
-            <%= link_to "Testimonials", testimonials_href, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white" %>
-            <%= link_to "Contact", contact_href, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white" %>
+            <%= link_to "Home", root_path, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white #{current_page?(root_path) ? 'text-blue-600' : ''}", data: { turbo_prefetch: false } %>
+            <%= link_to "Products", products_path, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white #{current_page?(products_path) ? 'text-blue-600' : ''}", data: { turbo_prefetch: false } %>
+            <%= link_to "Features", features_href, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white", data: { turbo_prefetch: false } %>
+            <%= link_to "Testimonials", testimonials_href, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white", data: { turbo_prefetch: false } %>
+            <%= link_to "Contact", contact_href, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white", data: { turbo_prefetch: false } %>
           </div>
         </div>
 
@@ -121,11 +121,11 @@
       <div id="primary-navigation" class="lg:hidden" data-mobile-menu-target="panel" hidden>
         <div class="space-y-6 border-t border-gray-200 bg-white px-4 pb-6 pt-4 shadow-lg">
           <div class="flex flex-col gap-2 text-base font-medium text-gray-700">
-            <%= link_to "Home", root_path, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600 #{current_page?(root_path) ? 'bg-blue-50 text-blue-600' : ''}", data: { action: "click->mobile-menu#close" } %>
-            <%= link_to "Products", products_path, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600 #{current_page?(products_path) ? 'bg-blue-50 text-blue-600' : ''}", data: { action: "click->mobile-menu#close" } %>
-            <%= link_to "Features", features_href, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600", data: { action: "click->mobile-menu#close" } %>
-            <%= link_to "Testimonials", testimonials_href, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600", data: { action: "click->mobile-menu#close" } %>
-            <%= link_to "Contact", contact_href, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600", data: { action: "click->mobile-menu#close" } %>
+            <%= link_to "Home", root_path, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600 #{current_page?(root_path) ? 'bg-blue-50 text-blue-600' : ''}", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
+            <%= link_to "Products", products_path, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600 #{current_page?(products_path) ? 'bg-blue-50 text-blue-600' : ''}", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
+            <%= link_to "Features", features_href, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
+            <%= link_to "Testimonials", testimonials_href, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
+            <%= link_to "Contact", contact_href, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
           </div>
           <form action="<%= products_path %>" method="get" class="flex items-center gap-2 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600" role="search">
             <label for="mobile-search" class="sr-only">Search products</label>
