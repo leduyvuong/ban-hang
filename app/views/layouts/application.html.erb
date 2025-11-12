@@ -25,68 +25,172 @@
     <%= yield :structured_data %>
   </head>
   <body class="min-h-screen bg-gray-50 text-gray-900" data-controller="cart" data-cart-add-url-value="<%= add_item_cart_path %>" data-cart-update-url-value="<%= update_item_cart_path %>" data-cart-remove-url-value="<%= remove_item_cart_path %>" data-cart-clear-url-value="<%= clear_cart_path %>" data-cart-mini-url-value="<%= mini_cart_path(format: :json) %>">
-    <header class="bg-white border-b border-gray-200">
-      <div class="container mx-auto px-4">
-        <nav class="flex flex-wrap items-center justify-between gap-4 py-4 md:flex-nowrap" aria-label="Primary">
-          <div class="flex items-center space-x-2">
-            <a href="/" class="text-2xl font-semibold text-indigo-600">BanHang</a>
-          </div>
-          <form action="#" method="get" class="order-3 w-full md:order-none md:flex-1 md:px-8" role="search">
-            <div class="relative">
-              <label for="global-search" class="sr-only">Search products</label>
-              <input id="global-search" type="search" name="q" placeholder="Search products..." class="w-full rounded-full border border-gray-300 bg-gray-100 py-2 pl-4 pr-10 text-sm focus:border-indigo-500 focus:bg-white focus:outline-none">
-              <span class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0a7.5 7.5 0 1 0-10.607-10.607 7.5 7.5 0 0 0 10.608 10.607Z" />
-                </svg>
-              </span>
-            </div>
-          </form>
-          <div class="flex items-center space-x-4">
-            <div data-cart-target="mini">
-              <%= render partial: "cart/mini", locals: { cart: current_cart } %>
-            </div>
-            <% if logged_in? %>
-              <details class="group relative">
-                <summary class="flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-indigo-200 hover:text-indigo-600">
-                  <span class="hidden sm:inline">Hi, <%= current_user.name.split.first %></span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                  </svg>
-                </summary>
-                <div class="absolute right-0 z-50 mt-2 w-48 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
-                  <div class="border-b border-gray-100 px-4 py-3 text-xs text-gray-500">
-                    Signed in as <span class="font-semibold text-gray-700"><%= current_user.email %></span>
-                  </div>
-                  <nav class="px-2 py-2 text-sm text-gray-700">
-                    <%= link_to "My orders", orders_path, class: "block rounded-xl px-3 py-2 transition hover:bg-indigo-50 hover:text-indigo-600" %>
-                    <%= link_to "Profile", edit_profile_path, class: "block rounded-xl px-3 py-2 transition hover:bg-indigo-50 hover:text-indigo-600" %>
-                    <% if admin? %>
-                      <%= link_to "Admin dashboard", admin_root_path, class: "block rounded-xl px-3 py-2 transition hover:bg-indigo-50 hover:text-indigo-600" %>
-                    <% end %>
-                    <%= button_to "Logout", session_path, method: :delete, class: "mt-2 w-full rounded-xl px-3 py-2 text-left text-red-600 transition hover:bg-red-50", form: { class: "px-2 pb-2" } %>
-                  </nav>
-                </div>
-              </details>
-            <% else %>
-              <div class="flex items-center gap-3">
-                <%= link_to "Login", new_session_path, class: "rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-indigo-200 hover:text-indigo-600" %>
-                <%= link_to "Register", new_registration_path, class: "rounded-full bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow transition hover:bg-indigo-500" %>
-              </div>
+    <header class="sticky top-0 z-50 border-b border-white/60 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
+      <% nav_links = [
+          { key: :home, label: "Home", href: root_path },
+          { key: :products, label: "Products", href: products_path },
+          { key: :features, label: "Features", href: homepage_section_href(:features, fallback: -> { products_path }) }
+        ] %>
+      <% if modern_homepage_enabled? || route_defined?(:reviews_path) %>
+        <% nav_links << { key: :reviews, label: "Reviews", href: homepage_section_href(:reviews, fallback: -> { route_defined?(:reviews_path) ? reviews_path : products_path }) } %>
+      <% end %>
+      <% nav_links << { key: :testimonials, label: "Testimonials", href: homepage_section_href(:testimonials, fallback: -> { products_path }) } %>
+      <% if modern_homepage_enabled? || route_defined?(:wishlist_path) %>
+        <% nav_links << { key: :wishlist, label: "Wishlist", href: homepage_section_href(:wishlist, fallback: -> { route_defined?(:wishlist_path) ? wishlist_path : products_path }) } %>
+      <% end %>
+      <% nav_links << { key: :contact, label: "Contact", href: homepage_section_href(:contact, fallback: -> { "mailto:hello@banhang.io" }) } %>
+      <nav class="mx-auto flex h-20 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 max-w-7xl" aria-label="Primary" data-controller="mobile-menu">
+        <div class="flex items-center gap-4">
+          <%= link_to root_path, class: "inline-flex items-center gap-2 text-2xl font-bold tracking-tight text-blue-600 transition hover:text-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white" do %>
+            <span class="sr-only">BanHang</span>
+            <svg class="h-8 w-8" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect width="40" height="40" rx="12" class="fill-blue-600"></rect>
+              <path d="M12 20c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M10 26c2.667 4 6.667 6 12 6s9.333-2 12-6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span class="hidden sm:inline text-gray-900">BanHang</span>
+          <% end %>
+          <div class="hidden lg:flex items-center gap-1 text-sm font-medium text-gray-600">
+            <% nav_links.each do |link| %>
+              <% active = case link[:key]
+                when :home
+                  current_page?(root_path)
+                when :products
+                  current_page?(products_path)
+                when :wishlist
+                  route_defined?(:wishlist_path) && current_page?(wishlist_path)
+                when :reviews
+                  route_defined?(:reviews_path) && current_page?(reviews_path)
+                else
+                  false
+                end %>
+              <%= link_to link[:label], link[:href], class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white #{active ? 'text-blue-600' : ''}", data: { turbo_prefetch: false } %>
             <% end %>
           </div>
-        </nav>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button type="button" class="inline-flex items-center justify-center rounded-full border border-gray-300 p-2 text-gray-600 transition hover:border-blue-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:hidden" data-mobile-menu-target="button" data-action="click->mobile-menu#toggle" aria-expanded="false" aria-controls="primary-navigation">
+            <span class="sr-only">Toggle navigation</span>
+            <svg data-mobile-menu-target="openIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 6h16.5m-16.5 6h16.5" />
+            </svg>
+            <svg data-mobile-menu-target="closeIcon" xmlns="http://www.w3.org/2000/svg" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <form action="<%= products_path %>" method="get" class="hidden md:flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-600 shadow-sm transition hover:border-blue-200 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100" role="search">
+            <label for="header-search" class="sr-only">Search products</label>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0a7.5 7.5 0 1 0-10.607-10.607 7.5 7.5 0 0 0 10.608 10.607Z" />
+            </svg>
+            <input id="header-search" type="search" name="q" placeholder="Search products" class="w-36 bg-transparent text-sm text-gray-600 placeholder-gray-400 focus:outline-none md:w-48 lg:w-64" />
+          </form>
+
+          <div data-cart-target="mini">
+            <%= render partial: "cart/mini", locals: { cart: current_cart } %>
+          </div>
+
+          <% if logged_in? %>
+            <details class="group relative hidden lg:block">
+              <summary class="flex cursor-pointer items-center gap-3 rounded-full border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:border-blue-200 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white">
+                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 font-semibold text-blue-700"><%= user_initials(current_user) %></span>
+                <span class="hidden xl:inline">Hi, <%= current_user.name.split.first %></span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-500 transition group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </summary>
+              <div class="absolute right-0 z-50 mt-3 w-56 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl">
+                <div class="border-b border-gray-100 px-4 py-3 text-xs text-gray-500">
+                  Signed in as <span class="font-semibold text-gray-700"><%= current_user.email %></span>
+                </div>
+                <nav class="px-2 py-2 text-sm text-gray-700">
+                  <%= link_to "Profile", edit_profile_path, class: "flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-blue-50 hover:text-blue-600" %>
+                  <%= link_to "Orders", orders_path, class: "flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-blue-50 hover:text-blue-600" %>
+                  <% if admin? %>
+                    <%= link_to "Admin Dashboard", admin_root_path, class: "flex items-center justify-between rounded-xl px-3 py-2 transition hover:bg-blue-50 hover:text-blue-600" %>
+                  <% end %>
+                </nav>
+                <div class="border-t border-gray-100 bg-gray-50 px-4 py-3">
+                  <%= button_to "Sign out", session_path, method: :delete, class: "flex w-full items-center justify-center gap-2 rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600" %>
+                </div>
+              </div>
+            </details>
+          <% else %>
+            <div class="hidden items-center gap-2 lg:flex">
+              <%= link_to "Sign In", new_session_path, class: "rounded-full border-2 border-white/0 bg-transparent px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white" %>
+              <%= link_to "Sign Up", new_registration_path, class: "rounded-full border-2 border-blue-600 bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white" %>
+            </div>
+          <% end %>
+        </div>
+      </nav>
+
+      <div id="primary-navigation" class="lg:hidden" data-mobile-menu-target="panel" hidden>
+        <div class="space-y-6 border-t border-gray-200 bg-white px-4 pb-6 pt-4 shadow-lg">
+          <div class="flex flex-col gap-2 text-base font-medium text-gray-700">
+            <% nav_links.each do |link| %>
+              <% active = case link[:key]
+                when :home
+                  current_page?(root_path)
+                when :products
+                  current_page?(products_path)
+                when :wishlist
+                  route_defined?(:wishlist_path) && current_page?(wishlist_path)
+                when :reviews
+                  route_defined?(:reviews_path) && current_page?(reviews_path)
+                else
+                  false
+                end %>
+              <%= link_to link[:label], link[:href], class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600 #{active ? 'bg-blue-50 text-blue-600' : ''}", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
+            <% end %>
+          </div>
+          <form action="<%= products_path %>" method="get" class="flex items-center gap-2 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600" role="search">
+            <label for="mobile-search" class="sr-only">Search products</label>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m0 0a7.5 7.5 0 1 0-10.607-10.607 7.5 7.5 0 0 0 10.608 10.607Z" />
+            </svg>
+            <input id="mobile-search" type="search" name="q" placeholder="Search products" class="w-full bg-transparent text-sm text-gray-600 placeholder-gray-400 focus:outline-none" />
+          </form>
+          <% if logged_in? %>
+            <div class="space-y-3 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+              <p class="text-sm text-gray-600">
+                Signed in as
+                <span class="font-semibold text-gray-900"><%= current_user.email %></span>
+              </p>
+              <div class="flex flex-col gap-2 text-sm font-medium text-gray-700">
+                <%= link_to "Profile", edit_profile_path, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600" %>
+                <%= link_to "Orders", orders_path, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600" %>
+                <% if admin? %>
+                  <%= link_to "Admin Dashboard", admin_root_path, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600" %>
+                <% end %>
+              </div>
+              <%= button_to "Sign out", session_path, method: :delete, class: "flex w-full items-center justify-center gap-2 rounded-full bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600" %>
+            </div>
+          <% else %>
+            <div class="flex flex-col gap-3">
+              <%= link_to "Sign In", new_session_path, class: "rounded-full border border-gray-200 px-4 py-2 text-center text-sm font-semibold text-gray-700 transition hover:border-blue-200 hover:text-blue-600" %>
+              <%= link_to "Sign Up", new_registration_path, class: "rounded-full bg-blue-600 px-4 py-2 text-center text-sm font-semibold text-white transition hover:bg-blue-700" %>
+            </div>
+          <% end %>
+        </div>
       </div>
     </header>
 
     <%= render "shared/flash" %>
 
     <main class="grow">
-      <div class="container mx-auto px-4 py-12 sm:py-16">
+      <% if modern_homepage? %>
         <%= yield %>
-      </div>
+      <% else %>
+        <div class="mx-auto max-w-6xl px-4 py-12 sm:py-16">
+          <%= yield %>
+        </div>
+      <% end %>
     </main>
-    <%= render "shared/footer" %>
+    <% unless modern_homepage? %>
+      <%= render "shared/footer" %>
+    <% end %>
     <div data-cart-target="drawer" class="hidden">
       <%= render partial: "cart/drawer", locals: { cart: current_cart } %>
     </div>

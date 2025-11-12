@@ -1,46 +1,72 @@
-<footer class="mt-20 bg-slate-900 text-slate-300">
-  <div class="mx-auto max-w-6xl px-6 py-12">
-    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="space-y-3">
-        <h3 class="text-lg font-semibold text-white">BanHang</h3>
-        <p class="text-sm text-slate-400">Your one-stop destination for thoughtfully curated products that blend style, comfort, and everyday functionality.</p>
+<footer class="mt-20 bg-gray-900 text-gray-300">
+  <div class="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+      <div class="space-y-5">
+        <div class="flex items-center gap-2 text-xl font-semibold text-white">
+          <svg class="h-8 w-8" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="40" height="40" rx="12" class="fill-blue-500"></rect>
+            <path d="M12 20c0-4.418 3.582-8 8-8s8 3.582 8 8-3.582 8-8 8" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M10 26c2.667 4 6.667 6 12 6s9.333-2 12-6" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          BanHang
+        </div>
+        <p class="text-sm text-gray-400">Giải pháp thương mại điện tử toàn diện giúp doanh nghiệp Việt Nam tạo dựng và mở rộng kênh bán hàng trực tuyến.</p>
       </div>
-      <div class="space-y-3">
-        <h4 class="text-sm font-semibold uppercase tracking-wide text-white">Quick Links</h4>
-        <ul class="space-y-2 text-sm text-slate-400">
-          <li><%= link_to "Home", root_path, class: "hover:text-white" %></li>
-          <li><%= link_to "Products", products_path, class: "hover:text-white" %></li>
-          <li><%= link_to "About", "#", class: "hover:text-white" %></li>
-          <li><%= link_to "Contact", "#", class: "hover:text-white" %></li>
-          <li><%= link_to "FAQ", "#", class: "hover:text-white" %></li>
+      <div class="space-y-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-white">Điều hướng nhanh</h3>
+        <ul class="space-y-2 text-sm text-gray-400">
+          <li><%= link_to "Trang chủ", root_path, class: "transition hover:text-white" %></li>
+          <li><%= link_to "Sản phẩm", products_path, class: "transition hover:text-white" %></li>
+          <li><a href="#" class="transition hover:text-white">Tính năng</a></li>
+          <li><a href="#" class="transition hover:text-white">Khách hàng</a></li>
+          <li><a href="#" class="transition hover:text-white">Liên hệ</a></li>
         </ul>
       </div>
-      <div class="space-y-3">
-        <h4 class="text-sm font-semibold uppercase tracking-wide text-white">Customer Service</h4>
-        <ul class="space-y-2 text-sm text-slate-400">
-          <li><%= link_to "Contact Us", "#", class: "hover:text-white" %></li>
-          <li><%= link_to "Returns", "#", class: "hover:text-white" %></li>
-          <li><%= link_to "Shipping Info", "#", class: "hover:text-white" %></li>
-          <li><%= link_to "Order Tracking", "#", class: "hover:text-white" %></li>
+      <div class="space-y-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-white">Hỗ trợ</h3>
+        <ul class="space-y-2 text-sm text-gray-400">
+          <li><a href="mailto:support@banhang.io" class="transition hover:text-white">support@banhang.io</a></li>
+          <li><a href="#" class="transition hover:text-white">Trung tâm trợ giúp</a></li>
+          <li><a href="#" class="transition hover:text-white">Chính sách bảo mật</a></li>
+          <li><a href="#" class="transition hover:text-white">Điều khoản sử dụng</a></li>
         </ul>
       </div>
-      <div class="space-y-3">
-        <h4 class="text-sm font-semibold uppercase tracking-wide text-white">Follow Us</h4>
-        <ul class="space-y-2 text-sm text-slate-400">
-          <li><a href="#" class="inline-flex items-center gap-2 hover:text-white"><span>Instagram</span></a></li>
-          <li><a href="#" class="inline-flex items-center gap-2 hover:text-white"><span>Facebook</span></a></li>
-          <li><a href="#" class="inline-flex items-center gap-2 hover:text-white"><span>Twitter</span></a></li>
-          <li><a href="#" class="inline-flex items-center gap-2 hover:text-white"><span>LinkedIn</span></a></li>
-        </ul>
+      <div class="space-y-4">
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-white">Đăng ký nhận tin</h3>
+        <p class="text-sm text-gray-400">Nhận thông tin cập nhật về sản phẩm và ưu đãi đặc biệt mỗi tuần.</p>
+        <%= form_with model: NewsletterSubscription.new, url: newsletter_subscriptions_path, class: "space-y-3", data: { turbo: false }, local: true do |form| %>
+          <div class="flex items-center gap-2">
+            <%= form.email_field :email, placeholder: "you@example.com", class: "w-full rounded-full border border-white/20 bg-gray-800 px-4 py-2 text-sm text-white placeholder-gray-400 focus:border-white focus:outline-none focus:ring-2 focus:ring-blue-500/40" %>
+            <%= form.submit "Gửi", class: "inline-flex items-center justify-center rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700" %>
+          </div>
+        <% end %>
+        <div class="flex items-center gap-3 pt-2">
+          <a href="#" class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition hover:border-blue-500 hover:text-blue-400" aria-label="Facebook">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M22 12a10 10 0 1 0-11.5 9.87v-6.99h-2.3V12h2.3V9.8c0-2.27 1.35-3.53 3.42-3.53.99 0 2.03.18 2.03.18v2.24h-1.14c-1.12 0-1.47.69-1.47 1.4V12h2.5l-.4 2.88h-2.1v6.99A10 10 0 0 0 22 12Z" />
+            </svg>
+          </a>
+          <a href="#" class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition hover:border-blue-500 hover:text-blue-400" aria-label="Instagram">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7Zm5 4.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Zm0 2a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm6.75-2.75a1.25 1.25 0 1 1-2.5 0 1.25 1.25 0 0 1 2.5 0Z" />
+            </svg>
+          </a>
+          <a href="#" class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 text-gray-400 transition hover:border-blue-500 hover:text-blue-400" aria-label="YouTube">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M21.8 8.001a2.75 2.75 0 0 0-1.936-1.949C18.093 5.5 12 5.5 12 5.5s-6.093 0-7.864.552A2.75 2.75 0 0 0 2.2 8.001 28.744 28.744 0 0 0 2 12a28.744 28.744 0 0 0 .2 3.999 2.75 2.75 0 0 0 1.936 1.949C5.907 18.5 12 18.5 12 18.5s6.093 0 7.864-.552a2.75 2.75 0 0 0 1.936-1.949c.134-1.322.2-2.653.2-3.999s-.066-2.677-.2-3.999ZM10 14.75V9.25l4.5 2.75L10 14.75Z" />
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
   </div>
-  <div class="border-t border-slate-800 bg-slate-950">
-    <div class="mx-auto flex flex-col gap-3 px-6 py-4 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-      <p>&copy; <%= Time.current.year %> BanHang. All rights reserved.</p>
+  <div class="border-t border-gray-800 bg-gray-950">
+    <div class="mx-auto flex flex-col gap-3 px-4 py-6 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+      <p>&copy; <%= Time.current.year %> BanHang. Bảo lưu mọi quyền.</p>
       <div class="flex items-center gap-4">
-        <%= link_to "Privacy Policy", "#", class: "hover:text-white" %>
-        <%= link_to "Terms of Service", "#", class: "hover:text-white" %>
+        <a href="#" class="transition hover:text-white">Điều khoản</a>
+        <a href="#" class="transition hover:text-white">Chính sách bảo mật</a>
+        <a href="mailto:support@banhang.io" class="transition hover:text-white">Hỗ trợ</a>
       </div>
     </div>
   </div>

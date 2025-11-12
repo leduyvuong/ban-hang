@@ -75,6 +75,18 @@ module ApplicationHelper
     @meta_robots = robots if robots.present?
   end
 
+  def homepage_section_href(section, fallback: nil)
+    if modern_homepage_enabled?
+      current_page?(root_path) ? "##{section}" : root_path(anchor: section)
+    else
+      fallback_value(fallback) || root_path
+    end
+  end
+
+  def route_defined?(helper_name)
+    respond_to?(helper_name, true)
+  end
+
   def user_avatar_tag(user, size: :md, class_name: "")
     size_classes = {
       sm: "h-9 w-9 text-xs",
@@ -99,5 +111,16 @@ module ApplicationHelper
     stars << content_tag(:span, "★" * filled, class: "text-amber-500") if filled.positive?
     stars << content_tag(:span, "☆" * empty, class: "text-gray-300") if empty.positive?
     safe_join(stars)
+  end
+
+  private
+
+  def fallback_value(value)
+    case value
+    when Proc
+      value.call
+    else
+      value
+    end
   end
 end

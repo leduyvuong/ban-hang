@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class Shop < ApplicationRecord
+  enum homepage_variant: {
+    classic: "classic",
+    modern: "modern"
+  }, _suffix: true
+
   has_many :shop_features, dependent: :destroy
   has_many :features, through: :shop_features
   has_many :audit_logs, dependent: :destroy
