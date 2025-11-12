@@ -47,8 +47,12 @@ module Checkout
     end
 
     def build_order(products, items)
+      # Determine shop from user or from first product
+      shop = @user.shop || products.values.first&.shop
+      
       order = Order.new(
         user: @user,
+        shop: shop,
         status: "pending",
         placed_at: Time.current,
         currency: @currency,

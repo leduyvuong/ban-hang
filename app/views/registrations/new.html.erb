@@ -29,7 +29,7 @@
       <%= field_error(@user, :password_confirmation) %>
     </div>
 
-    <%= form.submit "Create account", class: "w-full rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500", data: { disable_with: "Creating..." } %>
+    <%= form.submit "Create account", class: "w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-indigo-500", data: { disable_with: "Creating..." } %>
   <% end %>
 
   <p class="text-center text-sm text-gray-500">Already have an account? <%= link_to "Log in", new_session_path, class: "font-semibold text-indigo-600 hover:text-indigo-500" %></p>

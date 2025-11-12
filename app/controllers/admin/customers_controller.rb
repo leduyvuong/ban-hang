@@ -8,7 +8,7 @@ module Admin
       @query = params[:query].to_s.strip
       @status_filter = params[:status].presence
 
-      scope = User.customers
+      scope = User.customers.where(shop: current_shop)
       scope = scope.where(blocked_at: nil) if @status_filter == "active"
       scope = scope.where.not(blocked_at: nil) if @status_filter == "blocked"
       scope = scope.search(@query) if @query.present?
@@ -19,7 +19,7 @@ module Admin
     end
 
     def show
-      @orders = @customer.orders.includes(:order_items).order(created_at: :desc).to_a
+      @orders = @customer.orders.where(shop: current_shop).includes(:order_items).order(created_at: :desc).to_a
       @recent_orders = @orders.first(5)
       @total_spent = @orders.sum { |order| BigDecimal(order.total.to_s) }
     end
@@ -71,7 +71,7 @@ module Admin
     private
 
     def set_customer
-      @customer = User.customers.find(params[:id])
+      @customer = User.customers.where(shop: current_shop).find(params[:id])
     end
 
     def customer_params

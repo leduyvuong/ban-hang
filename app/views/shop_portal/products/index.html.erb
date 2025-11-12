@@ -1,0 +1,36 @@
+<main class="mx-auto max-w-6xl space-y-6 px-4 py-10">
+  <header class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Products</h1>
+      <p class="text-gray-600">Manage products for <%= shop.name %>.</p>
+    </div>
+    <%= link_to "View in storefront", shop_products_path(shop), class: "inline-flex items-center gap-2 rounded-full border border-indigo-200 px-4 py-2 text-sm font-semibold text-indigo-600 transition hover:border-indigo-300 hover:text-indigo-700" %>
+  </header>
+
+  <% if @products.present? %>
+    <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Name</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Category</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">Price</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">Stock</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% @products.each do |product| %>
+            <tr>
+              <td class="px-4 py-3 text-sm font-medium text-gray-900"><%= product.name %></td>
+              <td class="px-4 py-3 text-sm text-gray-500"><%= product.category&.name || "—" %></td>
+              <td class="px-4 py-3 text-right text-sm font-semibold text-indigo-600"><%= format_money(product.price) %></td>
+              <td class="px-4 py-3 text-right text-sm text-gray-500"><%= product.stock %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-sm text-gray-500">No products yet.</p>
+  <% end %>
+</main>

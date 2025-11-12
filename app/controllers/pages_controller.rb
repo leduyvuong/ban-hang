@@ -2,12 +2,26 @@
 
 class PagesController < ApplicationController
   def home
-    @featured_products = Rails.cache.fetch("home/featured_products", expires_in: 10.minutes) do
-      Product.includes(:category, image_attachment: { blob: :variant_records }).order(created_at: :desc).limit(6).to_a
+    @shops = Rails.cache.fetch("home/shops", expires_in: 10.minutes) do
+      Shop.publicly_visible.includes(:owner, :products).limit(6).to_a
     end
 
-    @categories = Rails.cache.fetch("home/featured_categories", expires_in: 10.minutes) do
-      Category.order(:name).includes(:products).limit(6).to_a
+    @featured_products = if current_shop.present?
+      cache_key = ["home/featured_products", current_shop.id]
+      Rails.cache.fetch(cache_key, expires_in: 10.minutes) do
+        current_shop.products.includes(:category, image_attachment: { blob: :variant_records }).order(created_at: :desc).limit(6).to_a
+      end
+    else
+      []
+    end
+
+    @categories = if current_shop.present?
+      cache_key = ["home/featured_categories", current_shop.id]
+      Rails.cache.fetch(cache_key, expires_in: 10.minutes) do
+        current_shop.categories.order(:name).limit(6).to_a
+      end
+    else
+      []
     end
 
     @newsletter_subscription = NewsletterSubscription.new

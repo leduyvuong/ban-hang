@@ -21,23 +21,9 @@ Feature.delete_all
 Shop.destroy_all
 User.where.not(email: "admin@banhang.test").delete_all
 
-# --- Categories ---
-CATEGORIES = %w[
-  Audio
-  Lighting
-  Kitchen
-  Travel
-  Home\ Decor
-  Wellness
-  Tech
-  Apparel
-  Outdoors
-  Beauty
-].freeze
-
-categories = CATEGORIES.map { |name| Category.create!(name: name) }
-
 # --- Features ---
+puts "Creating features..."
+
 FEATURE_SEEDS = [
   { name: "Product Management", slug: "product_management", description: "Manage products and inventory", category: "core" },
   { name: "Order Management", slug: "order_management", description: "Track and fulfill customer orders", category: "core" },
@@ -58,12 +44,31 @@ FEATURE_SEEDS = [
   { name: "Zapier Integration", slug: "zapier_integration", description: "Automate workflows with Zapier", category: "integrations" }
 ].freeze
 
-puts "Creating features..."
-
 FEATURE_SEEDS.each do |attrs|
   feature = Feature.find_or_initialize_by(slug: attrs[:slug])
   feature.update!(attrs)
 end
+
+# --- Users (create owners first, before shops) ---
+puts "Creating shop owner users..."
+
+owner_a = User.find_or_initialize_by(email: "owner-a@banhang.test")
+owner_a.update!(
+  name: "Alice Nguyen",
+  password: "password123",
+  role: :shop_owner,
+  phone: "+84 555 0100",
+  addresses: ["100 Owner Street, District 1, Ho Chi Minh City"]
+)
+
+owner_b = User.find_or_initialize_by(email: "owner-b@banhang.test")
+owner_b.update!(
+  name: "Bob Tran",
+  password: "password123",
+  role: :shop_owner,
+  phone: "+84 555 0200",
+  addresses: ["200 Business Avenue, District 3, Ho Chi Minh City"]
+)
 
 # --- Shops ---
 puts "Creating shops..."
@@ -71,18 +76,22 @@ puts "Creating shops..."
 shop_a = Shop.find_or_initialize_by(slug: "shop-a")
 shop_a.update!(
   name: "Shop A",
-  domain: "shopa.local",
-  time_zone: "Asia/Ho_Chi_Minh"
+  domain: "shop-a.local",
+  time_zone: "Asia/Ho_Chi_Minh",
+  homepage_variant: :modern,
+  status: :active,
+  owner: owner_a
 )
 
 shop_b = Shop.find_or_initialize_by(slug: "shop-b")
 shop_b.update!(
   name: "Shop B",
-  domain: "shopb.local",
-  time_zone: "Asia/Ho_Chi_Minh"
+  domain: "shop-b.local",
+  time_zone: "Asia/Ho_Chi_Minh",
+  homepage_variant: :classic,
+  status: :active,
+  owner: owner_b
 )
-
-shops = { shop_a: shop_a, shop_b: shop_b }
 
 # --- Admin Users ---
 puts "Creating admin users..."
@@ -95,17 +104,17 @@ master_admin.update!(
   shop: nil
 )
 
-owner_shopa = AdminUser.find_or_initialize_by(email: "owner@shopa.local")
-owner_shopa.update!(
-  name: "Shop A Owner",
+admin_a = AdminUser.find_or_initialize_by(email: "admin-a@shop-a.test")
+admin_a.update!(
+  name: "Admin Shop A",
   password: "password123",
   role: :shop_owner,
   shop: shop_a
 )
 
-owner_shopb = AdminUser.find_or_initialize_by(email: "owner@shopb.local")
-owner_shopb.update!(
-  name: "Shop B Owner",
+admin_b = AdminUser.find_or_initialize_by(email: "admin-b@shop-b.test")
+admin_b.update!(
+  name: "Admin Shop B",
   password: "password123",
   role: :shop_owner,
   shop: shop_b
@@ -114,22 +123,47 @@ owner_shopb.update!(
 # --- Feature Assignments ---
 puts "Assigning features to shops..."
 
-basic_feature_slugs = %w[product_management order_management customer_management]
-locked_feature_slugs = %w[analytics_dashboard promotions api_access pos_system]
+basic_feature_slugs = %w[product_management order_management customer_management inventory_tracking staff_management]
+premium_feature_slugs = %w[analytics_dashboard promotions email_campaigns newsletter]
+locked_feature_slugs = %w[api_access pos_system wholesale_pricing loyalty_program]
 
-shops.values.each do |shop|
-  basic_feature_slugs.each do |slug|
-    next if shop.feature_unlocked?(slug)
+# Unlock features for Shop A (basic + premium)
+basic_feature_slugs.each do |slug|
+  next if shop_a.feature_unlocked?(slug)
 
-    shop.unlock_feature!(
-      slug,
-      unlocked_by: master_admin,
-      reason: "Seed: basic feature unlocked"
-    )
-  end
+  shop_a.unlock_feature!(
+    slug,
+    unlocked_by: master_admin,
+    reason: "Seed: basic feature unlocked"
+  )
+end
 
-  locked_feature_slugs.each do |slug|
-    feature = Feature.find_by!(slug: slug)
+premium_feature_slugs.each do |slug|
+  next if shop_a.feature_unlocked?(slug)
+
+  shop_a.unlock_feature!(
+    slug,
+    unlocked_by: master_admin,
+    reason: "Seed: premium feature unlocked"
+  )
+end
+
+# Unlock only basic features for Shop B
+basic_feature_slugs.each do |slug|
+  next if shop_b.feature_unlocked?(slug)
+
+  shop_b.unlock_feature!(
+    slug,
+    unlocked_by: master_admin,
+    reason: "Seed: basic feature unlocked"
+  )
+end
+
+# Lock premium features for both shops
+locked_feature_slugs.each do |slug|
+  feature = Feature.find_by!(slug: slug)
+  
+  [shop_a, shop_b].each do |shop|
     shop_feature = ShopFeature.find_or_initialize_by(shop: shop, feature: feature)
     next if shop_feature.unlocked?
 
@@ -137,6 +171,28 @@ shops.values.each do |shop|
     shop_feature.save!
   end
 end
+
+# --- Categories ---
+puts "Creating categories..."
+
+CATEGORIES_A = %w[
+  Audio
+  Lighting
+  Kitchen
+  Travel
+  Home\ Decor
+].freeze
+
+CATEGORIES_B = %w[
+  Wellness
+  Tech
+  Apparel
+  Outdoors
+  Beauty
+].freeze
+
+categories_a = CATEGORIES_A.map { |name| Category.create!(name: name, shop: shop_a) }
+categories_b = CATEGORIES_B.map { |name| Category.create!(name: name, shop: shop_b) }
 
 # --- Products ---
 image_sources = [
@@ -154,8 +210,15 @@ image_sources = [
 
 puts "Creating products..."
 
-products = 40.times.map do |index|
-  category = categories.sample
+# Create 20 products for Shop A and 20 for Shop B
+products = []
+
+40.times do |index|
+  # Alternate between shops
+  current_shop = index < 20 ? shop_a : shop_b
+  shop_categories = index < 20 ? categories_a : categories_b
+  category = shop_categories.sample
+  
   price = Faker::Commerce.price(range: 20.0..350.0).round(2)
   price = 20.0 if price <= 0 # Ensure price is always > 0
   name = "#{Faker::Commerce.product_name} #{index + 1}"
@@ -170,7 +233,8 @@ products = 40.times.map do |index|
     price_currency: 'USD',
     price_local_amount: price,
     stock: rand(10..80),
-    category: category
+    category: category,
+    shop: current_shop
   )
 
   image_url = image_sources[index % image_sources.length]
@@ -187,7 +251,7 @@ products = 40.times.map do |index|
     Rails.logger.warn("Seed image download failed: #{e.message}")
   end
 
-  product
+  products << product
 end
 
 puts "Creating discounts..."
@@ -212,15 +276,6 @@ clearance_boost = Discount.create!(
   active: true
 )
 
-summer_preview = Discount.create!(
-  name: "Summer Preview",
-  discount_type: :percentage,
-  value: 15,
-  start_date: 1.week.from_now,
-  end_date: 2.months.from_now,
-  active: true
-)
-
 if products.size >= 2
   ProductDiscount.create!(product: products.first, discount: spring_sale)
   ProductDiscount.create!(product: products.second, discount: clearance_boost)
@@ -229,13 +284,32 @@ end
 # --- Users ---
 puts "Creating users..."
 
-customers = 20.times.map do
+# Create 10 customers for Shop A and 10 for Shop B
+customers = []
+
+10.times do
   name = Faker::Name.unique.name
-  User.create!(
+  customers << User.create!(
     name: name,
     email: Faker::Internet.unique.email(name: name),
     password: "password123",
     phone: Faker::PhoneNumber.phone_number,
+    shop: shop_a,
+    addresses: [
+      "#{Faker::Address.street_address}, #{Faker::Address.city}",
+      "#{Faker::Address.secondary_address}, #{Faker::Address.city}"
+    ]
+  )
+end
+
+10.times do
+  name = Faker::Name.unique.name
+  customers << User.create!(
+    name: name,
+    email: Faker::Internet.unique.email(name: name),
+    password: "password123",
+    phone: Faker::PhoneNumber.phone_number,
+    shop: shop_b,
     addresses: [
       "#{Faker::Address.street_address}, #{Faker::Address.city}",
       "#{Faker::Address.secondary_address}, #{Faker::Address.city}"
@@ -250,6 +324,7 @@ admin.update!(
   role: :admin,
   cart_data: [],
   phone: "+84 555 0101",
+  shop: shop_a,
   addresses: ["123 Admin Lane, District 1, Ho Chi Minh City"]
 )
 
@@ -271,7 +346,9 @@ review_comments = [
 
 customers.each do |customer|
   sample_size = rand(3..5)
-  products.sample(sample_size).each do |product|
+  # Only review products from the same shop
+  shop_products = products.select { |p| p.shop_id == customer.shop_id }
+  shop_products.sample(sample_size).each do |product|
     comment = review_comments.sample
     comment = nil if rand < 0.2
 
@@ -290,7 +367,9 @@ end
 puts "Creating wishlist items..."
 
 customers.each do |customer|
-  products.sample(rand(4..7)).each do |product|
+  # Only wishlist products from the same shop
+  shop_products = products.select { |p| p.shop_id == customer.shop_id }
+  shop_products.sample(rand(4..7)).each do |product|
     WishlistItem.create!(user: customer, product: product)
   end
 end
@@ -302,8 +381,11 @@ statuses = Order.statuses.keys
 
 30.times do
   customer = customers.sample
+  customer_shop = customer.shop
+  
   order = Order.create!(
     user: customer,
+    shop: customer_shop,
     status: statuses.sample,
     placed_at: rand(1..120).days.ago
   )
@@ -311,7 +393,9 @@ statuses = Order.statuses.keys
   items_count = rand(1..3)
   order_total = 0
 
-  products.sample(items_count).each do |product|
+  # Only order products from the same shop
+  shop_products = products.select { |p| p.shop_id == customer_shop.id }
+  shop_products.sample(items_count).each do |product|
     quantity = rand(1..4)
     line_total = product.price * quantity
 
@@ -330,11 +414,18 @@ statuses = Order.statuses.keys
 end
 
 puts "Seed complete!"
+puts "Shops: #{Shop.count}"
+puts "  - Shop A (modern template): #{Product.joins(:category).where(categories: { shop: shop_a }).count} products"
+puts "  - Shop B (classic template): #{Product.joins(:category).where(categories: { shop: shop_b }).count} products"
 puts "Products: #{Product.count}, Customers: #{User.customers.count}, Orders: #{Order.count}"
 puts "Reviews: #{Review.count} (visible: #{Review.visible.count}, hidden: #{Review.hidden.count})"
 puts "Wishlist items: #{WishlistItem.count}"
-puts "Admin login: admin@banhang.test / password123"
-puts "Master admin login: master@admin.local / password123"
+puts ""
+puts "Login credentials:"
+puts "  Master admin: master@admin.local / password123"
+puts "  Shop A admin: admin-a@shop-a.test / password123"
+puts "  Shop B admin: admin-b@shop-b.test / password123"
+puts "  Customer: admin@banhang.test / password123"
 # --- Currency Rates ---
 puts "Configuring currency rates..."
 CurrencyRate.upsert_all([

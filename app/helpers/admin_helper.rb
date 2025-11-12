@@ -9,9 +9,12 @@ module AdminHelper
   # Check if current admin user's shop has access to a feature
   def shop_feature_available?(feature_slug)
     return true if current_admin_user&.master_admin? || current_user&.admin?
-    return false unless current_admin_user&.shop
 
-    current_admin_user.shop.feature_unlocked?(feature_slug)
+    shop = current_admin_user&.shop || current_user&.owned_shop || current_user&.shops&.first
+    return false unless shop
+    return true if shop.shop_features.blank?
+
+    shop.feature_unlocked?(feature_slug)
   end
 
   # Check if feature is locked for current shop

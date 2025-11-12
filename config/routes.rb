@@ -9,6 +9,9 @@ Rails.application.routes.draw do
   # Mount Action Cable for WebSocket connections
   mount ActionCable.server => "/cable"
 
+  resources :shops, only: %i[index show], param: :slug
+  get "/shops/:shop_slug/products", to: "shop_products#index", as: :shop_products
+
   resources :products, only: %i[index show] do
     member do
       get :modal
@@ -42,6 +45,12 @@ Rails.application.routes.draw do
 
   resource :support_chat, only: :show, controller: "support_chats"
 
+  namespace :shop, module: :shop_portal do
+    get "dashboard", to: "dashboard#index"
+    resources :products, only: :index
+    resources :categories, only: :index
+  end
+
   namespace :admin do
     root to: "dashboard#index"
 
@@ -62,6 +71,7 @@ Rails.application.routes.draw do
       patch :block, on: :member
     end
     resources :shops, only: %i[index show] do
+      resources :products, only: :index, module: :shops
       resources :features, only: :index do
         post :unlock, on: :member
         post :lock, on: :member

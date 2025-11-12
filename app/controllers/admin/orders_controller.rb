@@ -8,7 +8,7 @@ module Admin
       @query = params[:query].to_s.strip
       @status_filter = params[:status].presence
 
-      scope = Order.includes(:user).order(created_at: :desc)
+      scope = Order.includes(:user).where(shop: current_shop).order(created_at: :desc)
       scope = scope.search(@query) if @query.present?
       scope = scope.with_status(@status_filter) if @status_filter.present?
 
@@ -29,7 +29,7 @@ module Admin
     private
 
     def set_order
-      @order = Order.find(params[:id])
+      @order = Order.where(shop: current_shop).find(params[:id])
     end
   end
 end

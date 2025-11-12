@@ -2,6 +2,8 @@
 
 class ApplicationController < ActionController::Base
   include Pagy::Backend
+  include ShopScoped
+
   protect_from_forgery with: :exception
 
   helper_method :current_cart, :current_user, :logged_in?, :admin?, :current_shop, :modern_homepage?, :modern_homepage_enabled?
@@ -63,14 +65,6 @@ class ApplicationController < ActionController::Base
     @current_user ||= nil
   end
 
-  def current_shop
-    return @current_shop if defined?(@current_shop)
-
-    admin_user = respond_to?(:current_admin_user, true) ? current_admin_user : nil
-
-    @current_shop = current_user&.shop || admin_user&.shop || Shop.first
-  end
-
   def modern_homepage?
     controller_name == "pages" && action_name == "home" && modern_homepage_enabled?
   end
@@ -100,6 +94,24 @@ class ApplicationController < ActionController::Base
 
     flash[:error] = "You are not authorized to access that page."
     redirect_to root_path
+  end
+
+  def ensure_admin_user
+    return if current_user&.admin?
+    return if respond_to?(:current_admin_user, true) && current_admin_user.present?
+
+    flash[:error] = "You are not authorized to access that page."
+    redirect_to root_path
+  end
+
+  def ensure_shop_owner_or_staff
+    return if current_user&.admin?
+
+    shop = current_shop
+    if shop.blank? || current_user.blank? || (shop.owner != current_user && !current_user.shops.exists?(id: shop.id))
+      flash[:error] = "You are not authorized to manage this shop."
+      redirect_to root_path
+    end
   end
 
   def current_cart
@@ -194,5 +206,16 @@ class ApplicationController < ActionController::Base
     @available_currencies ||= CurrencyRate.available_codes
   rescue ActiveRecord::StatementInvalid
     CurrencyRate::SUPPORTED_CURRENCIES.keys
+  end
+
+  def shop_from_params
+    return unless respond_to?(:params)
+
+    identifier = params[:shop_slug] || params[:shop_id]
+    identifier ||= params[:slug] if params[:controller].to_s == "shops"
+
+    return if identifier.blank?
+
+    Shop.find_by(slug: identifier) || (identifier.to_s =~ /\A\d+\z/ ? Shop.find_by(id: identifier) : nil)
   end
 end

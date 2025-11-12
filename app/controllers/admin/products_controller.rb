@@ -3,6 +3,7 @@
 module Admin
   class ProductsController < ApplicationController
     before_action :set_product, only: %i[show edit update destroy]
+    before_action :load_shops, only: %i[new create edit update]
     before_action :load_categories, only: %i[new create edit update]
     before_action :load_discounts, only: %i[new edit update]
     before_action :normalize_pricing_params, only: %i[create update]
@@ -12,14 +13,14 @@ module Admin
       @category_filter = params[:category].presence
       @stock_filter = params[:stock_status].presence
 
-      scope = Product.includes(:category, { product_discount: :discount }, image_attachment: { blob: :variant_records })
+      scope = Product.includes(:category, { product_discount: :discount }, image_attachment: { blob: :variant_records }).where(shop: current_shop)
       scope = scope.matching_query(@query)
       scope = scope.with_category_slug(@category_filter) if @category_filter.present?
       scope = scope.with_stock_status(@stock_filter) if @stock_filter.present?
       scope = scope.order(created_at: :desc)
 
       @pagy, @products = pagy(scope, items: 20)
-      @categories = Category.order(:name)
+      @categories = Category.where(shop: current_shop).order(:name)
 
       set_admin_page(
         title: "Products",
@@ -31,12 +32,12 @@ module Admin
     end
 
     def new
-      @product = Product.new
+      @product = Product.new(shop: current_shop)
       set_admin_page(title: "New product", subtitle: "Add a product to your catalogue")
     end
 
     def create
-      @product = Product.new(product_params)
+      @product = Product.new(product_params.merge(shop: current_shop))
       success = Product.transaction do
         next false unless @product.save
 
@@ -88,11 +89,11 @@ module Admin
     private
 
     def set_product
-      @product = Product.includes(product_discount: :discount).find_by_slug_or_id!(params[:id])
+      @product = Product.where(shop: current_shop).includes(product_discount: :discount).find_by_slug_or_id!(params[:id])
     end
 
     def product_params
-      params.require(:product).permit(:name, :description, :short_description, :price, :price_local_amount, :price_currency, :stock, :image, :category_id)
+      params.require(:product).permit(:name, :description, :short_description, :price, :price_local_amount, :price_currency, :stock, :image, :category_id, :shop_id)
     end
 
     def load_discounts
@@ -116,9 +117,16 @@ module Admin
     end
 
     def load_categories
-      @categories = Rails.cache.fetch("admin/categories", expires_in: 1.hour) do
-        Category.order(:name).to_a
+      shop_id = current_shop&.id
+      scope = shop_id.present? ? Category.where(shop_id: shop_id) : Category.none
+      cache_key = ["admin/categories", shop_id.presence || "none"]
+      @categories = Rails.cache.fetch(cache_key, expires_in: 1.hour) do
+        scope.order(:name).to_a
       end
+    end
+
+    def load_shops
+      @shops = Shop.order(:name)
     end
 
     def purge_image_if_requested
