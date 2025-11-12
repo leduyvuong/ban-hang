@@ -26,17 +26,17 @@
   </head>
   <body class="min-h-screen bg-gray-50 text-gray-900" data-controller="cart" data-cart-add-url-value="<%= add_item_cart_path %>" data-cart-update-url-value="<%= update_item_cart_path %>" data-cart-remove-url-value="<%= remove_item_cart_path %>" data-cart-clear-url-value="<%= clear_cart_path %>" data-cart-mini-url-value="<%= mini_cart_path(format: :json) %>">
     <header class="sticky top-0 z-50 border-b border-white/60 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      <% features_href = if modern_homepage?
+      <% features_href = if modern_homepage_enabled?
           current_page?(root_path) ? "#features" : root_path(anchor: "features")
         else
           products_path
         end %>
-      <% testimonials_href = if modern_homepage?
+      <% testimonials_href = if modern_homepage_enabled?
           current_page?(root_path) ? "#testimonials" : root_path(anchor: "testimonials")
         else
           products_path
         end %>
-      <% contact_href = if modern_homepage?
+      <% contact_href = if modern_homepage_enabled?
           current_page?(root_path) ? "#contact" : root_path(anchor: "contact")
         else
           "mailto:hello@banhang.io"

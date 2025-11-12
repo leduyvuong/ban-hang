@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   include Pagy::Backend
   protect_from_forgery with: :exception
 
-  helper_method :current_cart, :current_user, :logged_in?, :admin?, :current_shop, :modern_homepage?
+  helper_method :current_cart, :current_user, :logged_in?, :admin?, :current_shop, :modern_homepage?, :modern_homepage_enabled?
   helper_method :current_currency, :available_currencies
 
   before_action :assign_current_currency
@@ -72,7 +72,11 @@ class ApplicationController < ActionController::Base
   end
 
   def modern_homepage?
-    controller_name == "pages" && action_name == "home" && current_shop&.respond_to?(:homepage_variant) && current_shop.homepage_variant.to_s == "modern"
+    controller_name == "pages" && action_name == "home" && modern_homepage_enabled?
+  end
+
+  def modern_homepage_enabled?
+    current_shop&.respond_to?(:homepage_variant) && current_shop.homepage_variant.to_s == "modern"
   end
 
   def logged_in?
