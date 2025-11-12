@@ -8,6 +8,9 @@ class Product < ApplicationRecord
   has_one_attached :image
   has_one :product_discount, dependent: :destroy
   has_one :discount, through: :product_discount
+  has_many :reviews, dependent: :destroy
+  has_many :visible_reviews, -> { visible }, class_name: "Review"
+  has_many :wishlist_items, dependent: :destroy
 
   before_validation :ensure_slug!
   before_validation :apply_currency_conversion
@@ -131,6 +134,19 @@ class Product < ApplicationRecord
 
   def discounted?
     discount_amount.positive?
+  end
+
+  def average_rating
+    return 0.0 if reviews_count.zero?
+
+    visible_reviews.average(:rating).to_f.round(1)
+  end
+
+  def reviews_count
+    visible_association = association(:visible_reviews)
+    return visible_association.target.size if visible_association.loaded?
+
+    visible_reviews.count
   end
 
   def acceptable_image

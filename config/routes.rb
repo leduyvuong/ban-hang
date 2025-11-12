@@ -13,6 +13,9 @@ Rails.application.routes.draw do
     member do
       get :modal
     end
+
+    resource :wishlist, only: %i[create destroy], module: :products
+    resources :reviews, only: %i[create destroy], module: :products
   end
 
   resource :cart, only: %i[show], controller: "cart" do
@@ -24,6 +27,7 @@ Rails.application.routes.draw do
   end
 
   resource :checkout, only: %i[show update], controller: "checkout"
+  resource :wishlist, only: :show
   resources :newsletter_subscriptions, only: :create
 
   resource :session, only: %i[new create destroy]
@@ -49,6 +53,7 @@ Rails.application.routes.draw do
     resource :currency_selection, only: :create
     resources :currency_rates, except: %i[destroy show]
     resources :products
+    resources :reviews, only: %i[index update destroy]
     resources :discounts do
       patch :toggle_active, on: :member
     end

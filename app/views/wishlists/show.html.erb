@@ -1,0 +1,68 @@
+<% set_page_metadata(title: "My wishlist") %>
+
+<div class="mx-auto max-w-5xl space-y-8">
+  <header class="space-y-2 text-center">
+    <h1 class="text-4xl font-bold text-gray-900">Saved products</h1>
+    <p class="text-gray-600">Review your favourite items and move them to your cart when you're ready.</p>
+  </header>
+
+  <% if @wishlist_items.empty? %>
+    <div class="rounded-3xl border border-dashed border-gray-200 bg-white p-12 text-center shadow-sm">
+      <p class="text-lg text-gray-500">You haven't saved any products yet.</p>
+      <div class="mt-4">
+        <%= link_to "Browse products", products_path, class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500" %>
+      </div>
+    </div>
+  <% else %>
+    <ul class="grid gap-6 sm:grid-cols-2">
+      <% @wishlist_items.each do |item| %>
+        <% product = item.product %>
+        <li class="flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-200">
+          <div class="relative h-48 w-full overflow-hidden">
+            <% if (image_variant = product.image_variant(width: 600, height: 400)) %>
+              <%= image_tag image_variant, alt: product.name, class: "h-full w-full object-cover", loading: "lazy" %>
+            <% else %>
+              <div class="flex h-full w-full items-center justify-center bg-gray-100 text-gray-400">
+                <span>No image yet</span>
+              </div>
+            <% end %>
+            <% if product.discounted? %>
+              <span class="absolute left-4 top-4 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white shadow">
+                <%= product.discount_badge_label(currency: current_currency) %>
+              </span>
+            <% end %>
+          </div>
+          <div class="flex flex-1 flex-col space-y-4 p-6">
+            <div class="space-y-1">
+              <h2 class="text-xl font-semibold text-gray-900"><%= product.name %></h2>
+              <% if product.short_description.present? %>
+                <p class="text-sm text-gray-500"><%= truncate(product.short_description, length: 90) %></p>
+              <% end %>
+            </div>
+            <div class="flex items-center justify-between">
+              <div>
+                <% if product.discounted? %>
+                  <p class="text-lg font-semibold text-emerald-600"><%= format_money(product.discounted_price) %></p>
+                  <p class="text-sm text-gray-400 line-through"><%= format_money(product.price) %></p>
+                <% else %>
+                  <p class="text-lg font-semibold text-indigo-600"><%= format_money(product.price) %></p>
+                <% end %>
+              </div>
+              <% if product.reviews_count.positive? %>
+                <div class="flex items-center gap-2 text-sm text-amber-500">
+                  <span class="flex items-center gap-1"><%= render_rating_stars(product.average_rating) %></span>
+                  <span class="font-medium text-gray-700"><%= product.average_rating %></span>
+                  <span class="text-gray-400">(<%= product.reviews_count %>)</span>
+                </div>
+              <% end %>
+            </div>
+            <div class="mt-auto flex flex-wrap gap-3">
+              <%= link_to "View", product_path(product), class: "inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500" %>
+              <%= button_to "Remove", product_wishlist_path(product), method: :delete, form: { data: { turbo_confirm: "Remove this product from your wishlist?" } }, class: "inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-gray-300" %>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

@@ -8,6 +8,8 @@ puts "Resetting database..."
 AuditLog.delete_all
 ShopFeature.delete_all
 AdminUser.delete_all
+Review.delete_all
+WishlistItem.delete_all
 OrderItem.delete_all
 Order.delete_all
 CurrencyRate.delete_all
@@ -251,6 +253,48 @@ admin.update!(
   addresses: ["123 Admin Lane, District 1, Ho Chi Minh City"]
 )
 
+# --- Reviews ---
+puts "Creating reviews..."
+
+review_comments = [
+  "Great build quality and fast shipping.",
+  "Exactly what I needed, works perfectly.",
+  "Solid value for the price and easy to set up.",
+  "The design is beautiful and the materials feel premium.",
+  "Customer support was helpful and the item works as described.",
+  "Reliable performance with no issues so far.",
+  "Packaging was excellent and the product exceeded expectations.",
+  "Good quality overall, would purchase again.",
+  "Setup was straightforward and the manual was clear.",
+  "Feels sturdy and looks great in my home."
+]
+
+customers.each do |customer|
+  sample_size = rand(3..5)
+  products.sample(sample_size).each do |product|
+    comment = review_comments.sample
+    comment = nil if rand < 0.2
+
+    review = Review.create!(
+      user: customer,
+      product: product,
+      rating: rand(3..5),
+      comment: comment
+    )
+
+    review.hide! if rand < 0.15
+  end
+end
+
+# --- Wishlists ---
+puts "Creating wishlist items..."
+
+customers.each do |customer|
+  products.sample(rand(4..7)).each do |product|
+    WishlistItem.create!(user: customer, product: product)
+  end
+end
+
 # --- Orders ---
 puts "Creating orders..."
 
@@ -287,6 +331,8 @@ end
 
 puts "Seed complete!"
 puts "Products: #{Product.count}, Customers: #{User.customers.count}, Orders: #{Order.count}"
+puts "Reviews: #{Review.count} (visible: #{Review.visible.count}, hidden: #{Review.hidden.count})"
+puts "Wishlist items: #{WishlistItem.count}"
 puts "Admin login: admin@banhang.test / password123"
 puts "Master admin login: master@admin.local / password123"
 # --- Currency Rates ---
