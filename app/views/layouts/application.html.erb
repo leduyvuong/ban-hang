@@ -26,21 +26,19 @@
   </head>
   <body class="min-h-screen bg-gray-50 text-gray-900" data-controller="cart" data-cart-add-url-value="<%= add_item_cart_path %>" data-cart-update-url-value="<%= update_item_cart_path %>" data-cart-remove-url-value="<%= remove_item_cart_path %>" data-cart-clear-url-value="<%= clear_cart_path %>" data-cart-mini-url-value="<%= mini_cart_path(format: :json) %>">
     <header class="sticky top-0 z-50 border-b border-white/60 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      <% features_href = if modern_homepage_enabled?
-          current_page?(root_path) ? "#features" : root_path(anchor: "features")
-        else
-          products_path
-        end %>
-      <% testimonials_href = if modern_homepage_enabled?
-          current_page?(root_path) ? "#testimonials" : root_path(anchor: "testimonials")
-        else
-          products_path
-        end %>
-      <% contact_href = if modern_homepage_enabled?
-          current_page?(root_path) ? "#contact" : root_path(anchor: "contact")
-        else
-          "mailto:hello@banhang.io"
-        end %>
+      <% nav_links = [
+          { key: :home, label: "Home", href: root_path },
+          { key: :products, label: "Products", href: products_path },
+          { key: :features, label: "Features", href: homepage_section_href(:features, fallback: -> { products_path }) }
+        ] %>
+      <% if modern_homepage_enabled? || route_defined?(:reviews_path) %>
+        <% nav_links << { key: :reviews, label: "Reviews", href: homepage_section_href(:reviews, fallback: -> { route_defined?(:reviews_path) ? reviews_path : products_path }) } %>
+      <% end %>
+      <% nav_links << { key: :testimonials, label: "Testimonials", href: homepage_section_href(:testimonials, fallback: -> { products_path }) } %>
+      <% if modern_homepage_enabled? || route_defined?(:wishlist_path) %>
+        <% nav_links << { key: :wishlist, label: "Wishlist", href: homepage_section_href(:wishlist, fallback: -> { route_defined?(:wishlist_path) ? wishlist_path : products_path }) } %>
+      <% end %>
+      <% nav_links << { key: :contact, label: "Contact", href: homepage_section_href(:contact, fallback: -> { "mailto:hello@banhang.io" }) } %>
       <nav class="mx-auto flex h-20 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 max-w-7xl" aria-label="Primary" data-controller="mobile-menu">
         <div class="flex items-center gap-4">
           <%= link_to root_path, class: "inline-flex items-center gap-2 text-2xl font-bold tracking-tight text-blue-600 transition hover:text-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white" do %>
@@ -53,11 +51,21 @@
             <span class="hidden sm:inline text-gray-900">BanHang</span>
           <% end %>
           <div class="hidden lg:flex items-center gap-1 text-sm font-medium text-gray-600">
-            <%= link_to "Home", root_path, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white #{current_page?(root_path) ? 'text-blue-600' : ''}", data: { turbo_prefetch: false } %>
-            <%= link_to "Products", products_path, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white #{current_page?(products_path) ? 'text-blue-600' : ''}", data: { turbo_prefetch: false } %>
-            <%= link_to "Features", features_href, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white", data: { turbo_prefetch: false } %>
-            <%= link_to "Testimonials", testimonials_href, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white", data: { turbo_prefetch: false } %>
-            <%= link_to "Contact", contact_href, class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white", data: { turbo_prefetch: false } %>
+            <% nav_links.each do |link| %>
+              <% active = case link[:key]
+                when :home
+                  current_page?(root_path)
+                when :products
+                  current_page?(products_path)
+                when :wishlist
+                  route_defined?(:wishlist_path) && current_page?(wishlist_path)
+                when :reviews
+                  route_defined?(:reviews_path) && current_page?(reviews_path)
+                else
+                  false
+                end %>
+              <%= link_to link[:label], link[:href], class: "rounded-full px-4 py-2 transition-colors hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white #{active ? 'text-blue-600' : ''}", data: { turbo_prefetch: false } %>
+            <% end %>
           </div>
         </div>
 
@@ -121,11 +129,21 @@
       <div id="primary-navigation" class="lg:hidden" data-mobile-menu-target="panel" hidden>
         <div class="space-y-6 border-t border-gray-200 bg-white px-4 pb-6 pt-4 shadow-lg">
           <div class="flex flex-col gap-2 text-base font-medium text-gray-700">
-            <%= link_to "Home", root_path, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600 #{current_page?(root_path) ? 'bg-blue-50 text-blue-600' : ''}", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
-            <%= link_to "Products", products_path, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600 #{current_page?(products_path) ? 'bg-blue-50 text-blue-600' : ''}", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
-            <%= link_to "Features", features_href, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
-            <%= link_to "Testimonials", testimonials_href, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
-            <%= link_to "Contact", contact_href, class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
+            <% nav_links.each do |link| %>
+              <% active = case link[:key]
+                when :home
+                  current_page?(root_path)
+                when :products
+                  current_page?(products_path)
+                when :wishlist
+                  route_defined?(:wishlist_path) && current_page?(wishlist_path)
+                when :reviews
+                  route_defined?(:reviews_path) && current_page?(reviews_path)
+                else
+                  false
+                end %>
+              <%= link_to link[:label], link[:href], class: "rounded-xl px-3 py-2 transition-colors hover:bg-blue-50 hover:text-blue-600 #{active ? 'bg-blue-50 text-blue-600' : ''}", data: { action: "click->mobile-menu#close", turbo_prefetch: false } %>
+            <% end %>
           </div>
           <form action="<%= products_path %>" method="get" class="flex items-center gap-2 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600" role="search">
             <label for="mobile-search" class="sr-only">Search products</label>

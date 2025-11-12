@@ -205,6 +205,142 @@
     </div>
   </section>
 
+  <section id="reviews" class="bg-gray-50 py-16 sm:py-20 lg:py-24">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.45fr)_minmax(0,0.55fr)] lg:items-center">
+        <div class="space-y-6" data-controller="reveal" data-reveal-threshold-value="0.15">
+          <p class="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">
+            <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            Khách hàng yêu thích
+          </p>
+          <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">Trải nghiệm mua sắm được đánh giá 5 sao</h2>
+          <p class="text-lg text-gray-600">
+            BanHang giúp các thương hiệu xây dựng lòng tin bằng quy trình thanh toán mượt mà, giao hàng nhanh và chăm sóc sau bán hàng tận tâm.
+          </p>
+          <div class="flex flex-wrap items-center gap-6 rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
+            <div class="flex items-center gap-2 text-yellow-400" aria-hidden="true">
+              <% 5.times do %>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 0 0 .95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.866 2.08a1 1 0 0 0-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.866-2.08a1 1 0 0 0-1.176 0l-2.866 2.08c-.785.57-1.84-.197-1.54-1.118l1.07-3.292a1 1 0 0 0-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 0 0 .951-.69z" />
+                </svg>
+              <% end %>
+            </div>
+            <dl class="grid grid-cols-2 gap-4 text-left text-sm text-gray-600">
+              <div>
+                <dt>Điểm hài lòng trung bình</dt>
+                <dd class="text-2xl font-semibold text-gray-900">4.9/5.0</dd>
+              </div>
+              <div>
+                <dt>Số lượng đánh giá</dt>
+                <dd class="text-2xl font-semibold text-gray-900">18.2K+</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+        <% reviews = [
+          {
+            name: "Lê Thuỳ Linh",
+            role: "Owner, Coco Décor",
+            quote: "“Bảng điều khiển đơn giản giúp tôi theo dõi mọi đánh giá và phản hồi khách hàng, từ đó cải thiện sản phẩm nhanh chóng.”",
+            avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=160&q=80",
+            rating: 5
+          },
+          {
+            name: "Phạm Quốc Huy",
+            role: "Co-founder, VietWear",
+            quote: "“Wishlist đồng bộ với CRM giúp đội marketing hiểu khách muốn gì và lên chiến dịch cá nhân hoá chuẩn xác.”",
+            avatar: "https://images.unsplash.com/photo-1546539782-6fc531453083?auto=format&fit=crop&w=160&q=80",
+            rating: 5
+          },
+          {
+            name: "Đặng Hà Phương",
+            role: "CMO, Zen Skincare",
+            quote: "“BanHang tự động gửi email mời đánh giá sau mua hàng nên tỷ lệ nhận phản hồi của chúng tôi tăng gấp đôi.”",
+            avatar: "https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=160&q=80",
+            rating: 5
+          }
+        ] %>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3" role="list" aria-label="Customer reviews">
+          <% reviews.each do |review| %>
+            <article class="flex h-full flex-col justify-between rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg" data-controller="reveal" data-reveal-threshold-value="0.1">
+              <div class="space-y-4">
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center text-yellow-400" aria-hidden="true">
+                    <% review[:rating].times do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 0 0 .95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.866 2.08a1 1 0 0 0-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.866-2.08a1 1 0 0 0-1.176 0l-2.866 2.08c-.785.57-1.84-.197-1.54-1.118l1.07-3.292a1 1 0 0 0-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 0 0 .951-.69z" />
+                      </svg>
+                    <% end %>
+                  </div>
+                  <span class="text-sm font-semibold text-gray-900"><%= format("%.1f", review[:rating]) %></span>
+                </div>
+                <p class="text-gray-700"><%= review[:quote] %></p>
+              </div>
+              <div class="mt-6 flex items-center gap-3">
+                <%= image_tag review[:avatar], alt: "Ảnh đại diện của #{review[:name]}", class: "h-12 w-12 rounded-full object-cover", loading: "lazy" %>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900"><%= review[:name] %></p>
+                  <p class="text-xs text-gray-500"><%= review[:role] %></p>
+                </div>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <% wishlist_image_url = "https://images.unsplash.com/photo-1607082350899-7e105aa886ae?auto=format&fit=crop&w=960&q=80" %>
+  <section id="wishlist" class="relative overflow-hidden bg-white py-16 sm:py-20 lg:py-24">
+    <div class="absolute inset-0 bg-gradient-to-br from-purple-50 via-blue-50 to-transparent"></div>
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+        <div class="space-y-6" data-controller="reveal" data-reveal-threshold-value="0.15">
+          <p class="inline-flex items-center gap-2 rounded-full bg-purple-100 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-purple-700">
+            <span class="inline-flex h-2 w-2 rounded-full bg-purple-500"></span>
+            Wishlist thông minh
+          </p>
+          <h2 class="text-3xl font-bold text-gray-900 sm:text-4xl">Giữ chân khách hàng với wishlist đa kênh</h2>
+          <p class="text-lg text-gray-600">
+            Cho phép khách lưu sản phẩm yêu thích, nhận thông báo giảm giá tự động và đồng bộ dữ liệu với chiến dịch marketing cá nhân hoá.
+          </p>
+          <% wishlist_features = [
+            "Đồng bộ wishlist giữa web, mobile và điểm bán offline",
+            "Nhắc khách khi sản phẩm giảm giá hoặc sắp hết hàng",
+            "Phân nhóm khách dựa trên sản phẩm yêu thích để chạy quảng cáo"
+          ] %>
+          <ul class="space-y-4">
+            <% wishlist_features.each do |feature| %>
+              <li class="flex items-start gap-3 text-sm text-gray-700">
+                <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3-3a1 1 0 0 1 1.414-1.414L8.75 11.586l6.543-6.543a1 1 0 0 1 1.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+                <span><%= feature %></span>
+              </li>
+            <% end %>
+          </ul>
+          <div class="flex flex-col gap-3 pt-4 sm:flex-row">
+            <%= link_to "Khám phá sản phẩm", products_path, class: "inline-flex items-center justify-center rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow transition-all duration-300 hover:-translate-y-0.5 hover:bg-blue-700" %>
+            <% wishlist_signup_path = route_defined?(:wishlist_path) ? wishlist_path : new_session_path %>
+            <%= link_to "Đăng nhập để lưu wishlist", wishlist_signup_path, class: "inline-flex items-center justify-center rounded-full border border-blue-200 px-6 py-3 text-sm font-semibold text-blue-600 transition-all duration-300 hover:bg-blue-50" %>
+          </div>
+        </div>
+        <div class="relative" data-controller="reveal" data-reveal-threshold-value="0.2">
+          <div class="relative overflow-hidden rounded-3xl bg-white p-2 shadow-2xl ring-1 ring-blue-100">
+            <div class="overflow-hidden rounded-2xl">
+              <%= image_tag wishlist_image_url, alt: "Khách hàng đang thêm sản phẩm vào wishlist", class: "h-full w-full object-cover", loading: "lazy" %>
+            </div>
+          </div>
+          <div class="pointer-events-none absolute -bottom-6 -left-6 hidden rounded-3xl bg-white/80 p-4 shadow-lg ring-1 ring-blue-100 sm:block">
+            <p class="text-xs font-semibold text-gray-600">72% khách quay lại mua trong 30 ngày</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="contact" class="relative overflow-hidden py-20">
     <div class="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
     <div class="absolute inset-0 opacity-40" aria-hidden="true">
