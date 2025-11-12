@@ -2,7 +2,7 @@
 
 <nav class="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-3 text-sm shadow-sm" aria-label="Pagination">
   <% frame_id = local_assigns[:frame] %>
-  <% data_attributes = { turbo_prefetch: false } %>
+  <% data_attributes = { turbo_prefetch: "false" } %>
   <% data_attributes[:turbo_frame] = frame_id if frame_id.present? %>
   <% current_page = pagy.page.to_i %>
 
