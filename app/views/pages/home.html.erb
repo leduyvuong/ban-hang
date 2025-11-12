@@ -1,5 +1,7 @@
-<% if modern_homepage? %>
+<% if modern_homepage? && homepage_variant == "modern" %>
   <%= render "pages/home_modern", featured_products: @featured_products, categories: @categories, newsletter_subscription: @newsletter_subscription %>
+<% elsif modern_homepage? && homepage_variant == "template_3" %>
+  <%= render "pages/home_template_3", featured_products: @featured_products, categories: @categories, newsletter_subscription: @newsletter_subscription %>
 <% else %>
   <%= render "pages/home_classic", newsletter_subscription: @newsletter_subscription %>
 <% end %>

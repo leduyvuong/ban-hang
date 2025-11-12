@@ -31,13 +31,29 @@
           { key: :products, label: "Products", href: products_path },
           { key: :features, label: "Features", href: homepage_section_href(:features, fallback: -> { products_path }) }
         ] %>
-      <% if modern_homepage_enabled? || route_defined?(:reviews_path) %>
-        <% nav_links << { key: :reviews, label: "Reviews", href: homepage_section_href(:reviews, fallback: -> { route_defined?(:reviews_path) ? reviews_path : products_path }) } %>
-      <% end %>
+      <% 
+        # For reviews: use dedicated route if available, otherwise use homepage section
+        reviews_href = if route_defined?(:reviews_path)
+          reviews_path
+        elsif modern_homepage_enabled?
+          homepage_section_href(:reviews, fallback: -> { products_path })
+        else
+          products_path
+        end
+        nav_links << { key: :reviews, label: "Reviews", href: reviews_href }
+      %>
       <% nav_links << { key: :testimonials, label: "Testimonials", href: homepage_section_href(:testimonials, fallback: -> { products_path }) } %>
-      <% if modern_homepage_enabled? || route_defined?(:wishlist_path) %>
-        <% nav_links << { key: :wishlist, label: "Wishlist", href: homepage_section_href(:wishlist, fallback: -> { route_defined?(:wishlist_path) ? wishlist_path : products_path }) } %>
-      <% end %>
+      <% 
+        # For wishlist: use dedicated route if available, otherwise use homepage section
+        wishlist_href = if route_defined?(:wishlist_path)
+          wishlist_path
+        elsif modern_homepage_enabled?
+          homepage_section_href(:wishlist, fallback: -> { products_path })
+        else
+          products_path
+        end
+        nav_links << { key: :wishlist, label: "Wishlist", href: wishlist_href }
+      %>
       <% nav_links << { key: :contact, label: "Contact", href: homepage_section_href(:contact, fallback: -> { "mailto:hello@banhang.io" }) } %>
       <nav class="mx-auto flex h-20 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 max-w-7xl" aria-label="Primary" data-controller="mobile-menu">
         <div class="flex items-center gap-4">

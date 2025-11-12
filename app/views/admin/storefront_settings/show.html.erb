@@ -14,6 +14,7 @@
 
   <% classic_selected = @shop.homepage_variant.to_s == "classic" %>
   <% modern_selected = @shop.homepage_variant.to_s == "modern" %>
+  <% template_three_selected = @shop.homepage_variant.to_s == "template_3" %>
 
   <section class="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
     <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
@@ -26,7 +27,7 @@
 
     <%= form_with model: @shop, url: admin_storefront_settings_path, method: :patch, local: true, class: "mt-8 space-y-8" do |form| %>
       <%= hidden_field_tag :shop_id, @shop.id if can_switch_between_shops? %>
-      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <label class="group flex h-full cursor-pointer flex-col justify-between rounded-3xl border-2 bg-white p-6 transition-all duration-300 hover:border-indigo-400 hover:shadow-lg <%= 'border-indigo-500 shadow-lg' if classic_selected %>">
           <div class="space-y-5">
             <div class="flex items-center justify-between">
@@ -62,6 +63,25 @@
             </ul>
           </div>
           <div class="mt-6 rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 p-4 text-center text-xs font-medium uppercase tracking-wide text-blue-600">Layout hiện đại</div>
+        </label>
+
+        <label class="group flex h-full cursor-pointer flex-col justify-between rounded-3xl border-2 bg-white p-6 transition-all duration-300 hover:border-amber-400 hover:shadow-lg <%= 'border-amber-500 shadow-lg' if template_three_selected %>">
+          <div class="space-y-5">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-2 text-base font-semibold text-slate-900">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">L</span>
+                Luxury template
+              </span>
+              <%= form.radio_button :homepage_variant, :template_3, class: "h-4 w-4 border-slate-300 text-amber-600 focus:ring-amber-500" %>
+            </div>
+            <p class="text-sm text-slate-500">Giao diện tối giản mang phong cách lifestyle cao cấp với hero toàn màn hình và showcase bất đối xứng.</p>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li class="flex items-center gap-2"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-600">1</span> Hiệu ứng parallax tinh tế và typography sang trọng.</li>
+              <li class="flex items-center gap-2"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-600">2</span> Lưới sản phẩm dạng masonry, testimonials và newsletter đồng bộ.</li>
+              <li class="flex items-center gap-2"><span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-600">3</span> Footer tối màu cao cấp với form đăng ký nhanh.</li>
+            </ul>
+          </div>
+          <div class="mt-6 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-amber-500/10 p-4 text-center text-xs font-medium uppercase tracking-wide text-amber-600">Layout sang trọng</div>
         </label>
       </div>
 
