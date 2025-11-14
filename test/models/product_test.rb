@@ -3,15 +3,20 @@
 require "test_helper"
 
 class ProductTest < ActiveSupport::TestCase
+  def setup
+    @owner = User.create!(name: "Owner", email: "owner@example.com", password: "password123", role: :shop_owner)
+    @shop = Shop.create!(name: "Test Shop", slug: "test-shop", status: :active, owner: @owner, homepage_variant: :classic)
+  end
+
   test "requires name and price" do
-    product = Product.new
+    product = Product.new(shop: @shop)
     assert_not product.valid?
     assert_includes product.errors[:name], "can't be blank"
     assert_includes product.errors[:price], "can't be blank"
   end
 
   test "price cannot be negative" do
-    product = Product.new(name: "Test", price: -1)
+    product = Product.new(name: "Test", price: -1, shop: @shop)
     assert_not product.valid?
     assert_includes product.errors[:price], "must be greater than or equal to 0"
   end
@@ -22,13 +27,15 @@ class ProductTest < ActiveSupport::TestCase
       name: "Lotus Flower Tea",
       description: "Fragrant lotus petals with calming aroma.",
       price: "12.50",
-      stock: 5
+      stock: 5,
+      shop: @shop
     )
     Product.create!(
       name: "Coffee Beans",
       description: "Bold roast from the central highlands.",
       price: "18.00",
-      stock: 10
+      stock: 10,
+      shop: @shop
     )
 
     result = Product.matching_query("lotus")
@@ -38,8 +45,8 @@ class ProductTest < ActiveSupport::TestCase
 
   test "with_stock_status filters in-stock and out-of-stock items" do
     Product.delete_all
-    in_stock = Product.create!(name: "Bamboo Chopsticks", price: "4.00", stock: 3)
-    Product.create!(name: "Vintage Poster", price: "15.00", stock: 0)
+    in_stock = Product.create!(name: "Bamboo Chopsticks", price: "4.00", stock: 3, shop: @shop)
+    Product.create!(name: "Vintage Poster", price: "15.00", stock: 0, shop: @shop)
 
     records = Product.with_stock_status("in_stock")
     assert_includes records, in_stock
@@ -52,8 +59,8 @@ class ProductTest < ActiveSupport::TestCase
 
   test "ordered_by_param sorts products by accepted keys" do
     Product.delete_all
-    cheaper = Product.create!(name: "Ceramic Cup", price: "9.00", stock: 5)
-    pricier = Product.create!(name: "Ceramic Teapot", price: "35.00", stock: 5)
+    cheaper = Product.create!(name: "Ceramic Cup", price: "9.00", stock: 5, shop: @shop)
+    pricier = Product.create!(name: "Ceramic Teapot", price: "35.00", stock: 5, shop: @shop)
 
     price_desc = Product.ordered_by_param("price_high_low").first
     assert_equal pricier, price_desc

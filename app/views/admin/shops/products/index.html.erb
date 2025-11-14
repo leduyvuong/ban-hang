@@ -1,0 +1,36 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900"><%= @shop.name %> products</h1>
+      <p class="text-sm text-slate-500">Complete catalogue visible to administrators.</p>
+    </div>
+    <%= link_to "View storefront", shop_products_path(@shop), class: "inline-flex items-center gap-2 rounded-full border border-indigo-200 px-4 py-2 text-sm font-semibold text-indigo-600 transition hover:border-indigo-300 hover:text-indigo-700" %>
+  </div>
+
+  <% if @products.present? %>
+    <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Name</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">Category</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Price</th>
+            <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">Stock</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          <% @products.each do |product| %>
+            <tr>
+              <td class="px-4 py-3 text-sm font-medium text-slate-900"><%= product.name %></td>
+              <td class="px-4 py-3 text-sm text-slate-500"><%= product.category&.name || "—" %></td>
+              <td class="px-4 py-3 text-right text-sm font-semibold text-indigo-600"><%= format_money(product.price) %></td>
+              <td class="px-4 py-3 text-right text-sm text-slate-500"><%= product.stock %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p class="text-sm text-slate-500">No products found for this shop.</p>
+  <% end %>
+</div>

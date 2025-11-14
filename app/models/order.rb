@@ -4,6 +4,7 @@ require "securerandom"
 
 class Order < ApplicationRecord
   belongs_to :user, optional: true
+  belongs_to :shop
   has_many :order_items, dependent: :destroy
 
   enum status: {
@@ -30,6 +31,7 @@ class Order < ApplicationRecord
   before_validation :assign_order_number, on: :create
 
   validates :order_number, presence: true, uniqueness: true
+  validates :shop, presence: true
   validates :total, numericality: { greater_than_or_equal_to: 0 }
   validates :total_local_amount, numericality: { greater_than_or_equal_to: 0 }
   validates :currency, presence: true

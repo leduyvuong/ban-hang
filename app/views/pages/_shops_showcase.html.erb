@@ -1,0 +1,27 @@
+<% if shops.present? %>
+  <section class="space-y-6">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <h2 class="text-2xl font-semibold text-gray-900">Featured shops</h2>
+      <p class="text-sm text-gray-500">Discover independent businesses powered by BanHang.</p>
+    </div>
+    <%= link_to "Browse all shops", shops_path, class: "inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 transition hover:text-indigo-500" %>
+  </div>
+
+  <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+    <% shops.each do |shop| %>
+      <article class="flex flex-col justify-between rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+        <div class="space-y-3">
+          <h3 class="text-xl font-semibold text-gray-900"><%= link_to shop.name, shop_path(shop), class: "hover:text-indigo-600" %></h3>
+          <p class="text-sm text-gray-500">Managed by <%= shop.owner&.name || "Unknown owner" %></p>
+          <p class="text-sm text-gray-600">Status: <span class="font-medium text-emerald-600"><%= shop.status.humanize %></span></p>
+        </div>
+        <div class="mt-6 flex items-center justify-between text-sm text-gray-500">
+          <span><%= pluralize(shop.products.size, "product") %></span>
+          <%= link_to "View shop", shop_path(shop), class: "inline-flex items-center gap-2 text-indigo-600" %>
+        </div>
+      </article>
+    <% end %>
+  </div>
+  </section>
+<% end %>

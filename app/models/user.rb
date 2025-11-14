@@ -5,9 +5,12 @@ require "digest"
 class User < ApplicationRecord
   has_secure_password
 
-  enum role: { customer: 0, admin: 1 }, _default: :customer
+  enum role: { customer: 0, shop_owner: 1, admin: 2 }, _default: :customer
 
+  has_one :owned_shop, class_name: "Shop", foreign_key: :owner_id, dependent: :destroy, inverse_of: :owner
   belongs_to :shop, optional: true
+  has_many :shop_memberships, class_name: "ShopUser", dependent: :destroy
+  has_many :shops, through: :shop_memberships
   has_many :orders, dependent: :nullify
   has_many :conversation_participants, dependent: :destroy, inverse_of: :user
   has_many :conversations, through: :conversation_participants
@@ -26,7 +29,9 @@ class User < ApplicationRecord
 
   scope :with_reset_token, ->(token) { where(reset_password_token: token) }
   scope :customers, -> { where(role: roles[:customer]) }
-  scope :for_shop, ->(shop) { where(shop: shop) }
+  scope :for_shop, lambda { |shop|
+    joins(:shop_memberships).where(shop_users: { shop_id: shop }).distinct
+  }
   scope :search, lambda { |term|
     return all if term.blank?
 
@@ -98,10 +103,11 @@ class User < ApplicationRecord
     blocked_at.present?
   end
 
-  def can_access_feature?(feature_slug)
-    return true if shop.blank?
+  def can_access_feature?(feature_slug, shop: nil)
+    target_shop = shop || owned_shop || shops.first
+    return true if target_shop.blank?
 
-    shop.feature_unlocked?(feature_slug)
+    target_shop.feature_unlocked?(feature_slug)
   end
 
   def orders_count

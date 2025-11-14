@@ -4,6 +4,7 @@ require "securerandom"
 require "bigdecimal"
 
 class Product < ApplicationRecord
+  belongs_to :shop
   belongs_to :category, optional: true
   has_one_attached :image
   has_one :product_discount, dependent: :destroy
@@ -21,6 +22,7 @@ class Product < ApplicationRecord
   validates :price_currency, presence: true
   validates :price_local_amount, numericality: { greater_than_or_equal_to: 0 }
   validates :slug, presence: true, uniqueness: { case_sensitive: false }
+  validates :shop, presence: true
   validates :short_description, length: { maximum: 180 }, allow_blank: true
   validate :acceptable_image
 
@@ -76,10 +78,16 @@ class Product < ApplicationRecord
     order(order_clause)
   end
 
-  def self.find_by_slug_or_id!(identifier)
-    find_by!(slug: identifier)
+  scope :for_shop, lambda { |shop|
+    where(shop_id: shop)
+  }
+
+  def self.find_by_slug_or_id!(identifier, shop: nil)
+    relation = shop.present? ? where(shop_id: shop) : all
+
+    relation.find_by!(slug: identifier)
   rescue ActiveRecord::RecordNotFound
-    find(identifier)
+    relation.find(identifier)
   end
 
   def to_param
@@ -177,7 +185,10 @@ class Product < ApplicationRecord
     candidate = base_slug
     counter = 2
 
-    while self.class.unscoped.where.not(id: id).exists?(slug: candidate)
+    relation = self.class.unscoped
+    relation = relation.where(shop_id: shop_id) if shop_id.present?
+
+    while relation.where.not(id: id).exists?(slug: candidate)
       candidate = "#{base_slug}-#{counter}"
       counter += 1
     end

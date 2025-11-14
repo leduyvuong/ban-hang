@@ -32,7 +32,11 @@ class ProductsController < ApplicationController
       canonical: canonical_listing_url
     )
 
-    base_scope = Product.includes(:category, { product_discount: :discount }, image_attachment: { blob: :variant_records })
+    base_scope = if current_shop.present?
+      Product.includes(:category, { product_discount: :discount }, image_attachment: { blob: :variant_records }).for_shop(current_shop)
+    else
+      Product.none
+    end
     scoped_products = apply_filters(base_scope)
     freshness_token = scoped_products.reorder(nil).maximum(:updated_at)&.to_i
     @pagy, @products = pagy(scoped_products, items: 12, page: sanitized_page)
@@ -119,12 +123,17 @@ class ProductsController < ApplicationController
   end
 
   def set_product
-    @product = Product.includes(:category, { product_discount: :discount }, image_attachment: { blob: :variant_records }).find_by_slug_or_id!(params[:id])
+    @product = Product
+      .includes(:category, { product_discount: :discount }, image_attachment: { blob: :variant_records })
+      .find_by_slug_or_id!(params[:id], shop: current_shop)
   end
 
   def load_categories
-    @categories = Rails.cache.fetch("product_filters/categories", expires_in: 30.minutes) do
-      Category.order(:name).to_a
+    return @categories = [] if current_shop.blank?
+
+    cache_key = ["product_filters/categories", current_shop.id]
+    @categories = Rails.cache.fetch(cache_key, expires_in: 30.minutes) do
+      Category.for_shop(current_shop).order(:name).to_a
     end
   end
 

@@ -28,7 +28,7 @@ module Admin
       @shop = if can_switch_between_shops?
                 find_shop_from_params || Shop.order(:name).first
               else
-                current_admin_user&.shop || current_user&.shop || Shop.first
+                current_admin_user&.shop || current_user&.owned_shop || current_user&.shops&.first || Shop.first
               end
     end
 

@@ -7,16 +7,36 @@ class Shop < ApplicationRecord
     template_3: "template_3"
   }, _suffix: true
 
+  enum status: {
+    draft: "draft",
+    active: "active",
+    suspended: "suspended"
+  }, _default: "draft"
+
+  belongs_to :owner, class_name: "User", inverse_of: :owned_shop
+
   has_many :shop_features, dependent: :destroy
   has_many :features, through: :shop_features
   has_many :audit_logs, dependent: :destroy
   has_many :admin_users
-  has_many :users, dependent: :nullify
+  has_many :shop_users, dependent: :destroy
+  has_many :staff_members, through: :shop_users, source: :user
+  has_many :products, dependent: :destroy
+  has_many :categories, dependent: :destroy
+  has_many :orders, dependent: :nullify
 
   validates :name, presence: true, length: { maximum: 200 }
   validates :slug, presence: true, uniqueness: true, length: { maximum: 200 }
+  validates :status, presence: true
+  validates :owner, presence: true
 
   before_validation :normalize_slug
+
+  scope :publicly_visible, -> { active.order(:name) }
+
+  def to_param
+    slug.presence || super
+  end
 
   def feature_unlocked?(feature_slug)
     Rails.cache.fetch(feature_cache_key(feature_slug), expires_in: 1.hour) do

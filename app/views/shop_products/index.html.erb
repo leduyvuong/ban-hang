@@ -1,0 +1,45 @@
+<main class="mx-auto max-w-6xl space-y-8 px-4 py-10">
+  <header class="space-y-3">
+    <p class="text-sm font-semibold uppercase tracking-wide text-indigo-600">Products</p>
+    <h1 class="text-3xl font-bold text-gray-900"><%= @shop.name %></h1>
+    <p class="text-gray-600">Showing products available in this shop.</p>
+    <% if @selected_category.present? %>
+      <p class="text-sm text-indigo-600">Filtered by category: <%= @selected_category.name %></p>
+    <% end %>
+  </header>
+
+  <% if @categories.present? %>
+    <nav class="flex flex-wrap gap-3">
+      <% @categories.each do |category| %>
+        <% active = @selected_category&.id == category.id %>
+        <% css = ["inline-flex items-center rounded-full px-4 py-2 text-sm transition", active ? "border border-indigo-400 text-indigo-600" : "border border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600"] %>
+        <%= link_to category.name, shop_products_path(@shop, category: category.slug), class: css.join(" ") %>
+      <% end %>
+    </nav>
+  <% end %>
+
+  <% if @products.present? %>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <% @products.each do |product| %>
+        <% thumb = product.thumbnail(width: 600, height: 360) %>
+        <article class="flex h-full flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+          <div class="relative h-48 bg-gray-100">
+            <% if thumb.present? %>
+              <%= image_tag thumb, alt: product.name, class: "h-full w-full object-cover" %>
+            <% end %>
+          </div>
+          <div class="flex flex-1 flex-col gap-3 p-5">
+            <h3 class="text-lg font-semibold text-gray-900"><%= link_to product.name, product_path(product), class: "hover:text-indigo-600" %></h3>
+            <p class="text-sm text-gray-500"><%= truncate(product.short_description.presence || product.description, length: 100) %></p>
+            <div class="mt-auto flex items-center justify-between">
+              <p class="text-base font-semibold text-indigo-600"><%= format_money(product.discounted? ? product.discounted_price : product.price) %></p>
+              <%= link_to "View", product_path(product), class: "text-sm font-semibold text-indigo-600" %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-sm text-gray-500">No products available in this shop yet.</p>
+  <% end %>
+</main>

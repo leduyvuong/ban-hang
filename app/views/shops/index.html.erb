@@ -1,0 +1,26 @@
+<main class="mx-auto max-w-6xl space-y-10 px-4 py-10">
+  <header class="space-y-3 text-center">
+    <h1 class="text-3xl font-bold text-gray-900">Discover shops</h1>
+    <p class="text-gray-600">Browse independent storefronts and explore their latest products.</p>
+  </header>
+
+  <% if @shops.present? %>
+    <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <% @shops.each do |shop| %>
+        <article class="flex h-full flex-col justify-between rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+          <div class="space-y-3">
+            <h2 class="text-xl font-semibold text-gray-900"><%= link_to shop.name, shop_path(shop), class: "hover:text-indigo-600" %></h2>
+            <p class="text-sm text-gray-500">Owner: <%= shop.owner&.name || "Unknown" %></p>
+            <p class="text-sm text-gray-500">Status: <span class="font-medium text-emerald-600"><%= shop.status.humanize %></span></p>
+          </div>
+          <div class="mt-6 space-y-3">
+            <p class="text-sm text-gray-500"><%= pluralize(shop.products.size, "product") %> · <%= pluralize(shop.categories.size, "category") %></p>
+            <%= link_to "View products", shop_products_path(shop), class: "inline-flex items-center gap-2 text-sm font-semibold text-indigo-600" %>
+          </div>
+        </article>
+      <% end %>
+    </section>
+  <% else %>
+    <p class="text-center text-sm text-gray-500">No shops available yet.</p>
+  <% end %>
+</main>
